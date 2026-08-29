@@ -26,7 +26,7 @@ apt-get install -y steam steam-launcher steam:i386 2>/dev/null || true
 apt-get install -y lutris 2>/dev/null || true
 
 # Install Wine
-apt-get install -y wine wine32 wine64 winetricks wine-gecko wine-mono 2>/dev/null || true
+apt-get install -y wine libwine libwine winetricks wine-gecko wine-mono 2>/dev/null || true
 
 # ============================================
 # 2. CONFIGURE WINE
@@ -59,7 +59,7 @@ Filesystem = win32
 Enabled = 1
 WINEOF
 
-chown -R "$MAXREGNER_USER" "$MAXREGNER_USER" /home/$MAXREGNER_USER/.wine
+chown -R ${MAXREGNER_USER}:${MAXREGNER_USER} /home/$MAXREGNER_USER/.wine
 
 # ============================================
 # 3. CONFIGURE STEAM
@@ -91,7 +91,7 @@ cat > /home/$MAXREGNER_USER/.steam/steam/SteamAppUserData.vdf << 'STEAMOF'
 }
 STEAMOF
 
-chown -R "$MAXREGNER_USER" "$MAXREGNER_USER" /home/$MAXREGNER_USER/.steam
+chown -R ${MAXREGNER_USER}:${MAXREGNER_USER} /home/$MAXREGNER_USER/.steam
 
 # ============================================
 # 4. INSTALL GAMING UTILITIES

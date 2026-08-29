@@ -1,7 +1,0 @@
-#!/bin/bash
-
-set -e
-
-# MaxRegner user configuration
-
-# Vanilla OS hook - kept for compatibility
