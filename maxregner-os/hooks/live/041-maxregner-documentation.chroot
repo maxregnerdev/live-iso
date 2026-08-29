@@ -1,9 +1,11 @@
 #!/bin/bash
-# MaxRegner OS - Documentation and Help System Configuration Hook
-# Configures comprehensive documentation support
 
 set -e
 
+# MaxRegner user configuration
+
+# MaxRegner OS - Documentation and Help System Configuration Hook
+# Configures comprehensive documentation support
 echo "========================================"
 echo "MaxRegner OS - Documentation Hook"
 echo "========================================"
@@ -450,10 +452,7 @@ echo "[5/5] Creating help system..."
 # Create help command
 mkdir -p /usr/local/bin
 cat > /usr/local/bin/maxregner-help << 'MAXHELP'
-#!/bin/bash
 # MaxRegner OS Help System
-
-set -e
 
 if [ -z "$1" ]; then
     echo "=========================================="

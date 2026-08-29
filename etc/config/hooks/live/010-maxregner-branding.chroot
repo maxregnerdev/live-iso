@@ -1,9 +1,11 @@
 #!/bin/bash
-# MaxRegner OS - Complete Branding Hook
-# Applies all MaxRegner OS branding
 
 set -e
 
+# MaxRegner user configuration
+
+# MaxRegner OS - Complete Branding Hook
+# Applies all MaxRegner OS branding
 echo "========================================"
 echo "MaxRegner OS - Complete Branding Hook"
 echo "========================================"
@@ -275,7 +277,6 @@ EOF
 
 # Create Plymouth script
 cat > /usr/share/plymouth/themes/maxregner/maxregner-script <<'PLYSCRIPT'
-#!/bin/bash
 
 plymouth set-refresh-rate 60
 

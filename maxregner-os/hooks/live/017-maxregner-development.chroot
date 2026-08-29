@@ -1,9 +1,11 @@
 #!/bin/bash
-# MaxRegner OS - Development Tools Configuration Hook
-# Configures complete development environment
 
 set -e
 
+# MaxRegner user configuration
+
+# MaxRegner OS - Development Tools Configuration Hook
+# Configures complete development environment
 echo "========================================"
 echo "MaxRegner OS - Development Tools Hook"
 echo "========================================"

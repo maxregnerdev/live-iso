@@ -1,9 +1,11 @@
 #!/bin/bash
-# MaxRegner OS - Additional Power Saving Configuration Hook
-# Configures advanced power management features
 
 set -e
 
+# MaxRegner user configuration
+
+# MaxRegner OS - Additional Power Saving Configuration Hook
+# Configures advanced power management features
 echo "========================================"
 echo "MaxRegner OS - Power Saving Hook"
 echo "========================================"
@@ -184,7 +186,6 @@ echo "[5/5] Configuring power profiles..."
 # Create power profile scripts
 mkdir -p /usr/local/bin/maxregner-power
 cat > /usr/local/bin/maxregner-power/performance << 'POWERPROFILE'
-#!/bin/bash
 # MaxRegner OS Performance Power Profile
 
 echo "Activating Performance Power Profile..."
@@ -218,7 +219,6 @@ echo "Performance profile activated!"
 POWERPROFILE
 
 cat > /usr/local/bin/maxregner-power/powersave << 'POWERPROFILE'
-#!/bin/bash
 # MaxRegner OS Powersave Power Profile
 
 echo "Activating Powersave Power Profile..."
@@ -251,7 +251,6 @@ echo "Powersave profile activated!"
 POWERPROFILE
 
 cat > /usr/local/bin/maxregner-power/balanced << 'POWERPROFILE'
-#!/bin/bash
 # MaxRegner OS Balanced Power Profile
 
 echo "Activating Balanced Power Profile..."

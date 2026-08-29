@@ -1,9 +1,14 @@
 #!/bin/bash
-# MaxRegner OS - Applications Configuration Hook
-# Configures all installed applications
 
 set -e
 
+# MaxRegner user configuration
+MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
+
+MAXREGNER_HOME="/home/$MAXREGNER_USER"
+
+# MaxRegner OS - Applications Configuration Hook
+# Configures all installed applications
 echo "========================================"
 echo "MaxRegner OS - Applications Configuration Hook"
 echo "========================================"
@@ -12,9 +17,6 @@ echo "========================================"
 if [ -f /working_dir/maxregner-os/config/terraform-maxregner.conf ]; then
     source /working_dir/maxregner-os/config/terraform-maxregner.conf
 fi
-
-MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
-MAXREGNER_HOME="/home/$MAXREGNER_USER"
 
 # ============================================
 # 1. FIREFOX CONFIGURATION
@@ -57,7 +59,7 @@ user_pref("browser.download.dir", "$MAXREGNER_HOME/Downloads");
 user_pref("browser.helperApps.neverAsk.saveToDisk", "application/pdf, application/x-pdf, application/octet-stream");
 EOF
 
-chown -R "$MAXREGNER_USER:$MAXREGNER_USER" "$MAXREGNER_HOME/.mozilla"
+chown -R "$MAXREGNER_USER" "$MAXREGNER_USER" "$MAXREGNER_HOME/.mozilla"
 
 # ============================================
 # 2. LIBREOFFICE CONFIGURATION
@@ -85,8 +87,8 @@ cat > "$MAXREGNER_HOME/.local/share/templates/MaxRegner Template.ott" <<EOF
 PK
 EOF
 
-chown -R "$MAXREGNER_USER:$MAXREGNER_USER" "$MAXREGNER_HOME/.config/libreoffice"
-chown -R "$MAXREGNER_USER:$MAXREGNER_USER" "$MAXREGNER_HOME/.local"
+chown -R "$MAXREGNER_USER" "$MAXREGNER_USER" "$MAXREGNER_HOME/.config/libreoffice"
+chown -R "$MAXREGNER_USER" "$MAXREGNER_USER" "$MAXREGNER_HOME/.local"
 
 # ============================================
 # 3. TERMINAL CONFIGURATION
@@ -137,7 +139,7 @@ if [ -f /usr/bin/maxregner-welcome ]; then
 fi
 BASHEOF
 
-chown "$MAXREGNER_USER:$MAXREGNER_USER" "$MAXREGNER_HOME/.bashrc"
+chown "$MAXREGNER_USER" "$MAXREGNER_USER" "$MAXREGNER_HOME/.bashrc"
 
 # ============================================
 # 4. FILE MANAGER CONFIGURATION
@@ -205,8 +207,8 @@ Hidden=true
 X-GNOME-Autostart-Delay=60
 EOF
 
-chown -R "$MAXREGNER_USER:$MAXREGNER_USER" "$MAXREGNER_HOME/.local"
-chown -R "$MAXREGNER_USER:$MAXREGNER_USER" "$MAXREGNER_HOME/.config"
+chown -R "$MAXREGNER_USER" "$MAXREGNER_USER" "$MAXREGNER_HOME/.local"
+chown -R "$MAXREGNER_USER" "$MAXREGNER_USER" "$MAXREGNER_HOME/.config"
 
 # ============================================
 # FINAL CLEANUP

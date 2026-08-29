@@ -1,9 +1,11 @@
 #!/bin/bash
-# MaxRegner OS - Error Reporting Configuration Hook
-# Configures comprehensive error reporting system
 
 set -e
 
+# MaxRegner user configuration
+
+# MaxRegner OS - Error Reporting Configuration Hook
+# Configures comprehensive error reporting system
 echo "========================================"
 echo "MaxRegner OS - Error Reporting Hook"
 echo "========================================"
@@ -85,7 +87,6 @@ mkdir -p /etc/apport/pre-hook.d
 mkdir -p /etc/apport/post-hook.d
 
 cat > /etc/apport/pre-hook.d/maxregner << 'APPORTHOOK'
-#!/bin/bash
 # MaxRegner OS Apport Pre-Hook
 
 # Log the crash
@@ -117,7 +118,6 @@ APPORTHOOK
 chmod +x /etc/apport/pre-hook.d/maxregner
 
 cat > /etc/apport/post-hook.d/maxregner << 'APPORTPOSTHOOK'
-#!/bin/bash
 # MaxRegner OS Apport Post-Hook
 
 # Notify system administrator
@@ -248,7 +248,6 @@ LOGWATCHCONF
 # Create custom logwatch service
 mkdir -p /etc/logwatch/scripts/services
 cat > /etc/logwatch/scripts/services/maxregner << 'LOGWATCHSERVICE'
-#!/bin/bash
 # MaxRegner OS Logwatch Service
 
 # Check MaxRegner logs
@@ -303,10 +302,7 @@ echo "[5/5] Configuring error notification..."
 # Create error notification script
 mkdir -p /usr/local/bin
 cat > /usr/local/bin/maxregner-error-notify << 'ERRORNOTIFY'
-#!/bin/bash
 # MaxRegner OS Error Notification Script
-
-set -e
 
 # Check for new errors
 ERROR_LOG="/var/log/maxregner/errors.log"

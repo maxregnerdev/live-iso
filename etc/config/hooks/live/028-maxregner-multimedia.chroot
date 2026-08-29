@@ -1,14 +1,14 @@
-
-# MaxRegner user configuration
-MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
-MAXREGNER_HOME="/home/$MAXREGNER_USER"
-
 #!/bin/bash
-# MaxRegner OS - Multimedia Configuration Hook
-# Configures complete multimedia support
 
 set -e
 
+# MaxRegner user configuration
+MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
+
+MAXREGNER_HOME="/home/$MAXREGNER_USER"
+
+# MaxRegner OS - Multimedia Configuration Hook
+# Configures complete multimedia support
 echo "========================================"
 echo "MaxRegner OS - Multimedia Hook"
 echo "========================================"
@@ -242,7 +242,7 @@ keep-open=yes
 heartbeat-cmd="echo 'MaxRegner OS MPV Heartbeat'"
 MPVCONF
 
-chown -R "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/mpv
+chown -R "$MAXREGNER_USER" "$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/mpv
 
 echo ""
 echo "========================================"

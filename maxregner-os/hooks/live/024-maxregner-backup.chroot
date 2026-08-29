@@ -1,9 +1,11 @@
 #!/bin/bash
-# MaxRegner OS - Backup System Configuration Hook
-# Configures comprehensive backup solutions
 
 set -e
 
+# MaxRegner user configuration
+
+# MaxRegner OS - Backup System Configuration Hook
+# Configures comprehensive backup solutions
 echo "========================================"
 echo "MaxRegner OS - Backup System Hook"
 echo "========================================"
@@ -322,10 +324,7 @@ chmod 775 /var/backups/*
 # Create backup scripts
 mkdir -p /usr/local/bin/maxregner-backup
 cat > /usr/local/bin/maxregner-backup/daily.sh << 'BACKUPSCRIPT'
-#!/bin/bash
 # MaxRegner OS Daily Backup Script
-
-set -e
 
 echo "Starting daily backup..."
 

@@ -1,9 +1,11 @@
 #!/bin/bash
-# MaxRegner OS - Performance Profiles Configuration Hook
-# Configures comprehensive performance optimization profiles
 
 set -e
 
+# MaxRegner user configuration
+
+# MaxRegner OS - Performance Profiles Configuration Hook
+# Configures comprehensive performance optimization profiles
 echo "========================================"
 echo "MaxRegner OS - Performance Profiles Hook"
 echo "========================================"
@@ -168,10 +170,7 @@ SERVERPROFILE
 echo "[3/5] Creating profile switching script..."
 
 cat > /usr/local/bin/maxregner-performance/switch-profile << 'SWITCHPROFILE'
-#!/bin/bash
 # MaxRegner OS Performance Profile Switcher
-
-set -e
 
 PROFILE_DIR="/etc/maxregner/performance"
 CURRENT_PROFILE_FILE="/etc/maxregner/performance/current_profile"
@@ -248,10 +247,7 @@ chmod +x /usr/local/bin/maxregner-performance/switch-profile
 echo "[4/5] Creating performance monitor..."
 
 cat > /usr/local/bin/maxregner-performance/monitor << 'PERFMON'
-#!/bin/bash
 # MaxRegner OS Performance Monitor
-
-set -e
 
 CURRENT_PROFILE_FILE="/etc/maxregner/performance/current_profile"
 
@@ -320,10 +316,7 @@ chmod +x /usr/local/bin/maxregner-performance/monitor
 echo "[5/5] Creating performance optimization script..."
 
 cat > /usr/local/bin/maxregner-performance/optimize << 'PERFOPT'
-#!/bin/bash
 # MaxRegner OS Performance Optimization Script
-
-set -e
 
 echo "========================================"
 echo "MaxRegner OS Performance Optimization"

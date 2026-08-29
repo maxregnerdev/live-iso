@@ -1,9 +1,11 @@
 #!/bin/bash
-# MaxRegner OS - Additional Packages Installation Hook
-# This hook installs additional packages from the MaxRegner repository
 
 set -e
 
+# MaxRegner user configuration
+
+# MaxRegner OS - Additional Packages Installation Hook
+# This hook installs additional packages from the MaxRegner repository
 echo "========================================"
 echo "MaxRegner OS - Packages Installation Hook"
 echo "========================================"

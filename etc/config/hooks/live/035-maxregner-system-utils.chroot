@@ -1,14 +1,14 @@
-
-# MaxRegner user configuration
-MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
-MAXREGNER_HOME="/home/$MAXREGNER_USER"
-
 #!/bin/bash
-# MaxRegner OS - System Utilities Configuration Hook
-# Configures comprehensive system utility support
 
 set -e
 
+# MaxRegner user configuration
+MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
+
+MAXREGNER_HOME="/home/$MAXREGNER_USER"
+
+# MaxRegner OS - System Utilities Configuration Hook
+# Configures comprehensive system utility support
 echo "========================================"
 echo "MaxRegner OS - System Utilities Hook"
 echo "========================================"
@@ -88,7 +88,7 @@ custom_ascii="
 "
 NEOFETCHCONF
 
-chown -R "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/neofetch
+chown -R "$MAXREGNER_USER" "$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/neofetch
 
 # ============================================
 # 3. CONFIGURE INXI
@@ -127,7 +127,7 @@ cat > /home/$MAXREGNER_USER/.config/inxi/inxi.conf << 'INXICONF'
 --extra=1
 INXICONF
 
-chown -R "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/inxi
+chown -R "$MAXREGNER_USER" "$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/inxi
 
 # ============================================
 # 4. CONFIGURE SENSORS
@@ -203,7 +203,6 @@ echo "[5/5] Configuring system scripts..."
 # Create system utility scripts
 mkdir -p /usr/local/bin/maxregner-utils
 cat > /usr/local/bin/maxregner-utils/system-info << 'SYSINFO'
-#!/bin/bash
 # MaxRegner OS System Information Script
 
 echo "========================================"
@@ -264,7 +263,6 @@ echo "========================================"
 SYSINFO
 
 cat > /usr/local/bin/maxregner-utils/system-monitor << 'SYSMON'
-#!/bin/bash
 # MaxRegner OS System Monitor Script
 
 # Check if running as root

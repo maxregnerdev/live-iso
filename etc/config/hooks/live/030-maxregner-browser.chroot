@@ -1,14 +1,14 @@
-
-# MaxRegner user configuration
-MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
-MAXREGNER_HOME="/home/$MAXREGNER_USER"
-
 #!/bin/bash
-# MaxRegner OS - Browser Configuration Hook
-# Configures web browsers with MaxRegner settings
 
 set -e
 
+# MaxRegner user configuration
+MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
+
+MAXREGNER_HOME="/home/$MAXREGNER_USER"
+
+# MaxRegner OS - Browser Configuration Hook
+# Configures web browsers with MaxRegner settings
 echo "========================================"
 echo "MaxRegner OS - Browser Hook"
 echo "========================================"
@@ -121,7 +121,7 @@ user_pref("app.update.silent", true);
 user_pref("browser.aboutConfig.showProfile", true);
 FFUSERJS
 
-chown -R "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.mozilla
+chown -R "$MAXREGNER_USER" "$MAXREGNER_USER" /home/$MAXREGNER_USER/.mozilla
 
 # ============================================
 # 3. CONFIGURE CHROMIUM
@@ -241,7 +241,7 @@ cat > /home/$MAXREGNER_USER/.config/chromium/Default/Preferences << 'CHROMIUMPRE
 }
 CHROMIUMPREFS
 
-chown -R "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/chromium
+chown -R "$MAXREGNER_USER" "$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/chromium
 
 # ============================================
 # 4. CONFIGURE BROWSER EXTENSIONS

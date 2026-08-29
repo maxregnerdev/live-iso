@@ -1,9 +1,11 @@
 #!/bin/bash
-# MaxRegner OS - Power Management Configuration Hook
-# Configures power saving and performance settings
 
 set -e
 
+# MaxRegner user configuration
+
+# MaxRegner OS - Power Management Configuration Hook
+# Configures power saving and performance settings
 echo "========================================"
 echo "MaxRegner OS - Power Management Hook"
 echo "========================================"

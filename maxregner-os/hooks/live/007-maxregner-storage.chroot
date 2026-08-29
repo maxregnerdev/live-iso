@@ -1,9 +1,11 @@
 #!/bin/bash
-# MaxRegner OS - Storage Configuration Hook
-# Configures all storage-related settings
 
 set -e
 
+# MaxRegner user configuration
+
+# MaxRegner OS - Storage Configuration Hook
+# Configures all storage-related settings
 echo "========================================"
 echo "MaxRegner OS - Storage Configuration Hook"
 echo "========================================"

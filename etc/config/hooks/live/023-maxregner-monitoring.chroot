@@ -1,9 +1,11 @@
 #!/bin/bash
-# MaxRegner OS - System Monitoring Configuration Hook
-# Configures comprehensive system monitoring
 
 set -e
 
+# MaxRegner user configuration
+
+# MaxRegner OS - System Monitoring Configuration Hook
+# Configures comprehensive system monitoring
 echo "========================================"
 echo "MaxRegner OS - Monitoring Hook"
 echo "========================================"

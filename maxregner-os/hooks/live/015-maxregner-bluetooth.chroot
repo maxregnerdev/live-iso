@@ -1,9 +1,11 @@
 #!/bin/bash
-# MaxRegner OS - Bluetooth Configuration Hook
-# Configures Bluetooth for optimal performance
 
 set -e
 
+# MaxRegner user configuration
+
+# MaxRegner OS - Bluetooth Configuration Hook
+# Configures Bluetooth for optimal performance
 echo "========================================"
 echo "MaxRegner OS - Bluetooth Configuration Hook"
 echo "========================================"

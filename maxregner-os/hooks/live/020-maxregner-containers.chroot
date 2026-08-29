@@ -1,9 +1,11 @@
 #!/bin/bash
-# MaxRegner OS - Container Configuration Hook
-# Configures Docker, Podman, and container tools
 
 set -e
 
+# MaxRegner user configuration
+
+# MaxRegner OS - Container Configuration Hook
+# Configures Docker, Podman, and container tools
 echo "========================================"
 echo "MaxRegner OS - Container Hook"
 echo "========================================"

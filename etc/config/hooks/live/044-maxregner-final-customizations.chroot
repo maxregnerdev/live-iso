@@ -1,14 +1,16 @@
-
-# MaxRegner user configuration
-MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
-MAXREGNER_HOME="/home/$MAXREGNER_USER"
-
 #!/bin/bash
-# MaxRegner OS - Final Customizations Hook
-# Performs final system customizations
 
 set -e
 
+# MaxRegner user configuration
+MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
+
+MAXREGNER_HOME="/home/$MAXREGNER_USER"
+
+MAXREGNER_HOME="/home/$MAXREGNER_USER"
+
+# MaxRegner OS - Final Customizations Hook
+# Performs final system customizations
 echo "========================================"
 echo "MaxRegner OS - Final Customizations Hook"
 echo "========================================"
@@ -151,7 +153,6 @@ MAXREGNER_OS="MaxRegner"
 export MAXREGNER_OS
 MAXREGNER_VERSION="1.0"
 export MAXREGNER_VERSION
-MAXREGNER_HOME="/home/$MAXREGNER_USER"
 export MAXREGNER_HOME
 
 # Path settings
@@ -315,10 +316,7 @@ fi
 # Create final verification script
 mkdir -p /usr/local/bin
 cat > /usr/local/bin/maxregner-verify << 'VERIFY'
-#!/bin/bash
 # MaxRegner OS Verification Script
-
-set -e
 
 echo "========================================"
 echo "MaxRegner OS Verification"

@@ -1,14 +1,14 @@
-
-# MaxRegner user configuration
-MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
-MAXREGNER_HOME="/home/$MAXREGNER_USER"
-
 #!/bin/bash
-# MaxRegner OS - Office Suite Configuration Hook
-# Configures complete office productivity suite
 
 set -e
 
+# MaxRegner user configuration
+MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
+
+MAXREGNER_HOME="/home/$MAXREGNER_USER"
+
+# MaxRegner OS - Office Suite Configuration Hook
+# Configures complete office productivity suite
 echo "========================================"
 echo "MaxRegner OS - Office Suite Hook"
 echo "========================================"
@@ -121,7 +121,7 @@ cat > /home/$MAXREGNER_USER/.config/libreoffice/4/user/registrymodifications.xcu
 </oor:items>
 LOCONF
 
-chown -R "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/libreoffice
+chown -R "$MAXREGNER_USER" "$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/libreoffice
 
 # ============================================
 # 3. CONFIGURE EVOLUTION
@@ -179,7 +179,7 @@ reminder_method=alert
 reminder_time=15
 EVOCALCONF
 
-chown -R "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/evolution
+chown -R "$MAXREGNER_USER" "$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/evolution
 
 # ============================================
 # 4. CONFIGURE DOCUMENT VIEWERS
@@ -212,7 +212,7 @@ automatic-reload=true
 text-selection=true
 EVINCECONF
 
-chown "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/dconf/user
+chown "$MAXREGNER_USER" "$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/dconf/user
 
 # ============================================
 # 5. CONFIGURE OFFICE TEMPLATES

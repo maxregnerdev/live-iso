@@ -1,9 +1,11 @@
 #!/bin/bash
-# MaxRegner OS - Kernel Tuning Hook
-# Optimizes kernel parameters for performance and responsiveness
 
 set -e
 
+# MaxRegner user configuration
+
+# MaxRegner OS - Kernel Tuning Hook
+# Optimizes kernel parameters for performance and responsiveness
 echo "========================================"
 echo "MaxRegner OS - Kernel Tuning Hook"
 echo "========================================"

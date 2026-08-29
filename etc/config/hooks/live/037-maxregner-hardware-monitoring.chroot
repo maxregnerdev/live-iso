@@ -1,14 +1,14 @@
-
-# MaxRegner user configuration
-MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
-MAXREGNER_HOME="/home/$MAXREGNER_USER"
-
 #!/bin/bash
-# MaxRegner OS - Hardware Monitoring Configuration Hook
-# Configures comprehensive hardware monitoring support
 
 set -e
 
+# MaxRegner user configuration
+MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
+
+MAXREGNER_HOME="/home/$MAXREGNER_USER"
+
+# MaxRegner OS - Hardware Monitoring Configuration Hook
+# Configures comprehensive hardware monitoring support
 echo "========================================"
 echo "MaxRegner OS - Hardware Monitoring Hook"
 echo "========================================"
@@ -138,7 +138,7 @@ temperature_critical=90
 maxregner=true
 PSENSORCONF
 
-chown -R "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/psensor
+chown -R "$MAXREGNER_USER" "$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/psensor
 
 # ============================================
 # 4. CONFIGURE SMART MONITORING
@@ -169,7 +169,6 @@ SMARTDCONF
 # Configure smartd notifications
 mkdir -p /etc
 cat > /etc/smartd_notify.sh << 'SMARTDNOTIFY'
-#!/bin/bash
 # MaxRegner OS SMART Notification Script
 
 # Get the smartd message
@@ -205,7 +204,6 @@ echo "[5/5] Configuring hardware monitoring scripts..."
 # Create hardware monitoring scripts
 mkdir -p /usr/local/bin/maxregner-hwmon
 cat > /usr/local/bin/maxregner-hwmon/cpu-monitor << 'CPUMON'
-#!/bin/bash
 # MaxRegner OS CPU Monitor Script
 
 echo "========================================"
@@ -248,7 +246,6 @@ echo "========================================"
 CPUMON
 
 cat > /usr/local/bin/maxregner-hwmon/memory-monitor << 'MEMMON'
-#!/bin/bash
 # MaxRegner OS Memory Monitor Script
 
 echo "========================================"
@@ -279,7 +276,6 @@ echo "========================================"
 MEMMON
 
 cat > /usr/local/bin/maxregner-hwmon/disk-monitor << 'DISKMON'
-#!/bin/bash
 # MaxRegner OS Disk Monitor Script
 
 echo "========================================"
@@ -311,7 +307,6 @@ echo "========================================"
 DISKMON
 
 cat > /usr/local/bin/maxregner-hwmon/full-monitor << 'FULLMON'
-#!/bin/bash
 # MaxRegner OS Full Hardware Monitor Script
 
 clear

@@ -1,14 +1,14 @@
-
-# MaxRegner user configuration
-MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
-MAXREGNER_HOME="/home/$MAXREGNER_USER"
-
 #!/bin/bash
-# MaxRegner OS - Email Client Configuration Hook
-# Configures comprehensive email support
 
 set -e
 
+# MaxRegner user configuration
+MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
+
+MAXREGNER_HOME="/home/$MAXREGNER_USER"
+
+# MaxRegner OS - Email Client Configuration Hook
+# Configures comprehensive email support
 echo "========================================"
 echo "MaxRegner OS - Email Client Hook"
 echo "========================================"
@@ -146,7 +146,7 @@ user_pref("mail.check_all_folders_for_new", true);
 user_pref("mailnews.display.html_as", 2);
 TBPREFS
 
-chown -R "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.thunderbird
+chown -R "$MAXREGNER_USER" "$MAXREGNER_USER" /home/$MAXREGNER_USER/.thunderbird
 
 # ============================================
 # 3. CONFIGURE EVOLUTION
@@ -228,7 +228,7 @@ cat > /home/$MAXREGNER_USER/.config/evolution/calendar/sources.xml << 'EVOCALSOU
 </sources>
 EVOCALSOURCES
 
-chown -R "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/evolution
+chown -R "$MAXREGNER_USER" "$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/evolution
 
 # ============================================
 # 4. CONFIGURE EMAIL SERVERS

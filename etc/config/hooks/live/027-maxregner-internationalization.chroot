@@ -1,9 +1,11 @@
 #!/bin/bash
-# MaxRegner OS - Internationalization Configuration Hook
-# Configures comprehensive language and locale support
 
 set -e
 
+# MaxRegner user configuration
+
+# MaxRegner OS - Internationalization Configuration Hook
+# Configures comprehensive language and locale support
 echo "========================================"
 echo "MaxRegner OS - Internationalization Hook"
 echo "========================================"

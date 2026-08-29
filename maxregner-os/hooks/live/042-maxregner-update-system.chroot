@@ -1,14 +1,14 @@
-
-# MaxRegner user configuration
-MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
-MAXREGNER_HOME="/home/$MAXREGNER_USER"
-
 #!/bin/bash
-# MaxRegner OS - Update System Configuration Hook
-# Configures automatic update and upgrade system
 
 set -e
 
+# MaxRegner user configuration
+MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
+
+MAXREGNER_HOME="/home/$MAXREGNER_USER"
+
+# MaxRegner OS - Update System Configuration Hook
+# Configures automatic update and upgrade system
 echo "========================================"
 echo "MaxRegner OS - Update System Hook"
 echo "========================================"
@@ -156,10 +156,7 @@ echo "[4/5] Creating update scripts..."
 # Create MaxRegner update check script
 mkdir -p /usr/local/bin
 cat > /usr/local/bin/maxregner-update-check << 'UPDATECHECK'
-#!/bin/bash
 # MaxRegner OS Update Check Script
-
-set -e
 
 echo "========================================"
 echo "MaxRegner OS Update Check"
@@ -194,10 +191,7 @@ chmod +x /usr/local/bin/maxregner-update-check
 # Create MaxRegner update log script
 mkdir -p /usr/local/bin
 cat > /usr/local/bin/maxregner-update-log << 'UPDATELOG'
-#!/bin/bash
 # MaxRegner OS Update Log Script
-
-set -e
 
 LOG_FILE="/var/log/maxregner-updates.log"
 
@@ -283,7 +277,7 @@ cat > /var/spool/cron/crontabs/maxregner << 'USERCRON'
 @reboot if [ ! -f ~/.maxregner-welcome-shown ]; then /usr/local/bin/maxregner-welcome; touch ~/.maxregner-welcome-shown; fi
 USERCRON
 
-chown "$MAXREGNER_USER:$MAXREGNER_USER" /var/spool/cron/crontabs/maxregner
+chown "$MAXREGNER_USER" "$MAXREGNER_USER" /var/spool/cron/crontabs/maxregner
 
 # Enable and start services
 systemctl enable cron 2>/dev/null || true

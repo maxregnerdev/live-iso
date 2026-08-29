@@ -1,15 +1,17 @@
 #!/bin/bash
-# MaxRegner OS - Desktop Environment Configuration Hook
-# Configures the complete MaxRegner desktop experience
 
 set -e
 
+# MaxRegner user configuration
+MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
+
+MAXREGNER_HOME="/home/$MAXREGNER_USER"
+
+# MaxRegner OS - Desktop Environment Configuration Hook
+# Configures the complete MaxRegner desktop experience
 echo "========================================"
 echo "MaxRegner OS - Desktop Environment Hook"
 echo "========================================"
-
-MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
-MAXREGNER_HOME="/home/$MAXREGNER_USER"
 
 # ============================================
 # 1. GNOME SHELL CONFIGURATION

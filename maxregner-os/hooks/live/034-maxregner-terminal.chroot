@@ -1,14 +1,18 @@
-
-# MaxRegner user configuration
-MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
-MAXREGNER_HOME="/home/$MAXREGNER_USER"
-
 #!/bin/bash
-# MaxRegner OS - Terminal Emulator Configuration Hook
-# Configures comprehensive terminal support
 
 set -e
 
+# MaxRegner user configuration
+MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
+
+MAXREGNER_HOME="/home/$MAXREGNER_USER"
+
+MAXREGNER_HOME=/home/$MAXREGNER_USER
+
+export MAXREGNER_HOME=/home/$MAXREGNER_USER
+
+# MaxRegner OS - Terminal Emulator Configuration Hook
+# Configures comprehensive terminal support
 echo "========================================"
 echo "MaxRegner OS - Terminal Hook"
 echo "========================================"
@@ -105,7 +109,7 @@ picture-options=zoom
 picture-opacity=100
 GNOMETERMCONF
 
-chown "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/dconf/user
+chown "$MAXREGNER_USER" "$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/dconf/user
 
 # Create GNOME Terminal profile
 mkdir -p /home/$MAXREGNER_USER/.bash_profile.d
@@ -151,7 +155,7 @@ export PAGER=less
 export LESS='-R --shift 5'
 TERMPROFILE
 
-chown "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.bash_profile.d/terminal.sh
+chown "$MAXREGNER_USER" "$MAXREGNER_USER" /home/$MAXREGNER_USER/.bash_profile.d/terminal.sh
 
 # ============================================
 # 3. CONFIGURE TERMINATOR
@@ -282,7 +286,7 @@ cat > /home/$MAXREGNER_USER/.config/terminator/config << 'TERMINATORCONF'
     fullscreen = False
 TERMINATORCONF
 
-chown -R "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/terminator
+chown -R "$MAXREGNER_USER" "$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/terminator
 
 # ============================================
 # 4. CONFIGURE ALACRITTY
@@ -373,7 +377,7 @@ maxregner:
   branding: "MaxRegner OS"
 ALACRITTYCONF
 
-chown -R "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/alacritty
+chown -R "$MAXREGNER_USER" "$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/alacritty
 
 # ============================================
 # 5. CONFIGURE SHELL PROFILES
@@ -445,7 +449,7 @@ echo "Welcome to MaxRegner OS Terminal!"
 echo "Type 'help' for available commands."
 BASHRC
 
-chown "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.bashrc
+chown "$MAXREGNER_USER" "$MAXREGNER_USER" /home/$MAXREGNER_USER/.bashrc
 
 # Configure profile
 cat > /home/$MAXREGNER_USER/.profile << 'PROFILE'
@@ -459,7 +463,6 @@ if [ -n "$BASH_VERSION" ]; then
 fi
 
 # MaxRegner environment
-MAXREGNER_HOME=/home/$MAXREGNER_USER
 export MAXREGNER_HOME
 MAXREGNER_OS=MaxRegner
 export MAXREGNER_OS
@@ -489,7 +492,7 @@ MAXREGNER_ICONS=MaxRegner-Icons
 export MAXREGNER_ICONS
 PROFILE
 
-chown "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.profile
+chown "$MAXREGNER_USER" "$MAXREGNER_USER" /home/$MAXREGNER_USER/.profile
 
 # Create MaxRegner bashrc
 mkdir -p /etc/maxregner
@@ -542,7 +545,6 @@ function maxregner-info() {
 # Export MaxRegner environment
 export MAXREGNER_OS=MaxRegner
 export MAXREGNER_VERSION=1.0
-export MAXREGNER_HOME=/home/$MAXREGNER_USER
 MAXREGNERBASHRC
 
 echo ""

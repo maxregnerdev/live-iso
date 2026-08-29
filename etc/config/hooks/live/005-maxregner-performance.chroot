@@ -1,9 +1,11 @@
 #!/bin/bash
-# MaxRegner OS - Performance Optimization Hook
-# This hook applies performance optimizations to the system
 
 set -e
 
+# MaxRegner user configuration
+
+# MaxRegner OS - Performance Optimization Hook
+# This hook applies performance optimizations to the system
 echo "========================================"
 echo "MaxRegner OS - Performance Optimization Hook"
 echo "========================================"

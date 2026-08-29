@@ -1,14 +1,14 @@
-
-# MaxRegner user configuration
-MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
-MAXREGNER_HOME="/home/$MAXREGNER_USER"
-
 #!/bin/bash
-# MaxRegner OS - Custom Scripts Configuration Hook
-# Configures MaxRegner-specific custom scripts
 
 set -e
 
+# MaxRegner user configuration
+MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
+
+MAXREGNER_HOME="/home/$MAXREGNER_USER"
+
+# MaxRegner OS - Custom Scripts Configuration Hook
+# Configures MaxRegner-specific custom scripts
 echo "========================================"
 echo "MaxRegner OS - Custom Scripts Hook"
 echo "========================================"
@@ -32,10 +32,7 @@ echo "[2/5] Creating system scripts..."
 
 # Create MaxRegner update script
 cat > /usr/local/bin/maxregner-update << 'MAXUPDATE'
-#!/bin/bash
 # MaxRegner OS Update Script
-
-set -e
 
 echo "========================================"
 echo "MaxRegner OS Update"
@@ -87,10 +84,7 @@ chmod +x /usr/local/bin/maxregner-update
 
 # Create MaxRegner cleanup script
 cat > /usr/local/bin/maxregner-cleanup << 'MAXCLEANUP'
-#!/bin/bash
 # MaxRegner OS Cleanup Script
-
-set -e
 
 echo "========================================"
 echo "MaxRegner OS Cleanup"
@@ -157,10 +151,7 @@ chmod +x /usr/local/bin/maxregner-cleanup
 
 # Create MaxRegner backup script
 cat > /usr/local/bin/maxregner-backup << 'MAXBACKUP'
-#!/bin/bash
 # MaxRegner OS Backup Script
-
-set -e
 
 echo "========================================"
 echo "MaxRegner OS Backup"
@@ -231,7 +222,6 @@ mkdir -p /home/$MAXREGNER_USER/.local/bin
 
 # Create MaxRegner welcome script
 cat > /home/$MAXREGNER_USER/.local/bin/maxregner-welcome << 'WELCOME'
-#!/bin/bash
 # MaxRegner OS Welcome Script
 
 echo "=========================================="
@@ -262,7 +252,7 @@ echo "=========================================="
 WELCOME
 
 chmod +x /home/$MAXREGNER_USER/.local/bin/maxregner-welcome
-chown "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.local/bin/maxregner-welcome
+chown "$MAXREGNER_USER" "$MAXREGNER_USER" /home/$MAXREGNER_USER/.local/bin/maxregner-welcome
 
 # ============================================
 # 4. CREATE DEVELOPMENT SCRIPTS
@@ -275,10 +265,7 @@ mkdir -p /usr/local/bin/maxregner-dev
 
 # Create project setup script
 cat > /usr/local/bin/maxregner-dev/setup-project << 'DEVSETUP'
-#!/bin/bash
 # MaxRegner OS Project Setup Script
-
-set -e
 
 if [ -z "$1" ]; then
     echo "Usage: maxregner-dev-setup-project <project-name> [template]"
@@ -430,10 +417,7 @@ echo "[5/5] Creating system integration scripts..."
 
 # Create system hook script
 cat > /usr/local/bin/maxregner-hook-runner << 'HOOKRUNNER'
-#!/bin/bash
 # MaxRegner OS Hook Runner Script
-
-set -e
 
 HOOK_DIR="/workspace/github__maxregnerdev__live-iso/maxregner-os/hooks/live"
 

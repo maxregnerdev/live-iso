@@ -1,14 +1,14 @@
-
-# MaxRegner user configuration
-MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
-MAXREGNER_HOME="/home/$MAXREGNER_USER"
-
 #!/bin/bash
-# MaxRegner OS - Messaging Applications Configuration Hook
-# Configures comprehensive messaging support
 
 set -e
 
+# MaxRegner user configuration
+MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
+
+MAXREGNER_HOME="/home/$MAXREGNER_USER"
+
+# MaxRegner OS - Messaging Applications Configuration Hook
+# Configures comprehensive messaging support
 echo "========================================"
 echo "MaxRegner OS - Messaging Hook"
 echo "========================================"
@@ -200,7 +200,7 @@ cat > /home/$MAXREGNER_USER/.purple/accounts.xml << 'PIDGINACCOUNTS'
 </account>
 PIDGINACCOUNTS
 
-chown -R "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.purple
+chown -R "$MAXREGNER_USER" "$MAXREGNER_USER" /home/$MAXREGNER_USER/.purple
 
 # ============================================
 # 3. CONFIGURE TELEGRAM
@@ -241,7 +241,7 @@ use_proxy=false
 proxy_type=0
 TELEGRAMCONF
 
-chown -R "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/Telegram
+chown -R "$MAXREGNER_USER" "$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/Telegram
 
 # ============================================
 # 4. CONFIGURE DISCORD
@@ -302,7 +302,7 @@ cat > /home/$MAXREGNER_USER/.config/discord/settings.json << 'DISCORDCONF'
 }
 DISCORDCONF
 
-chown -R "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/discord
+chown -R "$MAXREGNER_USER" "$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/discord
 
 # ============================================
 # 5. CONFIGURE IRC CLIENTS
@@ -349,7 +349,7 @@ channel = #maxregner-support
 auto_join = 1
 HEXCHATCONF
 
-chown -R "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/hexchat
+chown -R "$MAXREGNER_USER" "$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/hexchat
 
 # Configure Quassel
 mkdir -p /home/$MAXREGNER_USER/.config/quassel-irc.org
@@ -372,7 +372,7 @@ Channel=#maxregner-support
 AutoJoin=true
 QUASSELCONF
 
-chown -R "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/quassel-irc.org
+chown -R "$MAXREGNER_USER" "$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/quassel-irc.org
 
 echo ""
 echo "========================================"

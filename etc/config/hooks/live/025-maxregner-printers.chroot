@@ -1,9 +1,11 @@
 #!/bin/bash
-# MaxRegner OS - Printer and Scanner Configuration Hook
-# Configures complete printing and scanning support
 
 set -e
 
+# MaxRegner user configuration
+
+# MaxRegner OS - Printer and Scanner Configuration Hook
+# Configures complete printing and scanning support
 echo "========================================"
 echo "MaxRegner OS - Printers and Scanners Hook"
 echo "========================================"

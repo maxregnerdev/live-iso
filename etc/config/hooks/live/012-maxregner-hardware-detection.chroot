@@ -1,9 +1,11 @@
 #!/bin/bash
-# MaxRegner OS - Hardware Detection and Configuration Hook
-# Detects and configures hardware automatically
 
 set -e
 
+# MaxRegner user configuration
+
+# MaxRegner OS - Hardware Detection and Configuration Hook
+# Detects and configures hardware automatically
 echo "========================================"
 echo "MaxRegner OS - Hardware Detection Hook"
 echo "========================================"

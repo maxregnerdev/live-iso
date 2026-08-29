@@ -1,9 +1,11 @@
 #!/bin/bash
-# MaxRegner OS - Network Configuration Hook
-# Configures all network settings for optimal performance
 
 set -e
 
+# MaxRegner user configuration
+
+# MaxRegner OS - Network Configuration Hook
+# Configures all network settings for optimal performance
 echo "========================================"
 echo "MaxRegner OS - Network Configuration Hook"
 echo "========================================"

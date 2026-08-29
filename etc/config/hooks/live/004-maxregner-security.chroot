@@ -1,9 +1,11 @@
 #!/bin/bash
-# MaxRegner OS - Security Hardening Hook
-# This hook applies security hardening to the system
 
 set -e
 
+# MaxRegner user configuration
+
+# MaxRegner OS - Security Hardening Hook
+# This hook applies security hardening to the system
 echo "========================================"
 echo "MaxRegner OS - Security Hardening Hook"
 echo "========================================"

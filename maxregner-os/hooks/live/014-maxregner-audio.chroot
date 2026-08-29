@@ -1,14 +1,13 @@
+#!/usr/bin/pulseaudio -nF
+set -e
 
 # MaxRegner user configuration
 MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
+
 MAXREGNER_HOME="/home/$MAXREGNER_USER"
 
-#!/bin/bash
 # MaxRegner OS - Audio Configuration Hook
 # Configures audio system for optimal performance
-
-set -e
-
 echo "========================================"
 echo "MaxRegner OS - Audio Configuration Hook"
 echo "========================================"
@@ -35,7 +34,6 @@ echo "[2/5] Configuring PulseAudio..."
 # Main PulseAudio configuration
 mkdir -p /etc/pulse
 cat > /etc/pulse/default.pa <<'PULSEEOF'
-#!/usr/bin/pulseaudio -nF
 
 # Load necessary modules
 .ifexists module-native-protocol-unix.so
@@ -347,7 +345,7 @@ ctl.!default {
 }
 ALSAEOF
 
-chown "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.asoundrc
+chown "$MAXREGNER_USER" "$MAXREGNER_USER" /home/$MAXREGNER_USER/.asoundrc
 
 # ============================================
 # 5. ENABLE AND START SERVICES

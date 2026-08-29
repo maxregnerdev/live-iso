@@ -1,14 +1,14 @@
-
-# MaxRegner user configuration
-MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
-MAXREGNER_HOME="/home/$MAXREGNER_USER"
-
 #!/bin/bash
-# MaxRegner OS - File Manager Configuration Hook
-# Configures comprehensive file management support
 
 set -e
 
+# MaxRegner user configuration
+MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
+
+MAXREGNER_HOME="/home/$MAXREGNER_USER"
+
+# MaxRegner OS - File Manager Configuration Hook
+# Configures comprehensive file management support
 echo "========================================"
 echo "MaxRegner OS - File Manager Hook"
 echo "========================================"
@@ -75,7 +75,6 @@ gsettings set org.gnome.nautilus.desktop volumes-visible true 2>/dev/null || tru
 # Create Nautilus scripts
 mkdir -p /home/$MAXREGNER_USER/.local/share/nautilus/scripts
 cat > /home/$MAXREGNER_USER/.local/share/nautilus/scripts/MaxRegner-Open-Terminal << 'NAUTILUSSCRIPT'
-#!/bin/bash
 # MaxRegner OS Nautilus Script - Open Terminal
 
 # Get current directory
@@ -90,7 +89,6 @@ fi
 NAUTILUSSCRIPT
 
 cat > /home/$MAXREGNER_USER/.local/share/nautilus/scripts/MaxRegner-Open-as-Root << 'NAUTILUSSCRIPT'
-#!/bin/bash
 # MaxRegner OS Nautilus Script - Open as Root
 
 # Get selected files
@@ -109,7 +107,6 @@ fi
 NAUTILUSSCRIPT
 
 cat > /home/$MAXREGNER_USER/.local/share/nautilus/scripts/MaxRegner-Properties << 'NAUTILUSSCRIPT'
-#!/bin/bash
 # MaxRegner OS Nautilus Script - Show Properties
 
 # Get selected files
@@ -133,7 +130,7 @@ fi
 NAUTILUSSCRIPT
 
 chmod +x /home/$MAXREGNER_USER/.local/share/nautilus/scripts/*
-chown -R "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.local/share/nautilus
+chown -R "$MAXREGNER_USER" "$MAXREGNER_USER" /home/$MAXREGNER_USER/.local/share/nautilus
 
 # ============================================
 # 3. CONFIGURE THUNAR
@@ -218,7 +215,7 @@ cat > /home/$MAXREGNER_USER/.config/Thunar/rc.xml << 'THUNARRXML'
 </ThunarRc>
 THUNARRXML
 
-chown -R "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/Thunar
+chown -R "$MAXREGNER_USER" "$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/Thunar
 
 # ============================================
 # 4. CONFIGURE PCMANFM
@@ -288,7 +285,7 @@ wallpaper_mode=1
 wallpaper_bg_color=#1a1a2e
 PCMANFMLXDECONF
 
-chown -R "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/pcmanfm
+chown -R "$MAXREGNER_USER" "$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/pcmanfm
 
 # ============================================
 # 5. CONFIGURE FILE MANAGER SETTINGS
@@ -321,24 +318,21 @@ inode/directory=nautilus.desktop;dolphin.desktop;thunar.desktop;pcmanfm.desktop;
 text/plain=gedit.desktop;mousepad.desktop;leafpad.desktop;
 MIMEAPPS
 
-chown "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.local/share/applications/mimeapps.list
+chown "$MAXREGNER_USER" "$MAXREGNER_USER" /home/$MAXREGNER_USER/.local/share/applications/mimeapps.list
 
 # Create file manager launcher scripts
 mkdir -p /usr/local/bin/maxregner-filemanager
 cat > /usr/local/bin/maxregner-filemanager/nautilus << 'FMSCRIPT'
-#!/bin/bash
 # MaxRegner OS Nautilus Launcher
 autilus --no-desktop $@
 FMSCRIPT
 
 cat > /usr/local/bin/maxregner-filemanager/dolphin << 'FMSCRIPT'
-#!/bin/bash
 # MaxRegner OS Dolphin Launcher
 dolphin $@
 FMSCRIPT
 
 cat > /usr/local/bin/maxregner-filemanager/thunar << 'FMSCRIPT'
-#!/bin/bash
 # MaxRegner OS Thunar Launcher
 thunar $@
 FMSCRIPT

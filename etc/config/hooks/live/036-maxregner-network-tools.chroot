@@ -1,14 +1,14 @@
-
-# MaxRegner user configuration
-MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
-MAXREGNER_HOME="/home/$MAXREGNER_USER"
-
 #!/bin/bash
-# MaxRegner OS - Network Tools Configuration Hook
-# Configures comprehensive network utility support
 
 set -e
 
+# MaxRegner user configuration
+MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
+
+MAXREGNER_HOME="/home/$MAXREGNER_USER"
+
+# MaxRegner OS - Network Tools Configuration Hook
+# Configures comprehensive network utility support
 echo "========================================"
 echo "MaxRegner OS - Network Tools Hook"
 echo "========================================"
@@ -136,7 +136,7 @@ cat > /home/$MAXREGNER_USER/.nmaprc << 'NMAPRC'
 --exclude 172.16.0.0/12
 NMAPRC
 
-chown "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.nmaprc
+chown "$MAXREGNER_USER" "$MAXREGNER_USER" /home/$MAXREGNER_USER/.nmaprc
 
 # ============================================
 # 4. CONFIGURE WIRELESS TOOLS
@@ -202,7 +202,6 @@ echo "[5/5] Configuring network scripts..."
 # Create network utility scripts
 mkdir -p /usr/local/bin/maxregner-network
 cat > /usr/local/bin/maxregner-network/scan << 'NETSCAN'
-#!/bin/bash
 # MaxRegner OS Network Scanner Script
 
 echo "========================================"
@@ -262,7 +261,6 @@ echo "========================================"
 NETSCAN
 
 cat > /usr/local/bin/maxregner-network/speedtest << 'SPEEDTEST'
-#!/bin/bash
 # MaxRegner OS Speed Test Script
 
 echo "========================================"
@@ -295,7 +293,6 @@ echo "========================================"
 SPEEDTEST
 
 cat > /usr/local/bin/maxregner-network/diagnose << 'NETDIAG'
-#!/bin/bash
 # MaxRegner OS Network Diagnosis Script
 
 echo "========================================"

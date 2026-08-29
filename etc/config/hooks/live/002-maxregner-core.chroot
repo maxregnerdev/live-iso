@@ -1,9 +1,14 @@
 #!/bin/bash
-# MaxRegner OS - Core Packages Installation Hook
-# This hook installs all MaxRegner-specific core packages
 
 set -e
 
+# MaxRegner user configuration
+MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
+
+MAXREGNER_HOME="/home/$MAXREGNER_USER"
+
+# MaxRegner OS - Core Packages Installation Hook
+# This hook installs all MaxRegner-specific core packages
 echo "========================================"
 echo "MaxRegner OS - Core Packages Hook"
 echo "========================================"
@@ -14,9 +19,6 @@ if [ -f /working_dir/maxregner-os/config/terraform-maxregner.conf ]; then
 elif [ -f /etc/terraform.conf ]; then
     source /etc/terraform.conf
 fi
-
-MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
-MAXREGNER_HOME="/home/$MAXREGNER_USER"
 
 # ============================================
 # 1. INSTALL MAXREGNER THEME
@@ -218,7 +220,6 @@ PLYMOUTHEOF
 
 # Create Plymouth script
 cat > /usr/share/plymouth/themes/maxregner-ultimate/maxregner-ultimate-script <<'PLYMOUTHEOF'
-#!/bin/bash
 plymouth set-refresh-rate 60
 plymouth image --file=/usr/share/plymouth/themes/maxregner-ultimate/background.png --section=0,0,1920,1080
 PLYMOUTHEOF
@@ -289,7 +290,6 @@ mkdir -p /usr/share/maxregner/utils
 # Create system info script
 mkdir -p /usr/bin
 cat > /usr/bin/maxregner-info <<'UTILEOF'
-#!/bin/bash
 echo "MaxRegner OS Information"
 echo "======================="
 echo "Version: $(cat /etc/os-release | grep VERSION= | cut -d'"' -f2)"

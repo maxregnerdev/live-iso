@@ -1,14 +1,14 @@
-
-# MaxRegner user configuration
-MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
-MAXREGNER_HOME="/home/$MAXREGNER_USER"
-
 #!/bin/bash
-# MaxRegner OS - Gaming Support Configuration Hook
-# Configures complete gaming environment
 
 set -e
 
+# MaxRegner user configuration
+MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
+
+MAXREGNER_HOME="/home/$MAXREGNER_USER"
+
+# MaxRegner OS - Gaming Support Configuration Hook
+# Configures complete gaming environment
 echo "========================================"
 echo "MaxRegner OS - Gaming Support Hook"
 echo "========================================"
@@ -59,7 +59,7 @@ Filesystem = win32
 Enabled = 1
 WINEOF
 
-chown -R "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.wine
+chown -R "$MAXREGNER_USER" "$MAXREGNER_USER" /home/$MAXREGNER_USER/.wine
 
 # ============================================
 # 3. CONFIGURE STEAM
@@ -91,7 +91,7 @@ cat > /home/$MAXREGNER_USER/.steam/steam/SteamAppUserData.vdf << 'STEAMOF'
 }
 STEAMOF
 
-chown -R "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.steam
+chown -R "$MAXREGNER_USER" "$MAXREGNER_USER" /home/$MAXREGNER_USER/.steam
 
 # ============================================
 # 4. INSTALL GAMING UTILITIES
@@ -200,7 +200,6 @@ VAEOF
 # Create gaming scripts
 mkdir -p /usr/local/games
 cat > /usr/local/games/run-game << 'SCRIPT'
-#!/bin/bash
 # MaxRegner OS Game Launcher Script
 echo "Launching game with optimized settings..."
 gamemoderun mangohud $@

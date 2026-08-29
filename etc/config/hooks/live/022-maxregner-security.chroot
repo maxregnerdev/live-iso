@@ -1,9 +1,11 @@
 #!/bin/bash
-# MaxRegner OS - Security Policies Configuration Hook
-# Configures comprehensive security settings
 
 set -e
 
+# MaxRegner user configuration
+
+# MaxRegner OS - Security Policies Configuration Hook
+# Configures comprehensive security settings
 echo "========================================"
 echo "MaxRegner OS - Security Policies Hook"
 echo "========================================"

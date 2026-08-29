@@ -1,9 +1,11 @@
 #!/bin/bash
-# MaxRegner OS - Services Configuration Hook
-# Configures all system services
 
 set -e
 
+# MaxRegner user configuration
+
+# MaxRegner OS - Services Configuration Hook
+# Configures all system services
 echo "========================================"
 echo "MaxRegner OS - Services Configuration Hook"
 echo "========================================"

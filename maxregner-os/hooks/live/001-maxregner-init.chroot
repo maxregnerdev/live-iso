@@ -1,10 +1,15 @@
 #!/bin/bash
-# MaxRegner OS - Initialization Hook
-# This is the first hook that runs in the chroot
-# It sets up the foundation for all MaxRegner OS customizations
 
 set -e
 
+# MaxRegner user configuration
+MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
+
+MAXREGNER_HOME="/home/$MAXREGNER_USER"
+
+# MaxRegner OS - Initialization Hook
+# This is the first hook that runs in the chroot
+# It sets up the foundation for all MaxRegner OS customizations
 echo "========================================"
 echo "MaxRegner OS - Initialization Hook"
 echo "========================================"
@@ -25,9 +30,7 @@ fi
 # Set default values
 MAXREGNER_VERSION="${VERSION:-4.4}"
 MAXREGNER_CODENAME="${CODENAME:-maxregner}"
-MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
 MAXREGNER_PASSWORD="${LIVE_PASSWORD:-maxregner}"
-MAXREGNER_HOME="/home/$MAXREGNER_USER"
 
 # Create temporary directory
 mkdir -p /tmp/maxregner-setup
@@ -59,7 +62,7 @@ if ! id "$MAXREGNER_USER" >/dev/null 2>&1; then
     
     # Ensure home directory exists
     mkdir -p "$MAXREGNER_HOME"
-    chown "$MAXREGNER_USER:$MAXREGNER_USER" "$MAXREGNER_HOME"
+    chown "$MAXREGNER_USER" "$MAXREGNER_USER" "$MAXREGNER_HOME"
     chmod 755 "$MAXREGNER_HOME"
     
     # Set proper permissions
