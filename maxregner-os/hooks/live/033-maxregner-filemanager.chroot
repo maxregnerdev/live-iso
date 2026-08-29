@@ -1,0 +1,334 @@
+#!/bin/bash
+# MaxRegner OS - File Manager Configuration Hook
+# Configures comprehensive file management support
+
+set -e
+
+echo "========================================"
+echo "MaxRegner OS - File Manager Hook"
+echo "========================================"
+
+# ============================================
+# 1. INSTALL FILE MANAGERS
+# ============================================
+
+echo "[1/5] Installing file managers..."
+
+# Install Nautilus (GNOME Files)
+apt-get install -y nautilus nautilus-extensions nautilus-gksu \
+    nautilus-python nautilus-sendto nautilus-share \
+    nautilus-wipe nautilus-actions 2>/dev/null || true
+
+# Install Dolphin (KDE)
+apt-get install -y dolphin dolphin-plugins 2>/dev/null || true
+
+# Install Thunar (XFCE)
+apt-get install -y thunar thunar-archive-plugin thunar-media-tags-plugin \
+    thunar-volman thunar-vcs-plugin 2>/dev/null || true
+
+# Install PCManFM (LXDE)
+apt-get install -y pcmanfm pcmanfm-lxde 2>/dev/null || true
+
+# Install SpaceFM
+apt-get install -y spacefm spacefm-gtk3 spacefm-common 2>/dev/null || true
+
+# Install ROX-Filer
+apt-get install -y rox-filer rox-filer-clipboard 2>/dev/null || true
+
+# Install Midnight Commander
+apt-get install -y mc mc-data 2>/dev/null || true
+
+# ============================================
+# 2. CONFIGURE NAUTILUS
+# ============================================
+
+echo "[2/5] Configuring Nautilus..."
+
+# Configure Nautilus preferences
+gsettings set org.gnome.nautilus.preferences default-folder-viewer "list-view" 2>/dev/null || true
+gsettings set org.gnome.nautilus.preferences sort-directories-first true 2>/dev/null || true
+gsettings set org.gnome.nautilus.list-view default-zoom-level "small" 2>/dev/null || true
+gsettings set org.gnome.nautilus.icon-view default-zoom-level "small" 2>/dev/null || true
+gsettings set org.gnome.nautilus.preferences show-hidden-files true 2>/dev/null || true
+gsettings set org.gnome.nautilus.preferences search-filter-time-type "last_modified" 2>/dev/null || true
+gsettings set org.gnome.nautilus.preferences show-create-link true 2>/dev/null || true
+gsettings set org.gnome.nautilus.preferences show-delete-permanently true 2>/dev/null || true
+
+# Nautilus window state
+gsettings set org.gnome.nautilus.window-state geometry "1200x800+0+0" 2>/dev/null || true
+gsettings set org.gnome.nautilus.window-state maximized true 2>/dev/null || true
+gsettings set org.gnome.nautilus.window-state width 1200 2>/dev/null || true
+gsettings set org.gnome.nautilus.window-state height 800 2>/dev/null || true
+
+# Nautilus desktop settings
+gsettings set org.gnome.nautilus.desktop home-icon-visible true 2>/dev/null || true
+gsettings set org.gnome.nautilus.desktop computer-icon-visible true 2>/dev/null || true
+gsettings set org.gnome.nautilus.desktop network-icon-visible true 2>/dev/null || true
+gsettings set org.gnome.nautilus.desktop trash-icon-visible true 2>/dev/null || true
+gsettings set org.gnome.nautilus.desktop volumes-visible true 2>/dev/null || true
+
+# Create Nautilus scripts
+mkdir -p /home/maxregner/.local/share/nautilus/scripts
+cat > /home/maxregner/.local/share/nautilus/scripts/MaxRegner-Open-Terminal << 'NAUTILUSSCRIPT'
+#!/bin/bash
+# MaxRegner OS Nautilus Script - Open Terminal
+
+# Get current directory
+CURRENT_DIR=$(nautilus --print-current-directory 2>/dev/null || pwd)
+
+# Open terminal in current directory
+if [ -n "$CURRENT_DIR" ]; then
+    gnome-terminal --working-directory="$CURRENT_DIR"
+else
+    gnome-terminal
+fi
+NAUTILUSSCRIPT
+
+cat > /home/maxregner/.local/share/nautilus/scripts/MaxRegner-Open-as-Root << 'NAUTILUSSCRIPT'
+#!/bin/bash
+# MaxRegner OS Nautilus Script - Open as Root
+
+# Get selected files
+FILES=$(nautilus --print-selected-files 2>/dev/null)
+
+if [ -z "$FILES" ]; then
+    # If no files selected, use current directory
+    CURRENT_DIR=$(nautilus --print-current-directory 2>/dev/null || pwd)
+    pkexec nautilus "$CURRENT_DIR"
+else
+    # Open selected files as root
+    for file in $FILES; do
+        pkexec nautilus "$(dirname "$file")"
+    done
+fi
+NAUTILUSSCRIPT
+
+cat > /home/maxregner/.local/share/nautilus/scripts/MaxRegner-Properties << 'NAUTILUSSCRIPT'
+#!/bin/bash
+# MaxRegner OS Nautilus Script - Show Properties
+
+# Get selected files
+FILES=$(nautilus --print-selected-files 2>/dev/null)
+
+if [ -z "$FILES" ]; then
+    zenity --info --text="No files selected" --title="MaxRegner OS"
+else
+    for file in $FILES; do
+        if [ -f "$file" ]; then
+            SIZE=$(du -h "$file" | cut -f1)
+            TYPE=$(file -b "$file" | cut -d' ' -f2-)
+            zenity --info --text="File: $(basename "$file")\nPath: $(dirname "$file")\nSize: $SIZE\nType: $TYPE" --title="MaxRegner OS Properties"
+        elif [ -d "$file" ]; then
+            COUNT=$(ls -1 "$file" | wc -l)
+            SIZE=$(du -sh "$file" | cut -f1)
+            zenity --info --text="Directory: $(basename "$file")\nPath: $(dirname "$file")\nItems: $COUNT\nSize: $SIZE" --title="MaxRegner OS Properties"
+        fi
+    done
+fi
+NAUTILUSSCRIPT
+
+chmod +x /home/maxregner/.local/share/nautilus/scripts/*
+chown -R maxregner:maxregner /home/maxregner/.local/share/nautilus
+
+# ============================================
+# 3. CONFIGURE THUNAR
+# ============================================
+
+echo "[3/5] Configuring Thunar..."
+
+# Create Thunar configuration
+mkdir -p /home/maxregner/.config/Thunar
+cat > /home/maxregner/.config/Thunar/accels.scm << 'THUNARACCELS'
+# MaxRegner OS Thunar Accelerators
+
+; Custom keyboard shortcuts
+(gtk_accel_path "<Actions>/ThunarActions/ThunarStandardView/Up" "<Alt>Up")
+(gtk_accel_path "<Actions>/ThunarActions/ThunarStandardView/Back" "<Alt>Left")
+(gtk_accel_path "<Actions>/ThunarActions/ThunarStandardView/Forward" "<Alt>Right")
+(gtk_accel_path "<Actions>/ThunarActions/ThunarStandardView/Refresh" "F5")
+(gtk_accel_path "<Actions>/ThunarActions/ThunarStandardView/NewFolder" "<Control>n")
+(gtk_accel_path "<Actions>/ThunarActions/ThunarStandardView/NewBlankFile" "<Control><Shift>n")
+(gtk_accel_path "<Actions>/ThunarActions/ThunarStandardView/Delete" "Delete")
+(gtk_accel_path "<Actions>/ThunarActions/ThunarStandardView/Rename" "F2")
+(gtk_accel_path "<Actions>/ThunarActions/ThunarStandardView/Properties" "<Alt>Return")
+THUNARACCELS
+
+cat > /home/maxregner/.config/Thunar/gtkrc << 'THUNARGTKRC'
+# MaxRegner OS Thunar GTK Configuration
+
+style "thunar" {
+    font_name = "Liberation Sans 10"
+    ThunarStandardView::text-column = 0
+    ThunarStandardView::icon-column = 1
+    ThunarStandardView::size-column = 2
+    ThunarStandardView::date-column = 3
+    ThunarStandardView::type-column = 4
+}
+
+class "*" style "thunar"
+THUNARGTKRC
+
+cat > /home/maxregner/.config/Thunar/rc.xml << 'THUNARRXML'
+<?xml version="1.0" encoding="UTF-8"?>
+<ThunarRc>
+  <Window>
+    <Width>800</Width>
+    <Height>600</Height>
+    <X>0</X>
+    <Y>0</Y>
+    <Maximized>false</Maximized>
+    <View>ThunarDetailsView</View>
+    <SortColumn>0</SortColumn>
+    <SortOrder>0</SortOrder>
+    <ShowHidden>true</ShowHidden>
+    <DateFormat>%Y-%m-%d %H:%M:%S</DateFormat>
+  </Window>
+  <Tree>
+    <Width>200</Width>
+    <ShowHidden>true</ShowHidden>
+  </Tree>
+  <Shortcuts>
+    <Shortcut>
+      <Path>/home/maxregner</Path>
+      <Name>Home</Name>
+    </Shortcut>
+    <Shortcut>
+      <Path>/home/maxregner/Downloads</Path>
+      <Name>Downloads</Name>
+    </Shortcut>
+    <Shortcut>
+      <Path>/home/maxregner/Documents</Path>
+      <Name>Documents</Name>
+    </Shortcut>
+  </Shortcuts>
+</ThunarRc>
+THUNARRXML
+
+chown -R maxregner:maxregner /home/maxregner/.config/Thunar
+
+# ============================================
+# 4. CONFIGURE PCMANFM
+# ============================================
+
+echo "[4/5] Configuring PCManFM..."
+
+# Create PCManFM configuration
+mkdir -p /home/maxregner/.config/pcmanfm
+cat > /home/maxregner/.config/pcmanfm/default/pcmanfm.conf << 'PCMANFMCONF'
+# MaxRegner OS PCManFM Configuration
+
+[config]
+width=800
+height=600
+x=0
+y=0
+maximized=0
+view_mode=0
+sort_by=0
+sort_order=0
+show_hidden=1
+no_mount=0
+no_unmount=0
+no_eject=0
+
+[window]
+remember_window_size=1
+remember_window_position=1
+
+[desktop]
+wallpaper_mode=1
+wallpaper_common=/usr/share/backgrounds/maxregner/desktop.jpg
+wallpaper_mode=1
+wallpaper_bg_color=#1a1a2e
+
+[volume]
+auto_mount=1
+auto_mount_options=
+auto_open=0
+
+[thumb]
+max_file_size=4194304
+show_thumbnails=1
+PCMANFMCONF
+
+cat > /home/maxregner/.config/pcmanfm/default/lxde/pcmanfm.conf << 'PCMANFMLXDECONF'
+# MaxRegner OS PCManFM LXDE Configuration
+
+[config]
+width=800
+height=600
+x=0
+y=0
+maximized=0
+view_mode=0
+sort_by=0
+sort_order=0
+show_hidden=1
+
+[desktop]
+wallpaper_mode=1
+wallpaper_common=/usr/share/backgrounds/maxregner/desktop.jpg
+wallpaper_mode=1
+wallpaper_bg_color=#1a1a2e
+PCMANFMLXDECONF
+
+chown -R maxregner:maxregner /home/maxregner/.config/pcmanfm
+
+# ============================================
+# 5. CONFIGURE FILE MANAGER SETTINGS
+# ============================================
+
+echo "[5/5] Configuring file manager settings..."
+
+# Set default file manager
+gsettings set org.gnome.desktop.default-applications.terminal exec "gnome-terminal" 2>/dev/null || true
+gsettings set org.gnome.desktop.default-applications.terminal exec-arg "-x" 2>/dev/null || true
+
+# Configure MIME types
+cat > /home/maxregner/.local/share/applications/mimeapps.list << 'MIMEAPPS'
+# MaxRegner OS MIME Applications
+
+[Default Applications]
+inode/directory=nautilus.desktop
+text/plain=gedit.desktop
+application/pdf=evince.desktop
+image/png=eog.desktop
+image/jpeg=eog.desktop
+image/gif=eog.desktop
+video/mp4=vlc.desktop
+video/webm=vlc.desktop
+audio/mp3=vlc.desktop
+
+[Added Associations]
+inode/directory=nautilus.desktop;dolphin.desktop;thunar.desktop;pcmanfm.desktop;
+text/plain=gedit.desktop;mousepad.desktop;leafpad.desktop;
+MIMEAPPS
+
+chown maxregner:maxregner /home/maxregner/.local/share/applications/mimeapps.list
+
+# Create file manager launcher scripts
+mkdir -p /usr/local/bin/maxregner-filemanager
+cat > /usr/local/bin/maxregner-filemanager/nautilus << 'FMSCRIPT'
+#!/bin/bash
+# MaxRegner OS Nautilus Launcher
+autilus --no-desktop $@
+FMSCRIPT
+
+cat > /usr/local/bin/maxregner-filemanager/dolphin << 'FMSCRIPT'
+#!/bin/bash
+# MaxRegner OS Dolphin Launcher
+dolphin $@
+FMSCRIPT
+
+cat > /usr/local/bin/maxregner-filemanager/thunar << 'FMSCRIPT'
+#!/bin/bash
+# MaxRegner OS Thunar Launcher
+thunar $@
+FMSCRIPT
+
+chmod +x /usr/local/bin/maxregner-filemanager/*
+
+echo ""
+echo "========================================"
+echo "MaxRegner File Manager Complete!"
+echo "========================================"

@@ -1,0 +1,351 @@
+#!/bin/bash
+# MaxRegner OS - Complete Branding Hook
+# Applies all MaxRegner OS branding
+
+set -e
+
+echo "========================================"
+echo "MaxRegner OS - Complete Branding Hook"
+echo "========================================"
+
+# Source configuration
+if [ -f /working_dir/maxregner-os/config/terraform-maxregner.conf ]; then
+    source /working_dir/maxregner-os/config/terraform-maxregner.conf
+fi
+
+MAXREGNER_VERSION="${VERSION:-4.4}"
+MAXREGNER_CODENAME="${CODENAME:-maxregner}"
+
+# ============================================
+# 1. SYSTEM BRANDING
+# ============================================
+
+echo "[1/5] Applying system branding..."
+
+# OS release
+cat > /etc/os-release <<EOF
+NAME="MaxRegner OS"
+VERSION="$MAXREGNER_VERSION"
+VERSION_ID="$MAXREGNER_VERSION"
+PRETTY_NAME="MaxRegner OS $MAXREGNER_VERSION"
+ID=maxregner
+ID_LIKE=debian
+HOME_URL="https://maxregner.dev"
+SUPPORT_URL="https://maxregner.dev/support"
+BUG_REPORT_URL="https://github.com/maxregnerdev/live-iso/issues"
+PRIVACY_POLICY_URL="https://maxregner.dev/privacy"
+VERSION_CODENAME="$MAXREGNER_CODENAME"
+UBUNTU_CODENAME="sid"
+ANSI_COLOR="35;1"
+LOGO="maxregner"
+EOF
+
+# LSB release
+cat > /etc/lsb-release <<EOF
+DISTRIB_ID=MaxRegner
+DISTRIB_RELEASE=$MAXREGNER_VERSION
+DISTRIB_CODENAME=$MAXREGNER_CODENAME
+DISTRIB_DESCRIPTION="MaxRegner OS $MAXREGNER_VERSION"
+EOF
+
+# Hostname
+cat > /etc/hostname <<EOF
+maxregner
+EOF
+
+# Issue files
+cat > /etc/issue <<EOF
+MaxRegner OS $MAXREGNER_VERSION \n \l
+
+EOF
+
+cat > /etc/issue.net <<EOF
+MaxRegner OS $MAXREGNER_VERSION
+
+EOF
+
+# ============================================
+# 2. LOGIN BRANDING
+# ============================================
+
+echo "[2/5] Applying login branding..."
+
+# Create branding directory
+mkdir -p /usr/share/maxregner/branding
+
+# Create logo
+cat > /usr/share/maxregner/branding/logo.svg <<'LOGOEOF'
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="maxregner" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#16213e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e94560;stop-opacity:1" />
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+      <stop offset="0%" style="stop-color:#e94560;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#e94560;stop-opacity:0" />
+    </radialGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect x="0" y="0" width="256" height="256" rx="40" fill="url(#maxregner)"/>
+  
+  <!-- Glow effect -->
+  <circle cx="128" cy="128" r="100" fill="url(#glow)"/>
+  
+  <!-- Main logo -->
+  <text x="128" y="110" font-family="Sans" font-size="64" font-weight="bold" fill="white" text-anchor="middle">MR</text>
+  <text x="128" y="155" font-family="Sans" font-size="32" fill="white" text-anchor="middle">OS</text>
+  
+  <!-- Version -->
+  <text x="128" y="200" font-family="Sans" font-size="14" fill="rgba(255,255,255,0.7)" text-anchor="middle">$MAXREGNER_VERSION</text>
+</svg>
+LOGOEOF
+
+# Create icon
+cat > /usr/share/maxregner/branding/icon.svg <<'ICONEOF'
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="icon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#16213e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e94560;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="56" height="56" rx="8" fill="url(#icon)"/>
+  <text x="32" y="38" font-family="Sans" font-size="24" font-weight="bold" fill="white" text-anchor="middle">MR</text>
+</svg>
+ICONEOF
+
+# ============================================
+# 3. GDM BRANDING
+# ============================================
+
+echo "[3/5] Applying GDM branding..."
+
+# Configure GDM
+mkdir -p /etc/gdm3
+cat > /etc/gdm3/greeter.dconf-defaults <<EOF
+[org/gnome/login-screen]
+logo=/usr/share/maxregner/branding/logo.svg
+
+[org/gnome/desktop/background]
+picture-uri=file:///usr/share/backgrounds/maxregner/login.jpg
+picture-uri-dark=file:///usr/share/backgrounds/maxregner/login-dark.jpg
+
+[org/gnome/login-screen]
+banner-message-enable=true
+banner-message-text=Welcome to MaxRegner OS $MAXREGNER_VERSION
+EOF
+
+# Create login background
+mkdir -p /usr/share/backgrounds/maxregner
+
+# Create a simple gradient background
+if command -v convert >/dev/null 2>&1; then
+    convert -size 1920x1080 \
+        -fill "#1a1a2e" -draw "rectangle 0,0 1920,1080" \
+        -fill "#16213e" -draw "rectangle 0,0 1920,540" \
+        -fill "#0f3460" -draw "rectangle 0,0 1920,270" \
+        -fill "rgba(233,69,96,0.3)" -draw "circle 960,540 200,200" \
+        /usr/share/backgrounds/maxregner/login.jpg 2>/dev/null || true
+    
+    convert -size 1920x1080 \
+        -fill "#0a0a1a" -draw "rectangle 0,0 1920,1080" \
+        -fill "#08080f" -draw "rectangle 0,0 1920,540" \
+        -fill "#04040a" -draw "rectangle 0,0 1920,270" \
+        -fill "rgba(150,30,60,0.3)" -draw "circle 960,540 200,200" \
+        /usr/share/backgrounds/maxregner/login-dark.jpg 2>/dev/null || true
+else
+    # Create placeholder files
+    echo "PNG" > /usr/share/backgrounds/maxregner/login.jpg
+    echo "PNG" > /usr/share/backgrounds/maxregner/login-dark.jpg
+fi
+
+# ============================================
+# 4. GRUB BRANDING
+# ============================================
+
+echo "[4/5] Applying GRUB branding..."
+
+# Configure GRUB
+mkdir -p /etc/default/grub.d
+cat > /etc/default/grub.d/40-maxregner.cfg <<EOF
+# MaxRegner OS GRUB Configuration
+set default="0"
+set timeout=5
+set timeout_style=menu
+
+# Background image
+set background_image="/boot/grub/maxregner.png"
+set background_color="black"
+
+# Theme
+set theme="/boot/grub/themes/maxregner/theme.txt"
+
+# Resolution
+set gfxmode="1920x1080"
+set gfxpayload="keep"
+
+# Kernel parameters
+gfxmode $linux_gfx_mode
+insmod efi_gop
+insmod efi_uga
+insmod gfxterm
+insmod vbe
+insmod vga
+insmod video_bochs
+insmod video_cirrus
+EOF
+
+# Create GRUB theme directory
+mkdir -p /boot/grub/themes/maxregner
+
+# Create simple GRUB theme
+cat > /boot/grub/themes/maxregner/theme.txt <<EOF
+# MaxRegner OS GRUB Theme
+
+title-text: "MaxRegner OS $MAXREGNER_VERSION"
+title-font: "DejaVu Sans Bold 24"
+title-color: "#e94560"
+
+message-text: "Loading..."
+message-font: "DejaVu Sans 14"
+message-color: "#eaeaea"
+
+background-image: "/boot/grub/maxregner.png"
+background-color: "#1a1a2e"
+
+item-color: "#eaeaea"
+item-font: "DejaVu Sans 14"
+selected-item-color: "#e94560"
+selected-item-font: "DejaVu Sans Bold 14"
+
+boot-menu {
+    left = 10%
+    top = 20%
+    width = 80%
+    height = 60%
+    item-padding = 10
+    item-spacing = 20
+}
+EOF
+
+# Create GRUB background
+if command -v convert >/dev/null 2>&1; then
+    convert -size 1920x1080 \
+        -fill "#1a1a2e" -draw "rectangle 0,0 1920,1080" \
+        -fill "rgba(22,33,62,0.8)" -draw "rectangle 0,800 1920,280" \
+        -fill "rgba(233,69,96,0.2)" -draw "rectangle 0,800 1920,50" \
+        -fill "white" -pointsize "48" -draw "text 960,900 'MaxRegner OS'" \
+        -fill "rgba(255,255,255,0.7)" -pointsize "24" -draw "text 960,960 '$MAXREGNER_VERSION'" \
+        /boot/grub/maxregner.png 2>/dev/null || true
+fi
+
+# Update GRUB
+update-grub 2>/dev/null || true
+
+# ============================================
+# 5. PLYMOUTH BRANDING
+# ============================================
+
+echo "[5/5] Applying Plymouth branding..."
+
+# Create Plymouth theme
+mkdir -p /usr/share/plymouth/themes/maxregner
+
+# Create Plymouth theme configuration
+cat > /usr/share/plymouth/themes/maxregner/maxregner.plymouth <<EOF
+[Plymouth Theme]
+Name=MaxRegner
+Description=MaxRegner OS Plymouth Theme
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/maxregner
+ScriptFile=/usr/share/plymouth/themes/maxregner/maxregner-script
+EOF
+
+# Create Plymouth script
+cat > /usr/share/plymouth/themes/maxregner/maxregner-script <<'PLYSCRIPT'
+#!/bin/bash
+
+plymouth set-refresh-rate 60
+
+# Load background
+plymouth image --file=/usr/share/plymouth/themes/maxregner/background.png --section=0,0,1920,1080
+
+# Splash screen animation
+SPLASH_X=$((1920 / 2 - 256 / 2))
+SPLASH_Y=$((1080 / 2 - 256 / 2))
+
+# Display splash
+plymouth image --file=/usr/share/plymouth/themes/maxregner/splash.png --section=$SPLASH_X,$SPLASH_Y,256,256
+
+# Animation
+ROTATION=0
+SCALE=1.0
+
+while [ true ]; do
+    # Pulsing animation
+    SCALE=$(echo "$SCALE + 0.005" | bc 2>/dev/null || echo "1.0")
+    if [ $(echo "$SCALE > 1.05" | bc 2>/dev/null) = 1 ]; then
+        SCALE=1.0
+    fi
+    
+    # Rotation
+    ROTATION=$((ROTATION + 1))
+    if [ $ROTATION -gt 359 ]; then
+        ROTATION=0
+    fi
+    
+    # Update splash
+    plymouth image --file=/usr/share/plymouth/themes/maxregner/splash.png \
+        --section=$SPLASH_X,$SPLASH_Y,256,256 \
+        --scale=$SCALE \
+        --rotate=$ROTATION
+    
+    sleep 0.05
+    
+    # Check if boot is complete
+    plymouth --wait
+    
+    if plymouth --quit; then
+        exit 0
+    fi
+done
+PLYSCRIPT
+
+chmod +x /usr/share/plymouth/themes/maxregner/maxregner-script
+
+# Create Plymouth images
+if command -v convert >/dev/null 2>&1; then
+    # Background
+    convert -size 1920x1080 \
+        -fill "#1a1a2e" -draw "rectangle 0,0 1920,1080" \
+        /usr/share/plymouth/themes/maxregner/background.png 2>/dev/null || true
+    
+    # Splash
+    convert -size 256x256 \
+        -fill "#e94560" -draw "rectangle 0,0 256,256" \
+        -fill "white" -pointsize "72" -draw "text 128,100 'MR'" \
+        -fill "white" -pointsize "36" -draw "text 128,160 'OS'" \
+        /usr/share/plymouth/themes/maxregner/splash.png 2>/dev/null || true
+fi
+
+# Set default Plymouth theme
+plymouth-set-default-theme maxregner 2>/dev/null || true
+
+# ============================================
+# FINAL CLEANUP
+# ============================================
+
+echo ""
+echo "========================================"
+echo "MaxRegner Branding Complete!"
+echo "========================================"
+echo "Version: $MAXREGNER_VERSION"
+echo "Codename: $MAXREGNER_CODENAME"
+echo "========================================"

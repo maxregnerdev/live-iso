@@ -1,0 +1,287 @@
+#!/bin/bash
+# MaxRegner OS - Internationalization Configuration Hook
+# Configures comprehensive language and locale support
+
+set -e
+
+echo "========================================"
+echo "MaxRegner OS - Internationalization Hook"
+echo "========================================"
+
+# ============================================
+# 1. INSTALL LOCALE PACKAGES
+# ============================================
+
+echo "[1/5] Installing locale packages..."
+
+# Install locale packages
+apt-get install -y locales locales-all language-pack-en language-pack-de \
+    language-pack-fr language-pack-es language-pack-it language-pack-ja \
+    language-pack-pt language-pack-ru language-pack-zh 2>/dev/null || true
+
+# Install input method packages
+apt-get install -y ibus ibus-gtk ibus-gtk3 ibus-qt4 ibus-libpinyin \
+    ibus-m17n ibus-unikey ibus-anthy ibus-hangul ibus-kkc \
+    ibus-mozc ibus-table ibus-table-emoji ibus-table-others \
+    fcitx fcitx-config-gtk fcitx-config-qt fcitx-ui-qimpanel \
+    fcitx-pinyin fcitx-googlepinyin fcitx-sunpinyin fcitx-libpinyin \
+    fcitx-m17n fcitx-table fcitx-table-other fcitx-table-emoji 2>/dev/null || true
+
+# ============================================
+# 2. GENERATE LOCALES
+# ============================================
+
+echo "[2/5] Generating locales..."
+
+# Configure locales
+cat > /etc/locale.gen << 'LOCALEGEN'
+# MaxRegner OS Locale Generation
+
+# English
+en_US.UTF-8 UTF-8
+en_GB.UTF-8 UTF-8
+en_AU.UTF-8 UTF-8
+en_CA.UTF-8 UTF-8
+
+# German
+de_DE.UTF-8 UTF-8
+de_AT.UTF-8 UTF-8
+de_CH.UTF-8 UTF-8
+
+# French
+fr_FR.UTF-8 UTF-8
+fr_BE.UTF-8 UTF-8
+fr_CA.UTF-8 UTF-8
+fr_CH.UTF-8 UTF-8
+
+# Spanish
+es_ES.UTF-8 UTF-8
+es_MX.UTF-8 UTF-8
+es_AR.UTF-8 UTF-8
+
+# Italian
+it_IT.UTF-8 UTF-8
+it_CH.UTF-8 UTF-8
+
+# Portuguese
+pt_PT.UTF-8 UTF-8
+pt_BR.UTF-8 UTF-8
+
+# Russian
+ru_RU.UTF-8 UTF-8
+ru_UA.UTF-8 UTF-8
+
+# Japanese
+ja_JP.UTF-8 UTF-8
+ja_JP.EUC-JP EUC-JP
+
+# Chinese
+zh_CN.UTF-8 UTF-8
+zh_TW.UTF-8 UTF-8
+zh_HK.UTF-8 UTF-8
+
+# Korean
+ko_KR.UTF-8 UTF-8
+
+# Arabic
+ar_SA.UTF-8 UTF-8
+ar_EG.UTF-8 UTF-8
+
+# Hindi
+hi_IN.UTF-8 UTF-8
+LOCALEGEN
+
+# Generate locales
+locale-gen 2>/dev/null || true
+
+# Configure default locale
+cat > /etc/default/locale << 'LOCALEDEFAULT'
+# MaxRegner OS Default Locale
+
+LANG=en_US.UTF-8
+LANGUAGE=en_US:en
+LC_ALL=en_US.UTF-8
+LC_MESSAGES=POSIX
+LOCALEDEFAULT
+
+# Update locale
+update-locale LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8 2>/dev/null || true
+
+# ============================================
+# 3. CONFIGURE INPUT METHODS
+# ============================================
+
+echo "[3/5] Configuring input methods..."
+
+# Configure IBus
+cat > /etc/default/ibus << 'IBUSDEFAULT'
+# MaxRegner OS IBus Configuration
+
+DEFAULT_INPUT_METHOD=ibus
+IBUS_DAEMON=-d -x -r
+IBUS_CONFIG=/etc/ibus.conf
+IBUS_ADDRESS_FILE=/tmp/ibus-address
+IBUS_ENABLE_SYNC_MODE=1
+IBUS_USE_SYSTEM_KEYBOARD_LAYOUT=1
+IBUS_DEFAULT_ENGINE=libpinyin
+IBUS_DEFAULT_ENGINE_FULL=xkb:us::eng
+IBUSDEFAULT
+
+# Configure IBus configuration
+mkdir -p /etc/ibus
+cat > /etc/ibus.conf << 'IBUSCONF'
+# MaxRegner OS IBus Configuration
+
+[general]
+preload_engines=xkb:us::eng,libpinyin,mozc,hangul,anthy
+use_system_keyboard_layout=true
+enable_sync_mode=1
+hide_input_method_icon=false
+
+[engine]
+libpinyin={
+    full_shape=false
+    simplified_chinese=true
+    traditional_chinese=false
+    remember_every_input=true
+}
+
+mozc={
+    preedit_method=romaji
+    conversion_mode=hiragana
+}
+
+anthy={
+    kana_table=romaji
+    dictionary=/usr/share/anthy/main.dic
+}
+
+[hotkey]
+trigger=Control+Space
+next_engine=Super+Space
+prev_engine=Shift+Super+Space
+IBUSCONF
+
+# Configure Fcitx
+cat > /etc/X11/xinit/xinputrc << 'FCITXCONF'
+# MaxRegner OS Fcitx Configuration
+
+run_im fcitx
+XMODIFIERS=@im=fcitx
+GTK_IM_MODULE=fcitx
+QT_IM_MODULE=fcitx
+FCITXCONF
+
+# ============================================
+# 4. CONFIGURE KEYBOARD LAYOUTS
+# ============================================
+
+echo "[4/5] Configuring keyboard layouts..."
+
+# Configure keyboard layouts
+cat > /etc/default/keyboard << 'KEYBOARDCONF'
+# MaxRegner OS Keyboard Configuration
+
+# Keyboard configuration
+XKBMODEL=pc105
+XKBLAYOUT=us
+XKBVARIANT=
+XKBOPTIONS=grp:alt_shift_toggle,grp_led:scroll
+
+# Console configuration
+CONSOLE_DATA_DIR=/usr/share/console-data
+CONSOLE_FONT=Lat2-Terminus16
+CONSOLE_FONT_MAP=8859-2
+CONSOLE_FONT_UNIMap=Lat2
+CONSOLE_CHARMAP=UTF-8
+KEYBOARDCONF
+
+# Configure X11 keyboard
+cat > /etc/X11/xorg.conf.d/00-keyboard.conf << 'XKEYBOARDCONF'
+# MaxRegner OS X11 Keyboard Configuration
+
+Section "InputClass"
+    Identifier "system-keyboard"
+    MatchIsKeyboard "on"
+    Option "XkbLayout" "us,de,fr,es,ru"
+    Option "XkbModel" "pc105"
+    Option "XkbOptions" "grp:alt_shift_toggle,grp_led:scroll"
+    Option "XkbVariant" ",,"
+EndSection
+
+Section "InputClass"
+    Identifier "evdev keyboard catchall"
+    MatchIsKeyboard "on"
+    MatchDevicePath "/dev/input/event*"
+    Driver "evdev"
+    Option "XkbLayout" "us,de,fr,es,ru"
+    Option "XkbModel" "pc105"
+    Option "XkbOptions" "grp:alt_shift_toggle,grp_led:scroll"
+EndSection
+XKEYBOARDCONF
+
+# ============================================
+# 5. CONFIGURE TIMEZONES
+# ============================================
+
+echo "[5/5] Configuring timezones..."
+
+# Configure timezone
+ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime 2>/dev/null || true
+
+# Install timezone data
+apt-get install -y tzdata 2>/dev/null || true
+
+# Configure timezone packages
+cat > /etc/timezone.conf << 'TZCONF'
+# MaxRegner OS Timezone Configuration
+
+# Default timezone
+TIMEZONE=America/New_York
+
+# Available timezones
+TIMEZONES="America/New_York America/Los_Angeles America/Chicago Europe/London Europe/Paris Asia/Tokyo Asia/Shanghai"
+
+# NTP settings
+NTP_SERVERS="0.pool.ntp.org 1.pool.ntp.org 2.pool.ntp.org 3.pool.ntp.org"
+TZCONF
+
+# Configure NTP
+apt-get install -y ntp ntpdate chrony 2>/dev/null || true
+
+cat > /etc/ntp.conf << 'NTPCONF'
+# MaxRegner OS NTP Configuration
+
+# NTP servers
+driftfile /var/lib/ntp/ntp.drift
+statsdir /var/log/ntpstats/
+
+server 0.pool.ntp.org iburst
+server 1.pool.ntp.org iburst
+server 2.pool.ntp.org iburst
+server 3.pool.ntp.org iburst
+
+# Local clock
+server 127.127.1.0
+fudge 127.127.1.0 stratum 10
+
+# Access control
+restrict -4 default kod notrap nomodify nopeer noquery limited
+restrict -6 default kod notrap nomodify nopeer noquery limited
+restrict 127.0.0.1
+restrict ::1
+
+# Logging
+logconfig =syncstatus +sysevent +sysstat
+NTPCONF
+
+# Enable and start services
+systemctl enable ntp 2>/dev/null || true
+systemctl enable chrony 2>/dev/null || true
+systemctl start ntp 2>/dev/null || true
+systemctl start chrony 2>/dev/null || true
+
+echo ""
+echo "========================================"
+echo "MaxRegner Internationalization Complete!"
+echo "========================================"

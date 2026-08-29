@@ -1,0 +1,218 @@
+#!/bin/bash
+# MaxRegner OS - Applications Configuration Hook
+# Configures all installed applications
+
+set -e
+
+echo "========================================"
+echo "MaxRegner OS - Applications Configuration Hook"
+echo "========================================"
+
+# Source configuration
+if [ -f /working_dir/maxregner-os/config/terraform-maxregner.conf ]; then
+    source /working_dir/maxregner-os/config/terraform-maxregner.conf
+fi
+
+MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
+MAXREGNER_HOME="/home/$MAXREGNER_USER"
+
+# ============================================
+# 1. FIREFOX CONFIGURATION
+# ============================================
+
+echo "[1/5] Configuring Firefox..."
+
+# Create Firefox profile directory
+mkdir -p "$MAXREGNER_HOME/.mozilla/firefox"
+
+# Create Firefox preferences
+cat > "$MAXREGNER_HOME/.mozilla/firefox/profiles.ini" <<EOF
+[General]
+StartWithLastProfile=1
+
+[Profile0]
+Name=default
+IsRelative=1
+Path=default
+Default=1
+EOF
+
+# Create Firefox user.js
+mkdir -p "$MAXREGNER_HOME/.mozilla/firefox/default"
+cat > "$MAXREGNER_HOME/.mozilla/firefox/default/user.js" <<EOF
+// MaxRegner OS Firefox Configuration
+user_pref("browser.startup.homepage", "https://maxregner.dev");
+user_pref("browser.newtabpage.enabled", false);
+user_pref("browser.search.defaultenginename", "DuckDuckGo");
+user_pref("browser.search.selectedEngine", "DuckDuckGo");
+user_pref("browser.search.order.1", "DuckDuckGo");
+user_pref("browser.search.hiddenOneOffs", "Bing,Amazon.com,eBay,Yahoo");
+user_pref("privacy.trackingprotection.enabled", true);
+user_pref("privacy.trackingprotection.pbmode.enabled", true);
+user_pref("network.cookie.cookieBehavior", 1);
+user_pref("network.cookie.thirdparty.sessionOnly", true);
+user_pref("security.sandbox.content.level", 5);
+user_pref("media.volume_scale", "0.5");
+user_pref("browser.download.dir", "$MAXREGNER_HOME/Downloads");
+user_pref("browser.helperApps.neverAsk.saveToDisk", "application/pdf, application/x-pdf, application/octet-stream");
+EOF
+
+chown -R "$MAXREGNER_USER:$MAXREGNER_USER" "$MAXREGNER_HOME/.mozilla"
+
+# ============================================
+# 2. LIBREOFFICE CONFIGURATION
+# ============================================
+
+echo "[2/5] Configuring LibreOffice..."
+
+# Create LibreOffice user profile
+mkdir -p "$MAXREGNER_HOME/.config/libreoffice/4/user"
+
+# Configure LibreOffice
+cat > "$MAXREGNER_HOME/.config/libreoffice/4/user/registrymodifications.xcu" <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<oor:items xmlns:oor="http://openoffice.org/2001/registry" xmlns:xs="http://www.w3.org/2001/XMLSchema" oor:name="Data" oor:type="xs:string">
+  <item oor:name="ooSetupPath" oor:type="xs:string">file://$MAXREGNER_HOME/.config/libreoffice/4/user</item>
+  <item oor:name="ooSetupUserProfilePath" oor:type="xs:string">file://$MAXREGNER_HOME/.config/libreoffice/4/user</item>
+  <item oor:name="DefaultFilter" oor:path="swriter" oor:name="Writer/HTML" oor:op="fuse" oor:type="xs:string">HTML (Writer)</item>
+  <item oor:name="DefaultFilter" oor:path="scalc" oor:name="Calc/HTML" oor:op="fuse" oor:type="xs:string">HTML (Calc)</item>
+</oor:items>
+EOF
+
+# Set default templates
+mkdir -p "$MAXREGNER_HOME/.local/share/templates"
+cat > "$MAXREGNER_HOME/.local/share/templates/MaxRegner Template.ott" <<EOF
+PK
+EOF
+
+chown -R "$MAXREGNER_USER:$MAXREGNER_USER" "$MAXREGNER_HOME/.config/libreoffice"
+chown -R "$MAXREGNER_USER:$MAXREGNER_USER" "$MAXREGNER_HOME/.local"
+
+# ============================================
+# 3. TERMINAL CONFIGURATION
+# ============================================
+
+echo "[3/5] Configuring terminal..."
+
+# Configure GNOME Terminal
+mkdir -p "$MAXREGNER_HOME/.config/dconf"
+dbus-launch gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9/ default-size-rows 25 2>/dev/null || true
+dbus-launch gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9/ default-size-columns 80 2>/dev/null || true
+dbus-launch gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9/ background-color '#1a1a2e' 2>/dev/null || true
+dbus-launch gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9/ foreground-color '#eaeaea' 2>/dev/null || true
+dbus-launch gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9/ font 'Cantarell 11' 2>/dev/null || true
+
+# Create bash configuration
+cat > "$MAXREGNER_HOME/.bashrc" <<'BASHEOF'
+# MaxRegner OS Bash Configuration
+
+# Source global settings
+if [ -f /etc/bashrc ]; then
+    . /etc/bashrc
+fi
+
+# User specific aliases and functions
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
+alias update='sudo apt-get update && sudo apt-get upgrade -y'
+alias install='sudo apt-get install -y'
+alias remove='sudo apt-get remove -y'
+alias clean='sudo apt-get clean && sudo apt-get autoclean'
+
+# PS1 prompt
+PS1='\u@\h:\w\$ '
+
+# History settings
+export HISTSIZE=10000
+export HISTFILESIZE=20000
+export HISTCONTROL=ignoreboth
+
+# Editor
+export EDITOR=nano
+
+# MaxRegner welcome message
+if [ -f /usr/bin/maxregner-welcome ]; then
+    /usr/bin/maxregner-welcome
+fi
+BASHEOF
+
+chown "$MAXREGNER_USER:$MAXREGNER_USER" "$MAXREGNER_HOME/.bashrc"
+
+# ============================================
+# 4. FILE MANAGER CONFIGURATION
+# ============================================
+
+echo "[4/5] Configuring file manager..."
+
+# Configure Nautilus (GNOME Files)
+dbus-launch gsettings set org.gnome.nautilus.preferences default-folder-viewer 'list-view' 2>/dev/null || true
+dbus-launch gsettings set org.gnome.nautilus.preferences sort-directories-first true 2>/dev/null || true
+dbus-launch gsettings set org.gnome.nautilus.list-view default-zoom-level 'small' 2>/dev/null || true
+dbus-launch gsettings set org.gnome.nautilus.icon-view default-zoom-level 'small' 2>/dev/null || true
+
+# Set default locations
+dbus-launch gsettings set org.gnome.shell.favorite-apps "['org.gnome.Nautilus.desktop', 'firefox-esr.desktop', 'org.gnome.Terminal.desktop', 'libreoffice-writer.desktop']" 2>/dev/null || true
+
+# ============================================
+# 5. SYSTEM APPLICATIONS
+# ============================================
+
+echo "[5/5] Configuring system applications..."
+
+# Create application directories
+mkdir -p "$MAXREGNER_HOME/.local/share/applications"
+mkdir -p "$MAXREGNER_HOME/.config/autostart"
+
+# Create custom applications
+cat > "$MAXREGNER_HOME/.local/share/applications/maxregner-terminal.desktop" <<EOF
+[Desktop Entry]
+Type=Application
+Name=MaxRegner Terminal
+Comment=MaxRegner Custom Terminal
+Exec=gnome-terminal
+Icon=utilities-terminal
+Terminal=false
+Categories=System;TerminalEmulator;
+StartupNotify=true
+X-GNOME-UsesNotifications=false
+EOF
+
+cat > "$MAXREGNER_HOME/.local/share/applications/maxregner-settings.desktop" <<EOF
+[Desktop Entry]
+Type=Application
+Name=MaxRegner Settings
+Comment=MaxRegner System Settings
+Exec=gnome-control-center
+Icon=gnome-control-center
+Terminal=false
+Categories=Settings;System;
+StartupNotify=true
+EOF
+
+# Create autostart applications
+cat > "$MAXREGNER_HOME/.config/autostart/maxregner-update-check.desktop" <<EOF
+[Desktop Entry]
+Type=Application
+Name=MaxRegner Update Checker
+Comment=Check for system updates
+Exec=/usr/bin/maxregner-update-check
+Icon=system-software-update
+Terminal=false
+Categories=System;
+StartupNotify=false
+Hidden=true
+X-GNOME-Autostart-Delay=60
+EOF
+
+chown -R "$MAXREGNER_USER:$MAXREGNER_USER" "$MAXREGNER_HOME/.local"
+chown -R "$MAXREGNER_USER:$MAXREGNER_USER" "$MAXREGNER_HOME/.config"
+
+# ============================================
+# FINAL CLEANUP
+# ============================================
+
+echo ""
+echo "========================================"
+echo "MaxRegner Applications Configuration Complete!"
+echo "========================================"

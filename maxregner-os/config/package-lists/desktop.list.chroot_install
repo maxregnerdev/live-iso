@@ -1,0 +1,161 @@
+# MaxRegner OS - Packages to install in the installed system
+# These packages are installed on the target system, not in the live session
+
+# ============================================
+# BASE SYSTEM FOR INSTALLED SYSTEM
+# ============================================
+
+# Kernel and boot
+linux-image-amd64
+linux-headers-amd64
+
+# Bootloader
+grub2
+grub-efi-amd64
+grub-efi-amd64-bin
+grub-efi-amd64-signed
+
+# Firmware
+linux-firmware
+
+# ============================================
+# CORE UTILITIES FOR INSTALLED SYSTEM
+# ============================================
+
+# System tools
+systemd
+systemd-sysv
+udev
+util-linux
+coreutils
+findutils
+diffutils
+bash
+bash-completion
+
+# Networking
+network-manager
+network-manager-gnome
+modemmanager
+wpasupplicant
+bluez
+
+# ============================================
+# MAXREGNER BRANDING AND THEMES
+# ============================================
+
+maxregner-theme-ultimate
+maxregner-icons-ultimate
+maxregner-wallpapers-ultimate
+maxregner-sounds-ultimate
+maxregner-cursors-ultimate
+maxregner-grub-themes
+maxregner-plymouth-themes
+
+# ============================================
+# GRUB CUSTOMIZATION
+# ============================================
+
+grub-customizer
+grub-themes-maxregner
+
+# ============================================
+# ADDITIONAL DRIVERS FOR INSTALLED SYSTEM
+# ============================================
+
+# Graphics drivers
+nvidia-driver
+nvidia-dkms
+nvidia-settings
+nvidia-prime
+
+# AMD drivers
+amd64-microcode
+firmware-amd-graphics
+
+# Intel drivers
+intel-microcode
+
+# ============================================
+# PRINTER DRIVERS
+# ============================================
+
+hplip
+hplip-gui
+epson-ppd
+brother-ppd
+sane
+sane-utils
+
+# ============================================
+# ADDITIONAL FONTS
+# ============================================
+
+fonts-noto
+fonts-noto-cjk
+fonts-noto-color-emoji
+fonts-roboto
+fonts-firacode
+
+# Microsoft fonts
+ttf-mscorefonts-installer
+
+# ============================================
+# DEVELOPMENT TOOLS FOR INSTALLED SYSTEM
+# ============================================
+
+build-essential
+git
+python3
+python3-dev
+python3-pip
+python3-venv
+
+# ============================================
+# VIRTUALIZATION SUPPORT
+# ============================================
+
+qemu-guest-agent
+open-vm-tools
+open-vm-tools-desktop
+virtualbox-guest-utils
+virtualbox-guest-x11
+virtualbox-guest-dkms
+
+# ============================================
+# CLOUD INIT SUPPORT
+# ============================================
+
+cloud-init
+cloud-initramfs-growroot
+cloud-initramfs-dyn-netconf
+
+# ============================================
+# SECURITY TOOLS FOR INSTALLED SYSTEM
+# ============================================
+
+ufw
+fail2ban
+clamav
+clamav-daemon
+
+# ============================================
+# MONITORING TOOLS
+# ============================================
+
+htop
+iotop
+nmon
+sysstat
+
+# ============================================
+# BACKUP TOOLS
+# ============================================
+
+rsync
+duplicity
+borgbackup
+
+# ============================================
+# END OF INSTALL PACKAGE LIST
+# ============================================

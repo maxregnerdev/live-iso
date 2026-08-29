@@ -1,0 +1,258 @@
+#!/bin/bash
+# MaxRegner OS - Storage Configuration Hook
+# Configures all storage-related settings
+
+set -e
+
+echo "========================================"
+echo "MaxRegner OS - Storage Configuration Hook"
+echo "========================================"
+
+# ============================================
+# 1. FILESYSTEM CONFIGURATION
+# ============================================
+
+echo "[1/5] Configuring filesystems..."
+
+# Configure fstab
+cat > /etc/fstab <<EOF
+# MaxRegner OS Filesystem Configuration
+# <file system> <mount point> <type> <options> <dump> <pass>
+
+# Root filesystem
+tmpfs /tmp tmpfs defaults,noatime,nosuid,nodev,size=2G 0 0
+
+# System partitions
+UUID=none / ext4 defaults,noatime,errors=remount-ro 0 1
+
+# Boot partition
+UUID=none /boot ext4 defaults,noatime 0 2
+
+# EFI partition
+UUID=none /boot/efi vfat defaults,noatime,umask=0077 0 2
+
+# Home partition (separate)
+UUID=none /home ext4 defaults,noatime,nodev 0 2
+
+# Swap partition
+UUID=none none swap sw 0 0
+
+# Temporary filesystems
+tmpfs /var/tmp tmpfs defaults,noatime,nosuid,nodev,size=1G 0 0
+tmpfs /var/log tmpfs defaults,noatime,nosuid,nodev,size=512M 0 0
+
+# CD/DVD
+/dev/sr0 /media/cdrom0 udf,iso9660 user,noauto 0 0
+EOF
+
+# ============================================
+# 2. LVM CONFIGURATION
+# ============================================
+
+echo "[2/5] Configuring LVM..."
+
+# Install LVM tools
+apt-get install -y lvm2 thin-provisioning-tools 2>/dev/null || true
+
+# Configure LVM
+cat > /etc/lvm/lvm.conf <<EOF
+# MaxRegner OS LVM Configuration
+
+devices {
+    # Scan for LVM volume groups
+    scan = [ "/dev/sd*", "/dev/vd*", "/dev/nvme*" ]
+    
+    # Filter devices
+    filter = [ "a|/dev/sd.*|", "a|/dev/vd.*|", "a|/dev/nvme.*|", "r|.*|" ]
+    
+    # Cache directory
+    cache_dir = "/run/lvm"
+    
+    # Write cache
+    write_cache_state = 1
+    
+    # Sysfs information
+    sysfs_scan = 1
+    
+    # Multipath
+    multipath_component_detection = 1
+    
+    # Ignore suspended devices
+    ignore_suspended_devices = 1
+}
+
+allocation {
+    # Retry failed allocations
+    retry_deactivation = 1
+    
+    # Thin provisioning
+    thin_pool_autoextend_threshold = 80
+    thin_pool_autoextend_chunk_size = 20
+}
+
+log {
+    # Logging level
+    level = 1
+    
+    # Log file
+    file = "/var/log/lvm2.log"
+    
+    # Overwrite log
+    overwrite = 1
+}
+
+activation {
+    # Retry failed commands
+    retry_deactivation = 1
+    
+    # Missing stripe width
+    missing_stripe_width = 65534
+    
+    # Thin pool autoextend
+    thin_pool_autoextend_threshold = 80
+    thin_pool_autoextend_chunk_size = 20
+}
+EOF
+
+# ============================================
+# 3. DISK UTILITIES CONFIGURATION
+# ============================================
+
+echo "[3/5] Configuring disk utilities..."
+
+# Configure smartd
+cat > /etc/smartd.conf <<EOF
+# MaxRegner OS SMART Monitoring Configuration
+
+# Enable SMART for all devices
+DEVICESCAN -d removable -n standby -s (S/../(02|22)/./02|L/../(03|21)/./03) -a -I 194 -W 5,40,45 -m admin@maxregner.dev
+
+# Additional settings
+DEVICESCAN -d removable -n standby -s (S/../02/./02|L/../03/./03) -a -I 194 -W 5,40,45
+
+# Temperature monitoring
+DEVICESCAN -d removable -n standby -W 45 -H 50
+EOF
+
+# Configure hdparm
+cat > /etc/hdparm.conf <<EOF
+# MaxRegner OS HDParm Configuration
+
+# Global settings
+command_line {
+    hdparm -B 254 /dev/sd[a-z] 2>/dev/null
+    hdparm -S 240 /dev/sd[a-z] 2>/dev/null
+    hdparm -M 254 /dev/sd[a-z] 2>/dev/null
+}
+
+# SSD optimization
+command_line {
+    hdparm -B 254 /dev/sd[a-z] 2>/dev/null
+    hdparm -S 0 /dev/sd[a-z] 2>/dev/null
+}
+
+# NVMe optimization
+command_line {
+    hdparm -B 254 /dev/nvme* 2>/dev/null
+    hdparm -S 0 /dev/nvme* 2>/dev/null
+}
+EOF
+
+# ============================================
+# 4. STORAGE OPTIMIZATION
+# ============================================
+
+echo "[4/5] Optimizing storage performance..."
+
+# Configure sysctl for storage
+cat > /etc/sysctl.d/99-maxregner-storage.conf <<EOF
+# MaxRegner OS Storage Optimization
+
+# Dirty page settings
+vm.dirty_ratio = 30
+vm.dirty_background_ratio = 10
+vm.dirty_expire_centisecs = 3000
+vm.dirty_writeback_centisecs = 500
+
+# Swappiness
+vm.swappiness = 10
+vm.watermark_scale_factor = 200
+
+# I/O scheduler
+vm.io_scheduler = bfq
+
+# File system settings
+fs.file-max = 2097152
+fs.nr_open = 1048576
+
+# Inode cache
+fs.inotify.max_user_watches = 524288
+
+# Buffer cache
+vm.vfs_cache_pressure = 50
+EOF
+
+# Apply sysctl settings
+sysctl -p /etc/sysctl.d/99-maxregner-storage.conf 2>/dev/null || true
+
+# ============================================
+# 5. MOUNT OPTIONS
+# ============================================
+
+echo "[5/5] Configuring mount options..."
+
+# Configure default mount options
+cat > /etc/default/mountall <<EOF
+# MaxRegner OS Mount Options
+
+# Filesystem mount options
+MOUNTOPTS="-o noatime,nodiratime,errors=remount-ro"
+
+# NFS mount options
+NFSOPTS="-o noatime,nodiratime,hard,intr,rsize=8192,wsize=8192"
+
+# CIFS mount options
+CIFSOPTS="-o noatime,nodiratime,uid=1000,gid=1000,file_mode=0775,dir_mode=0775"
+
+# tmpfs mount options
+TMPFSOPTS="-o defaults,noatime,nosuid,nodev,size=2G"
+EOF
+
+# Configure automount
+cat > /etc/auto_master <<EOF
+# MaxRegner OS AutoFS Configuration
+
++auto_master
+/net -hosts -nosuid,nobrowse
+/misc -fstype=autofs rbind
+/media -fstype=autofs nosuid,nodev
+EOF
+
+# Create automount maps
+mkdir -p /etc/auto.net /etc/auto.misc /etc/auto.media
+
+# Configure udev for storage
+cat > /etc/udev/rules.d/99-maxregner-storage.rules <<EOF
+# MaxRegner OS Storage Udev Rules
+
+# SSD optimization
+ACTION=="add|change", KERNEL=="sd[a-z]|nvme[0-9]*", ATTR{queue/scheduler}="bfq", ATTR{queue/rotational}="0"
+
+# HDD optimization
+ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}="1", ATTR{queue/scheduler}="bfq"
+
+# NVMe optimization
+ACTION=="add|change", KERNEL=="nvme[0-9]*", ATTR{queue/scheduler}="none", ATTR{queue/rotational}="0"
+
+# USB storage
+ACTION=="add", KERNEL=="sd[a-z]", ATTRS{idVendor}=="*", ATTRS{idProduct}=="*", ATTR{queue/scheduler}="bfq"
+EOF
+
+# ============================================
+# FINAL CLEANUP
+# ============================================
+
+echo ""
+echo "========================================"
+echo "MaxRegner Storage Configuration Complete!"
+echo "========================================"

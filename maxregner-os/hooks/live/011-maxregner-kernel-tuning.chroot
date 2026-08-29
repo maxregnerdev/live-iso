@@ -1,0 +1,173 @@
+#!/bin/bash
+# MaxRegner OS - Kernel Tuning Hook
+# Optimizes kernel parameters for performance and responsiveness
+
+set -e
+
+echo "========================================"
+echo "MaxRegner OS - Kernel Tuning Hook"
+echo "========================================"
+
+# ============================================
+# 1. CPU AND SCHEDULER TUNING
+# ============================================
+
+echo "[1/5] Tuning CPU and scheduler..."
+
+# Create sysctl configuration for CPU
+cat > /etc/sysctl.d/10-maxregner-cpu.conf <<EOF
+# MaxRegner OS CPU Tuning
+
+# Scheduler settings
+kernel.sched_min_granularity_ns = 1000000
+kernel.sched_wakeup_granularity_ns = 1500000
+kernel.sched_latency_ns = 6000000
+kernel.sched_nr_migrate = 32
+kernel.sched_time_avg_ms = 1000
+kernel.sched_shares_window_ns = 25000000
+
+# CPU frequency scaling
+kernel.sched_schedstats = 0
+
+# Preemption
+kernel.preempt = 1
+kernel.preempt_rt = 0
+EOF
+
+# Apply CPU settings
+sysctl -p /etc/sysctl.d/10-maxregner-cpu.conf 2>/dev/null || true
+
+# ============================================
+# 2. MEMORY MANAGEMENT
+# ============================================
+
+echo "[2/5] Tuning memory management..."
+
+cat > /etc/sysctl.d/20-maxregner-memory.conf <<EOF
+# MaxRegner OS Memory Tuning
+
+# Swappiness (lower = prefer RAM over swap)
+vm.swappiness = 10
+
+# Overcommit memory
+vm.overcommit_memory = 1
+vm.overcommit_ratio = 80
+
+# Dirty page settings
+vm.dirty_ratio = 30
+vm.dirty_background_ratio = 10
+vm.dirty_expire_centisecs = 3000
+vm.dirty_writeback_centisecs = 500
+
+# File cache
+vm.vfs_cache_pressure = 50
+
+# Huge pages
+vm.nr_hugepages = 128
+
+# Transparent Huge Pages
+vm.thp_enabled = 1
+EOF
+
+sysctl -p /etc/sysctl.d/20-maxregner-memory.conf 2>/dev/null || true
+
+# ============================================
+# 3. I/O PERFORMANCE
+# ============================================
+
+echo "[3/5] Tuning I/O performance..."
+
+cat > /etc/sysctl.d/30-maxregner-io.conf <<EOF
+# MaxRegner OS I/O Tuning
+
+# Readahead
+vm.readahead_size = 8192
+
+# File handles
+fs.file-max = 2097152
+fs.nr_open = 1048576
+
+# Inode cache
+fs.inotify.max_user_watches = 524288
+
+# Buffer sizes
+blockdev --setra 8192 /dev/sda 2>/dev/null || true
+blockdev --setra 8192 /dev/sdb 2>/dev/null || true
+blockdev --setra 8192 /dev/nvme0n1 2>/dev/null || true
+EOF
+
+sysctl -p /etc/sysctl.d/30-maxregner-io.conf 2>/dev/null || true
+
+# ============================================
+# 4. NETWORK TUNING
+# ============================================
+
+echo "[4/5] Tuning network stack..."
+
+cat > /etc/sysctl.d/40-maxregner-network.conf <<EOF
+# MaxRegner OS Network Tuning
+
+# TCP settings
+net.core.netdev_max_backlog = 5000
+net.core.rmem_max = 16777216
+net.core.wmem_max = 16777216
+net.core.rmem_default = 16777216
+net.core.wmem_default = 16777216
+net.core.optmem_max = 65536
+net.core.somaxconn = 4096
+
+# TCP congestion
+net.ipv4.tcp_congestion_control = cubic
+net.ipv4.tcp_no_metrics_save = 1
+net.ipv4.tcp_ecn = 1
+net.ipv4.tcp_syncookies = 1
+
+# TCP keepalive
+net.ipv4.tcp_keepalive_time = 300
+net.ipv4.tcp_keepalive_probes = 5
+net.ipv4.tcp_keepalive_intvl = 15
+
+# TCP buffer sizes
+net.ipv4.tcp_rmem = 4096 87380 16777216
+net.ipv4.tcp_wmem = 4096 87380 16777216
+
+# TCP retransmission
+net.ipv4.tcp_retries1 = 3
+net.ipv4.tcp_retries2 = 5
+EOF
+
+sysctl -p /etc/sysctl.d/40-maxregner-network.conf 2>/dev/null || true
+
+# ============================================
+# 5. VIRTUAL MEMORY
+# ============================================
+
+echo "[5/5] Tuning virtual memory..."
+
+cat > /etc/sysctl.d/50-maxregner-vm.conf <<EOF
+# MaxRegner OS Virtual Memory Tuning
+
+# Swap settings
+vm.swappiness = 10
+vm.watermark_scale_factor = 200
+
+# Memory compaction
+vm.compact_unevictable_allowed = 1
+
+# OOM killer
+vm.oom_kill_allocating_task = 1
+vm.oom_dump_tasks = 1
+
+# Low memory
+vm.lowmem_reserve_ratio = 256 256 32
+EOF
+
+sysctl -p /etc/sysctl.d/50-maxregner-vm.conf 2>/dev/null || true
+
+# Apply all sysctl settings
+sysctl --system 2>/dev/null || true
+
+echo ""
+echo "========================================"
+echo "MaxRegner Kernel Tuning Complete!"
+echo "========================================"

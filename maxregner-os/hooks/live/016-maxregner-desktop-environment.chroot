@@ -1,0 +1,144 @@
+#!/bin/bash
+# MaxRegner OS - Desktop Environment Configuration Hook
+# Configures the complete MaxRegner desktop experience
+
+set -e
+
+echo "========================================"
+echo "MaxRegner OS - Desktop Environment Hook"
+echo "========================================"
+
+MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
+MAXREGNER_HOME="/home/$MAXREGNER_USER"
+
+# ============================================
+# 1. GNOME SHELL CONFIGURATION
+# ============================================
+
+echo "[1/5] Configuring GNOME Shell..."
+
+# Enable all GNOME Shell extensions
+gsettings set org.gnome.shell enabled-extensions \
+    "['user-theme@gnome-shell-extensions.gcampax.github.com', \
+      'dash-to-dock@micxgx.gmail.com', \
+      'appindicator@kgx52.com', \
+      'caffeine@patapon.info', \
+      'clipboard-indicator@tudmotu.com', \
+      'easyscreencast@iacopodeenosee.gmail.com', \
+      'gsconnect@andyholmes.github.io', \
+      'multi-monitors@maestroschan.fr', \
+      'remmina@raffaele.dellaporta.name', \
+      'vitals@CoreCoding.com']" 2>/dev/null || true
+
+# Configure GNOME Shell settings
+gsettings set org.gnome.shell app-picker-layout "[]" 2>/dev/null || true
+gsettings set org.gnome.shell app-switcher current-workspace-only false 2>/dev/null || true
+gsettings set org.gnome.shell disable-user-extensions false 2>/dev/null || true
+gsettings set org.gnome.shell enable-animations true 2>/dev/null || true
+
+# Configure GNOME Shell favorite apps
+gsettings set org.gnome.shell favorite-apps \
+    "['org.gnome.Nautilus.desktop', \
+      'firefox-esr.desktop', \
+      'org.gnome.Terminal.desktop', \
+      'libreoffice-writer.desktop', \
+      'org.gnome.Calculator.desktop', \
+      'org.gnome.Contacts.desktop', \
+      'org.gnome.Calendar.desktop']" 2>/dev/null || true
+
+# ============================================
+# 2. GNOME DESKTOP CONFIGURATION
+# ============================================
+
+echo "[2/5] Configuring GNOME Desktop..."
+
+# Interface settings
+gsettings set org.gnome.desktop.interface gtk-theme "MaxRegner-Ultimate" 2>/dev/null || true
+gsettings set org.gnome.desktop.interface icon-theme "MaxRegner-Icons" 2>/dev/null || true
+gsettings set org.gnome.desktop.interface cursor-theme "MaxRegner-Cursor" 2>/dev/null || true
+gsettings set org.gnome.desktop.interface font-name "Cantarell 11" 2>/dev/null || true
+gsettings set org.gnome.desktop.interface document-font-name "Sans 11" 2>/dev/null || true
+gsettings set org.gnome.desktop.interface monospace-font-name "Monospace 11" 2>/dev/null || true
+gsettings set org.gnome.desktop.interface text-scaling-factor 1.0 2>/dev/null || true
+
+# Background settings
+gsettings set org.gnome.desktop.background primary-color "#1a1a2e" 2>/dev/null || true
+gsettings set org.gnome.desktop.background secondary-color "#16213e" 2>/dev/null || true
+gsettings set org.gnome.desktop.background color-shading-type "vertical" 2>/dev/null || true
+
+# Screensaver settings
+gsettings set org.gnome.desktop.screensaver lock-enabled false 2>/dev/null || true
+gsettings set org.gnome.desktop.screensaver idle-activation-enabled false 2>/dev/null || true
+gsettings set org.gnome.desktop.screensaver ubuntu-lock-on-suspend false 2>/dev/null || true
+
+# ============================================
+# 3. GNOME WINDOW MANAGER CONFIGURATION
+# ============================================
+
+echo "[3/5] Configuring window manager..."
+
+# Mutter settings (GNOME window manager)
+gsettings set org.gnome.mutter auto-maximize false 2>/dev/null || true
+gsettings set org.gnome.mutter auto-minimize false 2>/dev/null || true
+gsettings set org.gnome.mutter compositing true 2>/dev/null || true
+gsettings set org.gnome.mutter dynamic-workspaces true 2>/dev/null || true
+gsettings set org.gnome.mutter workspaces-only-on-primary false 2>/dev/null || true
+gsettings set org.gnome.mutter edge-tiling true 2>/dev/null || true
+gsettings set org.gnome.mutter focus-new-windows "smart" 2>/dev/null || true
+
+# Window keybindings
+gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-1 "['<Super>1']" 2>/dev/null || true
+gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-2 "['<Super>2']" 2>/dev/null || true
+gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-3 "['<Super>3']" 2>/dev/null || true
+gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-4 "['<Super>4']" 2>/dev/null || true
+
+# ============================================
+# 4. NAUTILUS (FILES) CONFIGURATION
+# ============================================
+
+echo "[4/5] Configuring Nautilus..."
+
+# Nautilus preferences
+gsettings set org.gnome.nautilus.preferences default-folder-viewer "list-view" 2>/dev/null || true
+gsettings set org.gnome.nautilus.preferences sort-directories-first true 2>/dev/null || true
+gsettings set org.gnome.nautilus.list-view default-zoom-level "small" 2>/dev/null || true
+gsettings set org.gnome.nautilus.icon-view default-zoom-level "small" 2>/dev/null || true
+gsettings set org.gnome.nautilus.preferences show-hidden-files true 2>/dev/null || true
+gsettings set org.gnome.nautilus.preferences search-filter-time-type "last_modified" 2>/dev/null || true
+
+# Nautilus window state
+gsettings set org.gnome.nautilus.window-state geometry "1200x800+0+0" 2>/dev/null || true
+gsettings set org.gnome.nautilus.window-state maximized true 2>/dev/null || true
+
+# ============================================
+# 5. GNOME TERMINAL CONFIGURATION
+# ============================================
+
+echo "[5/5] Configuring GNOME Terminal..."
+
+# Create terminal profile
+mkdir -p "$MAXREGNER_HOME/.config/dconf"
+
+# Set terminal preferences
+dbus-launch gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9/ default-size-rows 25 2>/dev/null || true
+dbus-launch gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9/ default-size-columns 80 2>/dev/null || true
+dbus-launch gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9/ background-color '#1a1a2e' 2>/dev/null || true
+dbus-launch gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9/ foreground-color '#eaeaea' 2>/dev/null || true
+dbus-launch gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9/ font 'Cantarell 11' 2>/dev/null || true
+dbus-launch gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9/ cursor-blink-mode 'on' 2>/dev/null || true
+dbus-launch gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9/ scrollback-lines 10000 2>/dev/null || true
+
+# Set default terminal profile
+dbus-launch gsettings set org.gnome.Terminal.ProfilesList default "b1dcc9dd-5262-4d8d-a863-c897e6d979b9" 2>/dev/null || true
+
+# Enable terminal bell
+dbus-launch gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9/ audible-bell true 2>/dev/null || true
+
+# ============================================
+# FINAL CLEANUP
+# ============================================
+
+echo ""
+echo "========================================"
+echo "MaxRegner Desktop Environment Complete!"
+echo "========================================"

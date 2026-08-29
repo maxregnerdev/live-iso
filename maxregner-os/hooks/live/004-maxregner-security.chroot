@@ -1,0 +1,162 @@
+#!/bin/bash
+# MaxRegner OS - Security Hardening Hook
+# This hook applies security hardening to the system
+
+set -e
+
+echo "========================================"
+echo "MaxRegner OS - Security Hardening Hook"
+echo "========================================"
+
+# ============================================
+# 1. FIREWALL CONFIGURATION
+# ============================================
+
+echo "[1/5] Configuring firewall..."
+
+# Install and configure UFW
+apt-get install -y ufw 2>/dev/null || true
+
+# Enable UFW with default deny
+ufw default deny incoming 2>/dev/null || true
+ufw default allow outgoing 2>/dev/null || true
+
+# Allow common services
+ufw allow ssh 2>/dev/null || true
+ufw allow http 2>/dev/null || true
+ufw allow https 2>/dev/null || true
+
+# Enable UFW
+ufw --force enable 2>/dev/null || true
+
+# ============================================
+# 2. APPARMOR CONFIGURATION
+# ============================================
+
+echo "[2/5] Configuring AppArmor..."
+
+# Install AppArmor
+apt-get install -y apparmor apparmor-utils 2>/dev/null || true
+
+# Enable AppArmor
+systemctl enable apparmor 2>/dev/null || true
+systemctl start apparmor 2>/dev/null || true
+
+# Put AppArmor in enforce mode
+aa-enforce /etc/apparmor.d/* 2>/dev/null || true
+
+# ============================================
+# 3. SSH HARDENING
+# ============================================
+
+echo "[3/5] Hardening SSH..."
+
+# Configure SSH
+if [ -f /etc/ssh/sshd_config ]; then
+    # Backup original
+    cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
+    
+    # Apply security settings
+    sed -i 's/^#PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config
+    sed -i 's/^#PasswordAuthentication.*/PasswordAuthentication no/' /etc/ssh/sshd_config
+    sed -i 's/^#ChallengeResponseAuthentication.*/ChallengeResponseAuthentication no/' /etc/ssh/sshd_config
+    sed -i 's/^#UsePAM.*/UsePAM yes/' /etc/ssh/sshd_config
+    sed -i 's/^#X11Forwarding.*/X11Forwarding no/' /etc/ssh/sshd_config
+    sed -i 's/^#AllowTcpForwarding.*/AllowTcpForwarding no/' /etc/ssh/sshd_config
+    sed -i 's/^#AllowAgentForwarding.*/AllowAgentForwarding no/' /etc/ssh/sshd_config
+    sed -i 's/^#MaxAuthTries.*/MaxAuthTries 3/' /etc/ssh/sshd_config
+    sed -i 's/^#LoginGraceTime.*/LoginGraceTime 60/' /etc/ssh/sshd_config
+    
+    # Add custom settings
+    echo "" >> /etc/ssh/sshd_config
+    echo "# MaxRegner OS Security" >> /etc/ssh/sshd_config
+    echo "AllowUsers $MAXREGNER_USER" >> /etc/ssh/sshd_config
+    echo "DenyUsers root" >> /etc/ssh/sshd_config
+fi
+
+# ============================================
+# 4. SYSTEM HARDENING
+# ============================================
+
+echo "[4/5] Applying system hardening..."
+
+# Configure kernel parameters
+cat > /etc/sysctl.d/99-maxregner-hardening.conf <<EOF
+# MaxRegner OS Security Hardening
+
+# Prevent kernel pointer leaks
+kernel.kptr_restrict=2
+
+# Prevent kernel stack traces
+kernel.dmesg_restrict=1
+
+# Enable ASLR for all processes
+kernel.randomize_va_space=2
+
+# Disable BPF JIT (prevents JIT spraying attacks)
+net.core.bpf_jit_enable=0
+
+# Enable strict memory protections
+vm.mmap_rnd_bits=32
+vm.mmap_rnd_compat_bits=16
+vm.unprivileged_userfaultfd=0
+
+# Network hardening
+net.ipv4.conf.all.rp_filter=1
+net.ipv4.conf.default.rp_filter=1
+net.ipv4.conf.all.accept_redirects=0
+net.ipv4.conf.default.accept_redirects=0
+net.ipv4.conf.all.send_redirects=0
+net.ipv4.conf.default.send_redirects=0
+net.ipv4.conf.all.accept_source_route=0
+net.ipv4.conf.default.accept_source_route=0
+net.ipv4.tcp_syncookies=1
+net.ipv4.tcp_max_syn_backlog=2048
+net.ipv4.tcp_fin_timeout=15
+
+# IPv6 hardening
+net.ipv6.conf.all.accept_redirects=0
+net.ipv6.conf.default.accept_redirects=0
+net.ipv6.conf.all.accept_source_route=0
+net.ipv6.conf.default.accept_source_route=0
+EOF
+
+# Apply sysctl settings
+sysctl -p /etc/sysctl.d/99-maxregner-hardening.conf 2>/dev/null || true
+
+# ============================================
+# 5. FILE PERMISSIONS
+# ============================================
+
+echo "[5/5] Fixing file permissions..."
+
+# Set strict permissions on sensitive files
+chmod 600 /etc/shadow 2>/dev/null || true
+chmod 600 /etc/gshadow 2>/dev/null || true
+chmod 644 /etc/passwd 2>/dev/null || true
+chmod 644 /etc/group 2>/dev/null || true
+
+# Set permissions on home directories
+if [ -d "/home" ]; then
+    chmod 755 /home
+    for dir in /home/*; do
+        if [ -d "$dir" ]; then
+            chmod 700 "$dir"
+            chmod 700 "$dir/.ssh" 2>/dev/null || true
+            chmod 600 "$dir/.ssh/authorized_keys" 2>/dev/null || true
+        fi
+    done
+fi
+
+# Set permissions on temporary directories
+chmod 1777 /tmp 2>/dev/null || true
+chmod 1777 /var/tmp 2>/dev/null || true
+
+# ============================================
+# FINAL CLEANUP
+# ============================================
+
+echo ""
+echo "========================================"
+echo "MaxRegner Security Hardening Complete!"
+echo "========================================"

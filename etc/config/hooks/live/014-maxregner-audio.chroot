@@ -1,0 +1,363 @@
+#!/bin/bash
+# MaxRegner OS - Audio Configuration Hook
+# Configures audio system for optimal performance
+
+set -e
+
+echo "========================================"
+echo "MaxRegner OS - Audio Configuration Hook"
+echo "========================================"
+
+# ============================================
+# 1. INSTALL AUDIO PACKAGES
+# ============================================
+
+echo "[1/5] Installing audio packages..."
+
+# Install audio packages
+apt-get install -y pulseaudio pulseaudio-utils pavucontrol paprefs \
+    alsa-base alsa-utils alsa-oss pipewire pipewire-pulse \
+    pipewire-alsa wireplumber libcanberra-gtk3-0 libcanberra-pulse \
+    gstreamer1.0-plugins-base gstreamer1.0-plugins-good \
+    gstreamer1.0-pulseaudio 2>/dev/null || true
+
+# ============================================
+# 2. CONFIGURE PULSEAUDIO
+# ============================================
+
+echo "[2/5] Configuring PulseAudio..."
+
+# Main PulseAudio configuration
+cat > /etc/pulse/default.pa <<'PULSEEOF'
+#!/usr/bin/pulseaudio -nF
+
+# Load necessary modules
+.ifexists module-native-protocol-unix.so
+load-module module-native-protocol-unix
+.endif
+
+# Load standard configuration
+load-module module-device-restore
+load-module module-stream-restore
+load-module module-card-restore
+load-module module-augment-properties
+load-module module-switch-on-port-available
+
+# Load always-sink module
+load-module module-always-sink
+
+# Load echo-cancel module
+load-module module-echo-cancel
+
+# Load equalizer module
+load-module module-equalizer-sink
+
+# Load LADSPA modules
+load-module module-ladspa-sink
+load-module module-ladspa-source
+
+# Load RTP modules
+load-module module-native-protocol-tcp
+load-module module-zeroconf-publish
+load-module module-zeroconf-discover
+
+# Load Bluetooth modules
+.ifexists module-bluetooth-policy.so
+load-module module-bluetooth-policy
+.endif
+.ifexists module-bluetooth-discover.so
+load-module module-bluetooth-discover
+.endif
+
+# Load AirPlay modules
+.ifexists module-raop-discover.so
+load-module module-raop-discover
+.endif
+.ifexists module-raop-sink.so
+load-module module-raop-sink
+.endif
+
+# MaxRegner OS specific settings
+load-module module-default-device-restore
+load-module module-rescue-streams
+load-module module-always-sink
+load-module module-suspend-on-idle
+
+# Set default sink and source
+set-default-sink @DEFAULT_SINK@
+set-default-source @DEFAULT_SOURCE@
+PULSEEOF
+
+# Client configuration
+cat > /etc/pulse/client.conf <<'PULSEEOF'
+# MaxRegner OS PulseAudio Client Configuration
+
+default-server = unix:/var/run/pulse/native
+; default-server = 127.0.0.1
+
+autospawn = yes
+; autospawn = no
+
+; daemonize = no
+; high-priority = yes
+; nice-level = -11
+
+; realtime-scheduling = yes
+; realtime-priority = 50
+
+; exit-idle-time = 20
+; scache-size = 50
+
+; enable-shm = true
+; shm-size-bytes = 16777216
+
+; lock-memory = true
+
+; flat-volumes = no
+PULSEEOF
+
+# Daemon configuration
+cat > /etc/pulse/daemon.conf <<'PULSEEOF'
+# MaxRegner OS PulseAudio Daemon Configuration
+
+; daemonize = no
+; fail = yes
+; allow-module-loading = true
+; allow-exit = yes
+; use-pid-file = true
+; system-instance = no
+
+; high-priority = yes
+; nice-level = -11
+
+; realtime-scheduling = yes
+; realtime-priority = 50
+
+; exit-idle-time = 20
+; scache-size = 50
+
+; resample-method = speex-float-1
+; default-fragments = 5
+; default-fragment-size-msec = 10
+
+; enable-remixing = yes
+; flat-volumes = no
+
+; lock-memory = true
+; disallow-module-loading = false
+
+; log-level = notice
+; log-meta = false
+; log-time = false
+; log-backtrace = 0
+PULSEEOF
+
+# ============================================
+# 3. CONFIGURE PIPEWIRE
+# ============================================
+
+echo "[3/5] Configuring PipeWire..."
+
+# Main PipeWire configuration
+mkdir -p /etc/pipewire
+cat > /etc/pipewire/pipewire.conf <<'PIPEWIREEOF'
+# MaxRegner OS PipeWire Configuration
+
+context.properties = {
+    "log.level" = 2
+    "log.backtrace" = 0
+    "target.object" = "api.pipewire.core"
+}
+
+context.exec = {
+    "pipewire.pulse.server" = {
+        args = [ "--exit-idle-time=20", "--realtime=yes", "--nice-level=-11" ]
+    }
+}
+
+context.modules = [
+    {   name = "api/libpipewire-module-protocol-native.so"
+        args = { "address" = "unix:/var/run/pipewire/pipewire-0" }
+    }
+    {   name = "api/libpipewire-module-protocol-pulse.so"
+        args = { "address" = "unix:/var/run/pipewire/pulse-0" }
+    }
+    {   name = "api/libpipewire-module-client-node.so"
+        args = { "client.node" = "pulseaudio" }
+    }
+]
+
+# Context for PulseAudio compatibility
+context.properties = {
+    "client.api" = "pulseaudio"
+    "client.name" = "PulseAudio Compatibility"
+}
+
+# Load modules
+context.modules = [
+    {   name = "api/libpipewire-module-adapter.so"
+        args = {
+            "factory.name" = "pulseaudio"
+            "client.node" = "pulseaudio"
+        }
+    }
+]
+PIPEWIREEOF
+
+# PipeWire PulseAudio configuration
+cat > /etc/pipewire/pipewire-pulse.conf <<'PIPEWIREEOF'
+# MaxRegner OS PipeWire PulseAudio Configuration
+
+context.properties = {
+    "log.level" = 2
+    "target.object" = "api.pipewire.pulse"
+}
+
+context.exec = {
+    "pipewire.pulse" = {
+        args = [ "--exit-idle-time=20" ]
+    }
+}
+
+# Load PulseAudio protocol
+context.modules = [
+    {   name = "api/libpipewire-module-protocol-pulse.so"
+        args = { "address" = "unix:/var/run/pipewire/pulse-1" }
+    }
+]
+PIPEWIREEOF
+
+# WirePlumber configuration
+mkdir -p /etc/wireplumber
+cat > /etc/wireplumber/main.lua.conf <<'WIREPLUMBEREOF'
+# MaxRegner OS WirePlumber Configuration
+
+[main]
+log-level = 2
+
+[alsa-monitor]
+monitor.properties = {
+    "node.description" = "ALSA Monitor"
+    "node.name" = "alsa_monitor"
+    "node.group" = "pipewire"
+    "node.nick" = "ALSA"
+}
+
+[pulse-monitor]
+monitor.properties = {
+    "node.description" = "PulseAudio Monitor"
+    "node.name" = "pulse_monitor"
+    "node.group" = "pipewire"
+    "node.nick" = "PulseAudio"
+}
+
+[bluez-monitor]
+monitor.properties = {
+    "node.description" = "Bluetooth Monitor"
+    "node.name" = "bluez_monitor"
+    "node.group" = "pipewire"
+    "node.nick" = "Bluetooth"
+}
+
+[default]
+monitor.properties = {
+    "node.description" = "Default Monitor"
+    "node.name" = "default_monitor"
+    "node.group" = "pipewire"
+    "node.nick" = "Default"
+}
+WIREPLUMBEREOF
+
+# ============================================
+# 4. CONFIGURE ALSA
+# ============================================
+
+echo "[4/5] Configuring ALSA..."
+
+# ALSA configuration
+cat > /etc/asound.conf <<'ALSAEOF'
+# MaxRegner OS ALSA Configuration
+
+# Default PCM device
+pcm.!default {
+    type pulse
+    fallback "sysdefault"
+    hint.description "Default Audio Device"
+}
+
+# Default control device
+ctl.!default {
+    type pulse
+    fallback "sysdefault"
+}
+
+# PulseAudio compatibility
+pcm.pulse {
+    type pulse
+}
+
+ctl.pulse {
+    type pulse
+}
+
+# DMIX for multiple applications
+pcm.dmix {
+    type dmix
+    ipc_key 5678293
+    slave {
+        pcm "hw:0,0"
+        period_time 0
+        period_size 1024
+        buffer_size 8192
+        rate 44100
+        channels 2
+        format S16_LE
+    }
+    bindings {
+        0 0
+        1 1
+    }
+}
+
+ctl.dmix {
+    type hw
+    card 0
+}
+ALSAEOF
+
+# .asoundrc for user
+mkdir -p /home/maxregner
+cat > /home/maxregner/.asoundrc <<'ALSAEOF'
+# MaxRegner OS User ALSA Configuration
+
+pcm.!default {
+    type pulse
+}
+
+ctl.!default {
+    type pulse
+}
+ALSAEOF
+
+chown maxregner:maxregner /home/maxregner/.asoundrc
+
+# ============================================
+# 5. ENABLE AND START SERVICES
+# ============================================
+
+echo "[5/5] Enabling audio services..."
+
+# Enable and start services
+systemctl enable pipewire 2>/dev/null || true
+systemctl enable pipewire-pulse 2>/dev/null || true
+systemctl enable wireplumber 2>/dev/null || true
+
+# Start services
+systemctl start pipewire 2>/dev/null || true
+systemctl start pipewire-pulse 2>/dev/null || true
+systemctl start wireplumber 2>/dev/null || true
+
+echo ""
+echo "========================================"
+echo "MaxRegner Audio Configuration Complete!"
+echo "========================================"

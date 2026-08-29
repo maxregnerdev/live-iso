@@ -1,0 +1,294 @@
+#!/bin/bash
+# MaxRegner OS - Additional Power Saving Configuration Hook
+# Configures advanced power management features
+
+set -e
+
+echo "========================================"
+echo "MaxRegner OS - Power Saving Hook"
+echo "========================================"
+
+# ============================================
+# 1. INSTALL POWER TOOLS
+# ============================================
+
+echo "[1/5] Installing additional power tools..."
+
+# Install power management packages
+apt-get install -y powertop thermald cpupowerutils \
+    laptop-mode-tools acpi acpi-support acpid \
+    pm-utils powermgmt-base 2>/dev/null || true
+
+# ============================================
+# 2. CONFIGURE POWERTOP
+# ============================================
+
+echo "[2/5] Configuring Powertop..."
+
+# Configure Powertop
+cat > /etc/powertop/autosave.d/maxregner-powertop.conf << 'POWERTOPCONF'
+# MaxRegner OS Powertop Configuration
+
+# Auto-tune settings
+AUTO_TUNE=1
+
+# Good settings (apply on AC power)
+GOOD_ENABLE_S2IDLE=1
+GOOD_ENABLE_EPCI_L1=1
+GOOD_ENABLE_PCIE_ASPM=1
+GOOD_ENABLE_AHCI_ALPM=1
+GOOD_ENABLE_USB_AUTOSUSPEND=1
+GOOD_ENABLE_USB_BLACKLIST=1
+GOOD_ENABLE_AUDIO_POWERSAVE=1
+GOOD_ENABLE_RAID_POWERSAVE=1
+GOOD_ENABLE_NMI_WATCHDOG=0
+
+# Bad settings (disable on AC power)
+BAD_ENABLE_S2IDLE=0
+BAD_ENABLE_EPCI_L1=0
+BAD_ENABLE_PCIE_ASPM=0
+BAD_ENABLE_AHCI_ALPM=0
+BAD_ENABLE_USB_AUTOSUSPEND=0
+BAD_ENABLE_AUDIO_POWERSAVE=0
+BAD_ENABLE_RAID_POWERSAVE=0
+BAD_ENABLE_NMI_WATCHDOG=1
+
+# Workaround settings
+WORKAROUND_ENABLE_BLDR_PCTL=0
+WORKAROUND_ENABLE_BLDR_ITCO=0
+
+# MaxRegner specific
+MAXREGNER_POWERSAVE=1
+POWERTOPCONF
+
+# Create Powertop service
+cat > /etc/systemd/system/powertop.service << 'POWERTOPSERVICE'
+[Unit]
+Description=Powertop power saving tool
+After=network.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/sbin/powertop --auto-tune
+
+[Install]
+WantedBy=multi-user.target
+POWERTOPSERVICE
+
+# ============================================
+# 3. CONFIGURE THERMALD
+# ============================================
+
+echo "[3/5] Configuring thermald..."
+
+# Configure thermald
+cat > /etc/thermald/thermald.conf << 'THERMALDCONF'
+# MaxRegner OS Thermald Configuration
+
+[THERMALD]
+PIDIntervalSec = 10
+PollingIntervalSec = 10
+
+[THERMAL ZONES]
+Zone0 = /sys/class/thermal/thermal_zone0
+Zone1 = /sys/class/thermal/thermal_zone1
+Zone2 = /sys/class/thermal/thermal_zone2
+Zone3 = /sys/class/thermal/thermal_zone3
+
+[COOLING DEVICES]
+CPUFAN = /sys/class/thermal/cooling_device0
+GPUFAN = /sys/class/thermal/cooling_device1
+
+[THERMAL POLICIES]
+DefaultPolicy = performance
+PerformancePolicy = performance
+PowerSavePolicy = powersave
+
+[THERMAL ACTIONS]
+Action0 = /usr/bin/systemctl hibernate
+Action1 = /usr/bin/systemctl suspend
+
+[THERMAL LIMITS]
+CPU_CRITICAL = 90
+CPU_PASSIVE = 80
+GPU_CRITICAL = 85
+GPU_PASSIVE = 75
+
+[THERMAL OFFSETS]
+CPU_OFFSET = 5
+GPU_OFFSET = 5
+THERMALDCONF
+
+# ============================================
+# 4. CONFIGURE LAPTOP MODE
+# ============================================
+
+echo "[4/5] Configuring laptop mode..."
+
+# Configure laptop mode
+cat > /etc/laptop-mode/conf.d/maxregner-laptop-mode.conf << 'LAPTOPMODECONF'
+# MaxRegner OS Laptop Mode Configuration
+
+# General settings
+CONTROL_LAPTOP_MODE=1
+LM_BATT_THRESHOLD=4
+LM_AC_THRESHOLD=2
+NO_LM_AC=0
+NO_LM_BATT=0
+
+# Disk settings
+CONTROL_HD_IDLE=1
+HD_IDLE_AC_VALUE=0
+HD_IDLE_BATT_VALUE=1
+
+# Read-ahead
+CONTROL_READAHEAD=1
+READAHEAD_AC_VALUE=128
+READAHEAD_BATT_VALUE=8192
+
+# I/O scheduler
+CONTROL_IO_SCHED=1
+IO_SCHED_AC=deadline
+IO_SCHED_BATT=cfq
+
+# Dirty ratio
+CONTROL_DIRTY_RATIO=1
+DIRTY_RATIO_AC=40
+DIRTY_RATIO_BATT=10
+
+# Dirty background ratio
+CONTROL_DIRTY_BG_RATIO=1
+DIRTY_BG_RATIO_AC=10
+DIRTY_BG_RATIO_BATT=5
+
+# NMI watchdog
+CONTROL_NMI_WATCHDOG=1
+NMI_WATCHDOG_AC=1
+NMI_WATCHDOG_BATT=0
+
+# MaxRegner specific
+MAXREGNER_LAPTOP_MODE=1
+LAPTOPMODECONF
+
+# ============================================
+# 5. CONFIGURE POWER PROFILES
+# ============================================
+
+echo "[5/5] Configuring power profiles..."
+
+# Create power profile scripts
+mkdir -p /usr/local/bin/maxregner-power
+cat > /usr/local/bin/maxregner-power/performance << 'POWERPROFILE'
+#!/bin/bash
+# MaxRegner OS Performance Power Profile
+
+echo "Activating Performance Power Profile..."
+
+# CPU governor
+for cpu in /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor; do
+    echo performance > "$cpu" 2>/dev/null || true
+done
+
+# TLP settings
+tlp ac
+
+# Enable performance mode
+systemctl stop thermald 2>/dev/null || true
+systemctl start thermald 2>/dev/null || true
+
+# Disable power saving
+powertop --auto-tune 2>/dev/null || true
+
+# Enable all CPU cores
+for cpu in /sys/devices/system/cpu/cpu*/online; do
+    echo 1 > "$cpu" 2>/dev/null || true
+done
+
+# Set PCIe to performance
+for pcie in /sys/bus/pci/devices/*/power/control; do
+    echo performance > "$pcie" 2>/dev/null || true
+done
+
+echo "Performance profile activated!"
+POWERPROFILE
+
+cat > /usr/local/bin/maxregner-power/powersave << 'POWERPROFILE'
+#!/bin/bash
+# MaxRegner OS Powersave Power Profile
+
+echo "Activating Powersave Power Profile..."
+
+# CPU governor
+for cpu in /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor; do
+    echo powersave > "$cpu" 2>/dev/null || true
+done
+
+# TLP settings
+tlp bat
+
+# Enable power saving
+powertop --auto-tune 2>/dev/null || true
+
+# Disable some CPU cores (keep at least 2)
+CPU_COUNT=$(nproc)
+if [ "$CPU_COUNT" -gt 2 ]; then
+    for ((i=2; i<CPU_COUNT; i++)); do
+        echo 0 > /sys/devices/system/cpu/cpu$i/online 2>/dev/null || true
+    done
+fi
+
+# Set PCIe to auto
+for pcie in /sys/bus/pci/devices/*/power/control; do
+    echo auto > "$pcie" 2>/dev/null || true
+fi
+
+echo "Powersave profile activated!"
+POWERPROFILE
+
+cat > /usr/local/bin/maxregner-power/balanced << 'POWERPROFILE'
+#!/bin/bash
+# MaxRegner OS Balanced Power Profile
+
+echo "Activating Balanced Power Profile..."
+
+# CPU governor
+for cpu in /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor; do
+    echo ondemand > "$cpu" 2>/dev/null || true
+done
+
+# TLP settings
+tlp ac
+
+# Enable balanced mode
+powertop --auto-tune 2>/dev/null || true
+
+# Enable all CPU cores
+for cpu in /sys/devices/system/cpu/cpu*/online; do
+    echo 1 > "$cpu" 2>/dev/null || true
+done
+
+# Set PCIe to auto
+for pcie in /sys/bus/pci/devices/*/power/control; do
+    echo auto > "$pcie" 2>/dev/null || true
+fi
+
+echo "Balanced profile activated!"
+POWERPROFILE
+
+chmod +x /usr/local/bin/maxregner-power/*
+
+# Enable and start services
+systemctl enable powertop 2>/dev/null || true
+systemctl enable thermald 2>/dev/null || true
+systemctl enable laptop-mode 2>/dev/null || true
+
+# Start services
+systemctl start powertop 2>/dev/null || true
+systemctl start thermald 2>/dev/null || true
+systemctl start laptop-mode 2>/dev/null || true
+
+echo ""
+echo "========================================"
+echo "MaxRegner Power Saving Complete!"
+echo "========================================"

@@ -1,0 +1,238 @@
+#!/bin/bash
+# MaxRegner OS - Bluetooth Configuration Hook
+# Configures Bluetooth for optimal performance
+
+set -e
+
+echo "========================================"
+echo "MaxRegner OS - Bluetooth Configuration Hook"
+echo "========================================"
+
+# ============================================
+# 1. INSTALL BLUETOOTH PACKAGES
+# ============================================
+
+echo "[1/5] Installing Bluetooth packages..."
+
+# Install Bluetooth packages
+apt-get install -y bluez bluez-tools bluez-cups pulseaudio-module-bluetooth \
+    blueman obexd-client obexfs gnome-bluetooth libbluetooth3 \
+    python3-bluez 2>/dev/null || true
+
+# ============================================
+# 2. CONFIGURE BLUEZ
+# ============================================
+
+echo "[2/5] Configuring BlueZ..."
+
+# Main BlueZ configuration
+cat > /etc/bluetooth/main.conf <<'BLUEZEOF'
+# MaxRegner OS BlueZ Configuration
+
+[Policy]
+AutoEnable=true
+JustWorksRepairing=always
+
+[Device]
+Name=MaxRegner OS
+Class=0x000100
+Icon=computer
+
+# Audio settings
+[Audio]
+Enable=Source,Sink,Media,Socket
+
+# Input settings
+[Input]
+Enable=true
+
+# Network settings
+[Network]
+Enable=true
+
+# GATT settings
+[GATT]
+Enable=true
+
+# OBEX settings
+[OBEX]
+Enable=true
+
+# A2DP settings
+[A2DP]
+Enable=true
+SBCSources=1
+MP3Sources=0
+AACSources=0
+
+# AVRCP settings
+[AVRCP]
+Enable=true
+
+# HFP settings
+[HFP]
+Enable=true
+HFPv16=0x01
+
+# HSP settings
+[HSP]
+Enable=true
+
+# PAN settings
+[PAN]
+Enable=true
+
+# DUN settings
+[DUN]
+Enable=true
+
+# HID settings
+[HID]
+Enable=true
+BLUEZEOF
+
+# Audio configuration
+cat > /etc/bluetooth/audio.conf <<'BLUEZEOF'
+# MaxRegner OS Bluetooth Audio Configuration
+
+[General]
+Enable=Source,Sink,Media,Socket
+
+[Headset]
+HFP=true
+mSBC=true
+
+[A2DP]
+SBCSources=1
+MP3Sources=0
+AACSources=0
+LDACSources=0
+
+[AVRCP]
+Enable=true
+
+[HFP]
+Enable=true
+HFPv16=0x01
+
+[PAN]
+Enable=true
+BLUEZEOF
+
+# ============================================
+# 3. CONFIGURE BLUEMAN
+# ============================================
+
+echo "[3/5] Configuring Blueman..."
+
+# Blueman configuration
+mkdir -p /etc/blueman
+cat > /etc/blueman/main.conf <<'BLUEMANEOF'
+# MaxRegner OS Blueman Configuration
+
+[general]
+ManagerApps=/usr/bin/blueman-manager
+UseBlueZ=True
+SkipPlugins=False
+Plugins=power,statusicon,dbus-service,appindicator,network,auth,serial,obex,ppp,headset,ofono,pulseaudio,thermoplug
+
+[plugins]
+power=True
+statusicon=True
+dbus-service=True
+appindicator=True
+network=True
+auth=True
+serial=True
+obex=True
+ppp=True
+headset=True
+ofono=True
+pulseaudio=True
+thermoplug=True
+
+[bluez]
+AutoPowerOn=True
+RememberPowered=True
+BLUEMANEOF
+
+# ============================================
+# 4. CONFIGURE PULSEAUDIO BLUETOOTH
+# ============================================
+
+echo "[4/5] Configuring PulseAudio Bluetooth..."
+
+# Load Bluetooth module for PulseAudio
+if [ -f /etc/pulse/default.pa ]; then
+    # Ensure Bluetooth modules are loaded
+    if ! grep -q "module-bluetooth-policy" /etc/pulse/default.pa; then
+        sed -i '/^load-module module-native-protocol-unix/a \\n.ifexists module-bluetooth-policy.so\nload-module module-bluetooth-policy\n.endif' /etc/pulse/default.pa
+    fi
+    if ! grep -q "module-bluetooth-discover" /etc/pulse/default.pa; then
+        sed -i '/^load-module module-bluetooth-policy/a \\n.ifexists module-bluetooth-discover.so\nload-module module-bluetooth-discover\n.endif' /etc/pulse/default.pa
+    fi
+fi
+
+# Configure Bluetooth audio profiles
+cat > /etc/pulse/bluetooth.conf <<'PULSEBLUEZEOF'
+# MaxRegner OS PulseAudio Bluetooth Configuration
+
+[General]
+Enable=Source,Sink,Media,Socket
+
+[Headset]
+HFP=true
+mSBC=true
+
+[A2DP]
+SBCSources=1
+MP3Sources=0
+AACSources=0
+
+[AVRCP]
+Enable=true
+
+[HFP]
+Enable=true
+HFPv16=0x01
+
+[PAN]
+Enable=true
+PULSEBLUEZEOF
+
+# ============================================
+# 5. ENABLE AND START SERVICES
+# ============================================
+
+echo "[5/5] Enabling Bluetooth services..."
+
+# Enable and start services
+systemctl enable bluetooth 2>/dev/null || true
+systemctl enable blueman-applet 2>/dev/null || true
+
+# Start services
+systemctl start bluetooth 2>/dev/null || true
+systemctl start blueman-applet 2>/dev/null || true
+
+# Configure udev rules for Bluetooth
+cat > /etc/udev/rules.d/99-maxregner-bluetooth.rules <<'UDEVEOF'
+# MaxRegner OS Bluetooth Udev Rules
+
+# Auto-power on Bluetooth adapters
+ACTION=="add", SUBSYSTEM=="bluetooth", ATTR{power/control}="auto"
+
+# Set Bluetooth power to on by default
+ACTION=="add", SUBSYSTEM=="bluetooth", ATTR{power/auto_enable}="1"
+
+# Bluetooth device permissions
+SUBSYSTEM=="bluetooth", GROUP="lp", MODE="0660"
+UDEVEOF
+
+# Reload udev rules
+udevadm control --reload-rules 2>/dev/null || true
+udevadm trigger 2>/dev/null || true
+
+echo ""
+echo "========================================"
+echo "MaxRegner Bluetooth Configuration Complete!"
+echo "========================================"

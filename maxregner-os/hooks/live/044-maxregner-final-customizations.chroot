@@ -1,0 +1,369 @@
+#!/bin/bash
+# MaxRegner OS - Final Customizations Hook
+# Performs final system customizations
+
+set -e
+
+echo "========================================"
+echo "MaxRegner OS - Final Customizations Hook"
+echo "========================================"
+
+# ============================================
+# 1. FINAL SYSTEM TWEAKS
+# ============================================
+
+echo "[1/5] Applying final system tweaks..."
+
+# Disable IPv6 if not needed
+# sysctl net.ipv6.conf.all.disable_ipv6=1 2>/dev/null || true
+# sysctl net.ipv6.conf.default.disable_ipv6=1 2>/dev/null || true
+
+# Enable TCP BBR congestion control
+sysctl net.core.default_qdisc=fq_codel 2>/dev/null || true
+sysctl net.ipv4.tcp_congestion_control=bbr 2>/dev/null || true
+
+# Increase file descriptor limits
+cat > /etc/security/limits.d/99-maxregner.conf << 'LIMITSCONF'
+# MaxRegner OS Limits Configuration
+
+# Root limits
+root soft nofile 1048576
+root hard nofile 1048576
+root soft nproc 65535
+root hard nproc 65535
+
+# User limits
+* soft nofile 1048576
+* hard nofile 1048576
+* soft nproc 65535
+* hard nproc 65535
+* soft memlock unlimited
+* hard memlock unlimited
+
+# MaxRegner user limits
+maxregner soft nofile 1048576
+maxregner hard nofile 1048576
+maxregner soft nproc 65535
+maxregner hard nproc 65535
+maxregner soft memlock unlimited
+maxregner hard memlock unlimited
+LIMITSCONF
+
+# Configure PAM limits
+cat > /etc/pam.d/common-session << 'PAMCONF'
+# MaxRegner OS PAM Configuration
+
+session required pam_limits.so
+session required pam_unix.so
+session optional pam_mail.so standard noenv
+session optional pam_systemd.so
+session required pam_env.so readenv=1
+session required pam_env.so readenv=1 envfile=/etc/default/locale
+
+# MaxRegner specific
+session optional pam_maxregner.so
+PAMCONF
+
+# ============================================
+# 2. CONFIGURE SYSTEM OPTIMIZATIONS
+# ============================================
+
+echo "[2/5] Configuring system optimizations..."
+
+# Configure systemd optimizations
+mkdir -p /etc/systemd/system.conf.d
+cat > /etc/systemd/system.conf.d/maxregner.conf << 'SYSTEMDCONF'
+# MaxRegner OS Systemd Configuration
+
+[Manager]
+DefaultTimeoutStartSec=10s
+DefaultTimeoutStopSec=10s
+DefaultRestartSec=5s
+DefaultStartLimitIntervalSec=30s
+DefaultStartLimitBurst=5
+
+# Logging
+LogLevelMax=info
+LogTarget=journal
+LogColor=yes
+LogLocation=yes
+
+# Cgroups
+DefaultCPUAccounting=yes
+DefaultMemoryAccounting=yes
+DefaultBlockIOAccounting=yes
+
+# Runtime
+RuntimeMaxSec=1h
+RuntimeWatchdogSec=30s
+
+# MaxRegner specific
+DefaultLimitNOFILE=1048576
+DefaultLimitNPROC=65535
+SYSTEMDCONF
+
+# Configure journalctl
+mkdir -p /etc/systemd/journald.conf.d
+cat > /etc/systemd/journald.conf.d/maxregner.conf << 'JOURNALCONF'
+# MaxRegner OS Journald Configuration
+
+[Journal]
+Storage=persistent
+Compress=yes
+PersistentStorageSize=1G
+RuntimeMaxUse=100M
+RuntimeMaxFileSize=50M
+
+# Logging
+MaxLevelStore=info
+MaxLevelSyslog=info
+MaxLevelWall=emerg
+
+# Rate limiting
+RateLimitIntervalSec=30s
+RateLimitBurst=1000
+
+# MaxRegner specific
+ForwardToSyslog=yes
+ForwardToWall=yes
+JOURNALCONF
+
+# ============================================
+# 3. CONFIGURE USER ENVIRONMENT
+# ============================================
+
+echo "[3/5] Configuring user environment..."
+
+# Configure bash profile
+cat > /etc/profile.d/maxregner.sh << 'MAXPROFILE'
+# MaxRegner OS Environment Configuration
+
+# MaxRegner environment
+MAXREGNER_OS="MaxRegner"
+export MAXREGNER_OS
+MAXREGNER_VERSION="1.0"
+export MAXREGNER_VERSION
+MAXREGNER_HOME="/home/maxregner"
+export MAXREGNER_HOME
+
+# Path settings
+PATH=$PATH:/usr/local/bin:/usr/local/sbin:/usr/local/maxregner/bin
+export PATH
+
+# Editor
+EDITOR=nano
+export EDITOR
+VISUAL=nano
+export VISUAL
+
+# Pager
+PAGER=less
+export PAGER
+LESS='-R --shift 5'
+export LESS
+
+# Browser
+BROWSER=firefox
+export BROWSER
+
+# Terminal
+TERM=xterm-256color
+export TERM
+
+# MaxRegner specific
+MAXREGNER_THEME="MaxRegner-Ultimate"
+export MAXREGNER_THEME
+MAXREGNER_ICONS="MaxRegner-Icons"
+export MAXREGNER_ICONS
+MAXREGNER_CURSOR="MaxRegner-Cursor"
+export MAXREGNER_CURSOR
+
+# Aliases
+alias update='sudo maxregner-update'
+alias cleanup='sudo maxregner-cleanup'
+alias backup='sudo maxregner-backup'
+alias monitor='maxregner-performance/monitor'
+alias info='maxregner-info'
+alias help='maxregner-help'
+
+# History settings
+export HISTCONTROL=ignoreboth
+export HISTSIZE=10000
+export HISTFILESIZE=20000
+export HISTIGNORE='ls:ll:la:cd:pwd:exit:history'
+
+# Color settings
+export LS_COLORS='di=01;34:ln=00;36:so=01;35:pi=40;33:ex=01;32:bd=40;33;01:cd=40;33;01:su=01;34:sg=01;36:tw=01;32:ow=01;33;01'
+
+# MaxRegner welcome message
+if [ -f /usr/local/bin/maxregner-welcome ]; then
+    /usr/local/bin/maxregner-welcome
+fi
+MAXPROFILE
+
+chmod +x /etc/profile.d/maxregner.sh
+
+# Configure inputrc
+cat > /etc/inputrc << 'INPUTRC'
+# MaxRegner OS Input Configuration
+
+# Settings for bash
+set editing-mode vi
+set bell-style none
+set completion-ignore-case on
+set show-all-if-ambiguous on
+set show-all-if-unmodified on
+
+# Tab completion
+TAB: menu-complete
+
+# History
+set history-preserve-point on
+set history-search-forward \C-s
+set history-search-backward \C-r
+
+# MaxRegner specific
+set colored-completion-prefix on
+set completion-query-items 100
+INPUTRC
+
+# ============================================
+# 4. CONFIGURE FINAL SERVICES
+# ============================================
+
+echo "[4/5] Configuring final services..."
+
+# Enable essential services
+for service in cron anacron rsyslog apport whoopsie; do
+    systemctl enable $service 2>/dev/null || true
+    systemctl start $service 2>/dev/null || true
+done
+
+# Configure systemd services
+cat > /etc/systemd/system/maxregner-optimize.service << 'MAXSERVICE'
+[Unit]
+Description=MaxRegner OS Optimization Service
+After=network.target multi-user.target
+Wants=network.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/bin/maxregner-performance/optimize
+ExecStartPost=/usr/local/bin/maxregner-update-check
+
+[Install]
+WantedBy=multi-user.target
+MAXSERVICE
+
+cat > /etc/systemd/system/maxregner-monitor.service << 'MAXSERVICE'
+[Unit]
+Description=MaxRegner OS Monitoring Service
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/maxregner-performance/monitor
+Restart=always
+RestartSec=300
+
+[Install]
+WantedBy=multi-user.target
+MAXSERVICE
+
+# Enable and start MaxRegner services
+systemctl daemon-reload 2>/dev/null || true
+systemctl enable maxregner-optimize 2>/dev/null || true
+systemctl enable maxregner-monitor 2>/dev/null || true
+systemctl start maxregner-optimize 2>/dev/null || true
+systemctl start maxregner-monitor 2>/dev/null || true
+
+# ============================================
+# 5. FINAL CLEANUP AND VERIFICATION
+# ============================================
+
+echo "[5/5] Performing final cleanup and verification..."
+
+# Clean package cache
+apt-get clean 2>/dev/null || true
+apt-get autoclean 2>/dev/null || true
+
+# Remove temporary files
+rm -rf /tmp/* 2>/dev/null || true
+rm -rf /var/tmp/* 2>/dev/null || true
+
+# Verify all hooks are executable
+HOOK_DIR="/workspace/github__maxregnerdev__live-iso/maxregner-os/hooks/live"
+HOOK_COUNT=$(ls "$HOOK_DIR"/*.chroot 2>/dev/null | wc -l)
+EXEC_COUNT=$(ls -x "$HOOK_DIR"/*.chroot 2>/dev/null | wc -l)
+
+if [ "$HOOK_COUNT" -eq "$EXEC_COUNT" ]; then
+    echo "All $HOOK_COUNT hooks are executable"
+else
+    echo "Warning: Not all hooks are executable"
+fi
+
+# Create final verification script
+cat > /usr/local/bin/maxregner-verify << 'VERIFY'
+#!/bin/bash
+# MaxRegner OS Verification Script
+
+set -e
+
+echo "========================================"
+echo "MaxRegner OS Verification"
+echo "========================================"
+echo ""
+
+# Check hooks
+HOOK_DIR="/workspace/github__maxregnerdev__live-iso/maxregner-os/hooks/live"
+HOOK_COUNT=$(ls "$HOOK_DIR"/*.chroot 2>/dev/null | wc -l)
+echo "Hooks: $HOOK_COUNT installed"
+
+# Check services
+SERVICES=$(systemctl list-unit-files | grep enabled | wc -l)
+echo "Services: $SERVICES enabled"
+
+# Check packages
+PACKAGES=$(dpkg -l | grep ^ii | wc -l)
+echo "Packages: $PACKAGES installed"
+
+# Check users
+USERS=$(cut -d: -f1 /etc/passwd | wc -l)
+echo "Users: $USERS configured"
+
+# Check system status
+UPTIME=$(uptime -p | cut -d' ' -f2-)
+echo "Uptime: $UPTIME"
+
+# Check load
+LOAD=$(cat /proc/loadavg | awk '{print $1, $2, $3}')
+echo "Load Average: $LOAD"
+
+# Check disk
+DISK=$(df -h / | awk 'NR==2 {print $4}')
+echo "Disk Available: $DISK"
+
+# Check memory
+MEM=$(free -h | awk '/Mem:/ {print $7}')
+echo "Memory Available: $MEM"
+
+echo ""
+echo "MaxRegner OS is ready!"
+VERIFY
+
+chmod +x /usr/local/bin/maxregner-verify
+
+# Run verification
+/usr/local/bin/maxregner-verify
+
+echo ""
+echo "========================================"
+echo "MaxRegner Final Customizations Complete!"
+echo "========================================"
+echo ""
+echo "System is ready for use!"
+echo "Run 'maxregner-welcome' for information"
+echo "Run 'maxregner-help' for help"
+echo "Run 'maxregner-verify' to verify installation"

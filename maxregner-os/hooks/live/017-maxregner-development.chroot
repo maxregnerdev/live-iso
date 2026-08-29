@@ -1,0 +1,195 @@
+#!/bin/bash
+# MaxRegner OS - Development Tools Configuration Hook
+# Configures complete development environment
+
+set -e
+
+echo "========================================"
+echo "MaxRegner OS - Development Tools Hook"
+echo "========================================"
+
+# ============================================
+# 1. INSTALL DEVELOPMENT PACKAGES
+# ============================================
+
+echo "[1/5] Installing development tools..."
+
+# Install essential development packages
+apt-get install -y build-essential cmake ninja-build autoconf automake \
+    libtool pkg-config gettext bison flex g++ gcc gdb make \
+    strace ltrace valgrind gdbserver 2>/dev/null || true
+
+# ============================================
+# 2. CONFIGURE PYTHON DEVELOPMENT
+# ============================================
+
+echo "[2/5] Configuring Python development..."
+
+# Install Python development packages
+apt-get install -y python3 python3-dev python3-pip python3-venv \
+    python3-virtualenv python3-setuptools python3-wheel \
+    python3-requests python3-numpy python3-scipy python3-matplotlib \
+    python3-pandas python3-jupyter 2>/dev/null || true
+
+# Configure Python environment
+cat > /etc/python3/devel.conf << 'PYEOF'
+# MaxRegner OS Python Development Configuration
+
+[Python]
+DefaultVersion=3.11
+VirtualEnvWrapper=true
+PipCache=/var/cache/pip
+
+[Pip]
+IndexURL=https://pypi.org/simple/
+TrustedHost=pypi.org
+Timeout=60
+
+[VirtualEnv]
+Create=true
+Activate=true
+PYEOF
+
+# ============================================
+# 3. CONFIGURE NODE.JS DEVELOPMENT
+# ============================================
+
+echo "[3/5] Configuring Node.js development..."
+
+# Install Node.js and npm
+apt-get install -y nodejs npm node-gyp node-typescript \
+    node-eslint node-prettier node-webpack node-babel 2>/dev/null || true
+
+# Configure npm
+cat > /etc/npmrc << 'NPMEOF'
+# MaxRegner OS NPM Configuration
+
+prefix=/usr/local
+cache=/var/cache/npm
+init-module=/usr/local/lib/node_modules
+loglevel=info
+strict-ssl=true
+registry=https://registry.npmjs.org/
+
+# MaxRegner specific settings
+save=true
+save-exact=false
+save-prefix="~"
+NPMEOF
+
+# ============================================
+# 4. CONFIGURE JAVA DEVELOPMENT
+# ============================================
+
+echo "[4/5] Configuring Java development..."
+
+# Install Java development tools
+apt-get install -y default-jdk default-jre openjdk-17-jdk openjdk-17-jre \
+    maven gradle ant ant-optional 2>/dev/null || true
+
+# Configure Java environment
+cat > /etc/java/java.conf << 'JAVAEOF'
+# MaxRegner OS Java Configuration
+
+JAVA_HOME=/usr/lib/jvm/default-java
+JRE_HOME=/usr/lib/jvm/default-java/jre
+CLASSPATH=.
+
+# Maven settings
+MAVEN_HOME=/usr/share/maven
+MAVEN_OPTS="-Xmx1024m"
+
+# Gradle settings
+GRADLE_HOME=/usr/share/gradle
+GRADLE_OPTS="-Xmx1024m"
+JAVAEOF
+
+# ============================================
+# 5. CONFIGURE OTHER DEVELOPMENT TOOLS
+# ============================================
+
+echo "[5/5] Configuring other development tools..."
+
+# Install additional development tools
+apt-get install -y git git-lfs git-flow tig subversion mercurial \
+    docker.io docker-compose podman buildah skopeo \
+    qemu qemu-system qemu-user-static libvirt-daemon-system \
+    vagrant virtualbox virtualbox-ext-pack 2>/dev/null || true
+
+# Configure Git
+cat > /etc/gitconfig << 'GITEOF'
+# MaxRegner OS Git Configuration
+
+[user]
+    name = MaxRegner Developer
+    email = developer@maxregneros.com
+
+[core]
+    editor = nano
+    pager = less
+    autocrlf = input
+    safecrlf = true
+    longpaths = true
+
+[color]
+    ui = auto
+    diff = auto
+    status = auto
+    branch = auto
+
+[alias]
+    co = checkout
+    br = branch
+    ci = commit
+    st = status
+    pl = pull
+    ps = push
+    lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+
+[merge]
+    tool = vimdiff
+    ff = only
+
+[diff]
+    tool = vimdiff
+    renames = true
+
+[push]
+    default = simple
+GITEOF
+
+# Configure Docker
+cat > /etc/docker/daemon.json << 'DOCKEREOF'
+{
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "10m",
+    "max-file": "3"
+  },
+  "storage-driver": "overlay2",
+  "default-ulimits": {
+    "nofile": {
+      "Name": "nofile",
+      "Hard": 65536,
+      "Soft": 65536
+    }
+  },
+  "max-concurrent-downloads": 10,
+  "max-download-attempts": 5
+}
+DOCKEREOF
+
+# Configure development directories
+mkdir -p /opt/development
+mkdir -p /opt/development/projects
+mkdir -p /opt/development/tools
+mkdir -p /opt/development/libs
+
+# Set permissions
+chmod 775 /opt/development
+chmod 775 /opt/development/*
+
+echo ""
+echo "========================================"
+echo "MaxRegner Development Tools Complete!"
+echo "========================================"

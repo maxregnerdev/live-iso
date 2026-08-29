@@ -1,0 +1,711 @@
+#!/bin/bash
+# MaxRegner OS - Documentation and Help System Configuration Hook
+# Configures comprehensive documentation support
+
+set -e
+
+echo "========================================"
+echo "MaxRegner OS - Documentation Hook"
+echo "========================================"
+
+# ============================================
+# 1. INSTALL DOCUMENTATION TOOLS
+# ============================================
+
+echo "[1/5] Installing documentation tools..."
+
+# Install documentation packages
+apt-get install -y man man-db manpages manpages-dev manpages-posix \
+    manpages-posix-dev info info-browser gnu-info 2>/dev/null || true
+
+# Install help viewers
+apt-get install -y yelp yelp-xsl devhelp devhelp-common \
+    gnome-help gnome-user-docs 2>/dev/null || true
+
+# Install documentation generators
+apt-get install -y doxygen doxygen-doc doxygen-latex doxygen-gui \
+    sphinx-common sphinx-doc python3-sphinx 2>/dev/null || true
+
+# Install Markdown tools
+apt-get install -y pandoc pandoc-data pandoc-citeproc \
+    markdown ghostscript texlive-xetex texlive-latex-extra \
+    texlive-fonts-recommended texlive-fonts-extra 2>/dev/null || true
+
+# ============================================
+# 2. CONFIGURE MAN PAGES
+# ============================================
+
+echo "[2/5] Configuring man pages..."
+
+# Configure man-db
+cat > /etc/manpath.config << 'MANPATHCONF'
+# MaxRegner OS Manpath Configuration
+
+# Manpath map
+MANPATH_MAP /usr/bin /usr/share/man
+MANPATH_MAP /usr/sbin /usr/share/man
+MANPATH_MAP /bin /usr/share/man
+MANPATH_MAP /sbin /usr/share/man
+MANPATH_MAP /usr/local/bin /usr/local/share/man
+MANPATH_MAP /usr/local/sbin /usr/local/share/man
+MANPATH_MAP /opt /opt/share/man
+MANPATH_MAP /home/*/bin /home/*/share/man
+
+# Mandatory manpaths
+MANDATORY_MANPATH /usr/share/man
+MANDATORY_MANPATH /usr/local/share/man
+MANDATORY_MANPATH /usr/local/man
+
+# Section ordering
+SECTION 1 1p 8 2 3 3p 4 5 6 7 9 0p n l p o 1x 2x 3x 4x 5x 6x 7x 8x 9x
+
+# MaxRegner specific
+MAXREGNER_MANPATH /usr/share/maxregner/man
+MANPATHCONF
+
+# Create MaxRegner man pages
+mkdir -p /usr/share/maxregner/man/man1
+cat > /usr/share/maxregner/man/man1/maxregner.1 << 'MAXMAN1'
+." MaxRegner OS Manual Page
+.TH MAXREGNER 1 "2024-01-01" "MaxRegner OS 1.0" "MaxRegner OS User Manual"
+.SH NAME
+maxregner \- MaxRegner OS user commands
+.SH SYNOPSIS
+.B maxregner [OPTION]...
+.SH DESCRIPTION
+.PP
+MaxRegner OS is a custom Linux distribution based on Debian, optimized for
+performance, security, and user experience.
+.PP
+This manual page describes the MaxRegner OS specific commands and features.
+.SH OPTIONS
+.TP
+.B \-h, \-\-help
+Show help message and exit.
+.TP
+.B \-v, \-\-version
+Show version information and exit.
+.TP
+.B update
+Update the system packages.
+.TP
+.B cleanup
+Clean up the system.
+.TP
+.B backup
+Create a system backup.
+.TP
+.B monitor
+Monitor system resources.
+.TP
+.B info
+Show system information.
+.SH EXAMPLES
+.TP
+.B maxregner update
+Update all system packages.
+.TP
+.B maxregner info
+Show system information.
+.SH FILES
+.TP
+.I /usr/local/bin/maxregner-*
+MaxRegner OS scripts and utilities.
+.TP
+.I /etc/maxregner
+MaxRegner OS configuration files.
+.SH SEE ALSO
+.BR man (1),
+.BR apt (8),
+.BR systemd (1)
+.SH BUGS
+Report bugs to: support@maxregneros.com
+.SH AUTHOR
+MaxRegner Team
+MAXMAN1
+
+chmod 644 /usr/share/maxregner/man/man1/maxregner.1
+
+# ============================================
+# 3. CONFIGURE INFO PAGES
+# ============================================
+
+echo "[3/5] Configuring info pages..."
+
+# Create MaxRegner info pages
+mkdir -p /usr/share/info/maxregner
+cat > /usr/share/info/maxregner << 'MAXINFO'
+This is the MaxRegner OS Info page.
+
+* Menu:
+
+* Introduction::          About MaxRegner OS
+* Installation::          How to install MaxRegner OS
+* Configuration::        Configuring MaxRegner OS
+* Commands::             MaxRegner OS commands
+* Troubleshooting::      Common issues and solutions
+* FAQ::                  Frequently Asked Questions
+
+File: maxregner,  Node: Top,  Next: Introduction,  Up: (dir)
+
+MaxRegner OS Documentation
+**************************
+
+This documentation provides comprehensive information about MaxRegner OS.
+
+* Introduction
+--------------
+
+MaxRegner OS is a custom Linux distribution based on Debian, designed
+for optimal performance, security, and user experience.
+
+* Features
+
+- Optimized kernel with custom tuning
+- Comprehensive hardware detection
+- Advanced power management
+- Complete multimedia support
+- Development tools pre-configured
+- Gaming support
+- Virtualization support
+- Container support
+- Cloud integration
+- Comprehensive security
+- System monitoring
+- Backup solutions
+- Accessibility features
+- Internationalization support
+
+* Installation
+------------
+
+To install MaxRegner OS, follow these steps:
+
+1. Download the ISO image from the official website
+2. Create a bootable USB drive
+3. Boot from the USB drive
+4. Follow the installation prompts
+5. Reboot and enjoy MaxRegner OS
+
+* Configuration
+--------------
+
+MaxRegner OS can be configured using:
+
+- GNOME Settings
+- Command line tools
+- Configuration files in /etc/maxregner/
+- Custom scripts in /usr/local/bin/maxregner-*
+
+* Commands
+---------
+
+MaxRegner OS provides the following custom commands:
+
+maxregner-update    - Update the system
+maxregner-cleanup   - Clean up the system
+maxregner-backup    - Create a backup
+maxregner-monitor   - Monitor system resources
+maxregner-info      - Show system information
+
+* Troubleshooting
+---------------
+
+Common issues and their solutions:
+
+1. No sound: Check if PulseAudio is running
+2. No network: Check if NetworkManager is running
+3. Slow performance: Try switching to performance profile
+4. High temperature: Check fan control settings
+
+* FAQ
+----
+
+Q: How do I update MaxRegner OS?
+A: Run 'sudo maxregner-update'
+
+Q: How do I switch performance profiles?
+A: Use 'sudo maxregner-performance/switch-profile <profile>'
+
+Q: How do I get help?
+A: Run 'maxregner-welcome' or visit https://maxregneros.com
+
+Q: Where are the configuration files?
+A: Configuration files are in /etc/maxregner/
+
+MAXINFO
+
+# ============================================
+# 4. CREATE DOCUMENTATION DIRECTORY
+# ============================================
+
+echo "[4/5] Creating documentation directory..."
+
+# Create documentation directory
+mkdir -p /usr/share/maxregner/doc
+mkdir -p /usr/share/maxregner/doc/html
+mkdir -p /usr/share/maxregner/doc/pdf
+mkdir -p /usr/share/maxregner/doc/man
+
+# Create HTML documentation
+cat > /usr/share/maxregner/doc/html/index.html << 'MAXDOCHTML'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MaxRegner OS Documentation</title>
+    <style>
+        body {
+            font-family: 'Liberation Sans', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a2e;
+            color: #eaeaea;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #16213e;
+            padding: 20px;
+            text-align: center;
+        }
+        nav {
+            background-color: #0f3460;
+            padding: 10px;
+        }
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+        }
+        nav li {
+            margin: 0 15px;
+        }
+        nav a {
+            color: #eaeaea;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        nav a:hover {
+            color: #f81ce5;
+        }
+        main {
+            padding: 20px;
+        }
+        h1, h2, h3 {
+            color: #f81ce5;
+        }
+        code {
+            background-color: #0f3460;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #16213e;
+            border-radius: 5px;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #0f3460;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>MaxRegner OS Documentation</h1>
+        <p>Comprehensive documentation for MaxRegner OS</p>
+    </header>
+    
+    <nav>
+        <ul>
+            <li><a href="#introduction">Introduction</a></li>
+            <li><a href="#installation">Installation</a></li>
+            <li><a href="#configuration">Configuration</a></li>
+            <li><a href="#commands">Commands</a></li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#troubleshooting">Troubleshooting</a></li>
+        </ul>
+    </nav>
+    
+    <main class="container">
+        <section id="introduction" class="section">
+            <h2>Introduction</h2>
+            <p>MaxRegner OS is a custom Linux distribution based on Debian, designed for optimal performance, security, and user experience.</p>
+            <p>It includes comprehensive hardware detection, advanced power management, complete multimedia support, and much more.</p>
+        </section>
+        
+        <section id="installation" class="section">
+            <h2>Installation</h2>
+            <p>To install MaxRegner OS:</p>
+            <ol>
+                <li>Download the ISO from <a href="https://maxregneros.com">https://maxregneros.com</a></li>
+                <li>Create a bootable USB drive using dd or balenaEtcher</li>
+                <li>Boot from the USB drive</li>
+                <li>Follow the installation prompts</li>
+                <li>Reboot and enjoy MaxRegner OS</li>
+            </ol>
+        </section>
+        
+        <section id="configuration" class="section">
+            <h2>Configuration</h2>
+            <p>MaxRegner OS can be configured using:</p>
+            <ul>
+                <li>GNOME Settings application</li>
+                <li>Command line tools</li>
+                <li>Configuration files in <code>/etc/maxregner/</code></li>
+                <li>Custom scripts in <code>/usr/local/bin/maxregner-*</code></li>
+            </ul>
+        </section>
+        
+        <section id="commands" class="section">
+            <h2>Commands</h2>
+            <p>MaxRegner OS provides the following custom commands:</p>
+            <table>
+                <tr>
+                    <th>Command</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td><code>maxregner-update</code></td>
+                    <td>Update the system</td>
+                </tr>
+                <tr>
+                    <td><code>maxregner-cleanup</code></td>
+                    <td>Clean up the system</td>
+                </tr>
+                <tr>
+                    <td><code>maxregner-backup</code></td>
+                    <td>Create a backup</td>
+                </tr>
+                <tr>
+                    <td><code>maxregner-monitor</code></td>
+                    <td>Monitor system resources</td>
+                </tr>
+                <tr>
+                    <td><code>maxregner-info</code></td>
+                    <td>Show system information</td>
+                </tr>
+            </table>
+        </section>
+        
+        <section id="features" class="section">
+            <h2>Features</h2>
+            <p>MaxRegner OS includes the following features:</p>
+            <ul>
+                <li><strong>Kernel Tuning:</strong> Optimized kernel parameters for performance</li>
+                <li><strong>Hardware Detection:</strong> Automatic detection and configuration of hardware</li>
+                <li><strong>Power Management:</strong> Advanced power saving with TLP and thermald</li>
+                <li><strong>Multimedia:</strong> Complete codec and player support</li>
+                <li><strong>Development:</strong> Pre-configured development environment</li>
+                <li><strong>Gaming:</strong> Steam, Wine, and gaming optimizations</li>
+                <li><strong>Virtualization:</strong> QEMU, KVM, and VirtualBox support</li>
+                <li><strong>Containers:</strong> Docker and Podman support</li>
+                <li><strong>Cloud:</strong> AWS, Azure, and Google Cloud integration</li>
+                <li><strong>Security:</strong> Firewall, AppArmor, and SSH hardening</li>
+                <li><strong>Monitoring:</strong> Prometheus, Grafana, and system monitoring</li>
+                <li><strong>Backup:</strong> Borg, Restic, and Timeshift support</li>
+            </ul>
+        </section>
+        
+        <section id="troubleshooting" class="section">
+            <h2>Troubleshooting</h2>
+            <p>Common issues and their solutions:</p>
+            <ul>
+                <li><strong>No sound:</strong> Check if PulseAudio is running: <code>systemctl status pulseaudio</code></li>
+                <li><strong>No network:</strong> Check if NetworkManager is running: <code>systemctl status NetworkManager</code></li>
+                <li><strong>Slow performance:</strong> Try switching to performance profile: <code>sudo maxregner-performance/switch-profile gaming</code></li>
+                <li><strong>High temperature:</strong> Check fan control: <code>systemctl status fancontrol</code></li>
+            </ul>
+        </section>
+    </main>
+    
+    <footer>
+        <p>&copy; 2024 MaxRegner Team. All rights reserved.</p>
+        <p>For more information, visit <a href="https://maxregneros.com">https://maxregneros.com</a></p>
+    </footer>
+</body>
+</html>
+MAXDOCHTML
+
+# ============================================
+# 5. CREATE HELP SYSTEM
+# ============================================
+
+echo "[5/5] Creating help system..."
+
+# Create help command
+cat > /usr/local/bin/maxregner-help << 'MAXHELP'
+#!/bin/bash
+# MaxRegner OS Help System
+
+set -e
+
+if [ -z "$1" ]; then
+    echo "=========================================="
+    echo "MaxRegner OS Help System"
+    echo "=========================================="
+    echo ""
+    echo "Usage: maxregner-help [command|topic]"
+    echo ""
+    echo "Available commands:"
+    echo "  update          - Update the system"
+    echo "  cleanup         - Clean up the system"
+    echo "  backup          - Create a backup"
+    echo "  monitor         - Monitor system resources"
+    echo "  info            - Show system information"
+    echo ""
+    echo "Available topics:"
+    echo "  introduction    - About MaxRegner OS"
+    echo "  installation    - Installation guide"
+    echo "  configuration   - Configuration options"
+    echo "  commands        - List of commands"
+    echo "  features        - List of features"
+    echo "  troubleshooting - Common issues"
+    echo ""
+    echo "Documentation locations:"
+    echo "  HTML: /usr/share/maxregner/doc/html/"
+    echo "  Man pages: /usr/share/maxregner/man/"
+    echo "  Info pages: /usr/share/info/maxregner"
+    echo ""
+    echo "For more information, visit: https://maxregneros.com"
+    exit 0
+fi
+
+TOPIC="$1"
+
+case "$TOPIC" in
+    update)
+        echo "maxregner-update - Update the system"
+        echo ""
+        echo "Usage: sudo maxregner-update"
+        echo ""
+        echo "Description:"
+        echo "  Updates all system packages, performs distro upgrade,"
+        echo "  cleans up old packages, and updates initramfs and GRUB."
+        ;;
+    cleanup)
+        echo "maxregner-cleanup - Clean up the system"
+        echo ""
+        echo "Usage: sudo maxregner-cleanup"
+        echo ""
+        echo "Description:"
+        echo "  Cleans package cache, removes old kernels, cleans"
+        echo "  temporary files, old logs, and unused container images."
+        ;;
+    backup)
+        echo "maxregner-backup - Create a backup"
+        echo ""
+        echo "Usage: sudo maxregner-backup"
+        echo ""
+        echo "Description:"
+        echo "  Creates a compressed backup of important system directories"
+        echo "  and stores it in /var/backups/maxregner/."
+        ;;
+    monitor)
+        echo "maxregner-monitor - Monitor system resources"
+        echo ""
+        echo "Usage: maxregner-monitor"
+        echo ""
+        echo "Description:"
+        echo "  Displays CPU, memory, disk, and network information."
+        ;;
+    info)
+        echo "maxregner-info - Show system information"
+        echo ""
+        echo "Usage: maxregner-info"
+        echo ""
+        echo "Description:"
+        echo "  Shows comprehensive system information including OS,"
+        echo "  kernel, CPU, memory, disk, network, and graphics."
+        ;;
+    introduction)
+        echo "=========================================="
+        echo "MaxRegner OS - Introduction"
+        echo "=========================================="
+        echo ""
+        echo "MaxRegner OS is a custom Linux distribution based on Debian,"
+        echo "designed for optimal performance, security, and user experience."
+        echo ""
+        echo "Key features:"
+        echo "  - Optimized kernel with custom tuning"
+        echo "  - Comprehensive hardware detection"
+        echo "  - Advanced power management"
+        echo "  - Complete multimedia support"
+        echo "  - Development tools pre-configured"
+        echo "  - Gaming support"
+        echo "  - Virtualization support"
+        echo "  - Container support"
+        echo "  - Cloud integration"
+        echo "  - Comprehensive security"
+        echo "  - System monitoring"
+        echo "  - Backup solutions"
+        echo ""
+        echo "For more information, visit: https://maxregneros.com"
+        ;;
+    installation)
+        echo "=========================================="
+        echo "MaxRegner OS - Installation"
+        echo "=========================================="
+        echo ""
+        echo "To install MaxRegner OS:"
+        echo ""
+        echo "1. Download the ISO from https://maxregneros.com"
+        echo "2. Create a bootable USB drive using dd or balenaEtcher"
+        echo "   Example with dd:"
+        echo "     sudo dd if=maxregner-os.iso of=/dev/sdX bs=4M status=progress"
+        echo "3. Boot from the USB drive"
+        echo "4. Follow the installation prompts"
+        echo "5. Reboot and enjoy MaxRegner OS"
+        echo ""
+        echo "Minimum requirements:"
+        echo "  - 2 GHz dual-core processor"
+        echo "  - 2 GB RAM"
+        echo "  - 25 GB disk space"
+        echo "  - VGA capable of 1024x768 resolution"
+        ;;
+    configuration)
+        echo "=========================================="
+        echo "MaxRegner OS - Configuration"
+        echo "=========================================="
+        echo ""
+        echo "MaxRegner OS can be configured using:"
+        echo ""
+        echo "1. GNOME Settings application"
+        echo "2. Command line tools"
+        echo "3. Configuration files in /etc/maxregner/"
+        echo "4. Custom scripts in /usr/local/bin/maxregner-*"
+        echo ""
+        echo "Common configuration files:"
+        echo "  /etc/maxregner/performance/profiles.conf - Performance profiles"
+        echo "  /etc/maxregner/security/ - Security settings"
+        echo "  /etc/maxregner/network/ - Network settings"
+        echo ""
+        echo "To edit configuration files, use:"
+        echo "  sudo nano /path/to/config"
+        ;;
+    commands)
+        echo "=========================================="
+        echo "MaxRegner OS - Commands"
+        echo "=========================================="
+        echo ""
+        echo "MaxRegner OS provides the following custom commands:"
+        echo ""
+        echo "System commands:"
+        echo "  maxregner-update    - Update the system"
+        echo "  maxregner-cleanup   - Clean up the system"
+        echo "  maxregner-backup    - Create a backup"
+        echo "  maxregner-monitor   - Monitor system resources"
+        echo "  maxregner-info      - Show system information"
+        echo ""
+        echo "Performance commands:"
+        echo "  maxregner-performance/switch-profile <profile> - Switch performance profile"
+        echo "  maxregner-performance/monitor         - Monitor performance"
+        echo "  maxregner-performance/optimize        - Optimize performance"
+        echo ""
+        echo "Power commands:"
+        echo "  maxregner-power/performance - Activate performance profile"
+        echo "  maxregner-power/powersave   - Activate powersave profile"
+        echo "  maxregner-power/balanced    - Activate balanced profile"
+        echo ""
+        echo "Network commands:"
+        echo "  maxregner-network/scan      - Scan network"
+        echo "  maxregner-network/speedtest - Test network speed"
+        echo "  maxregner-network/diagnose - Diagnose network issues"
+        ;;
+    features)
+        echo "=========================================="
+        echo "MaxRegner OS - Features"
+        echo "=========================================="
+        echo ""
+        echo "MaxRegner OS includes the following features:"
+        echo ""
+        echo "Kernel and System:"
+        echo "  - Optimized kernel parameters"
+        echo "  - Custom sysctl settings"
+        echo "  - Hardware detection and configuration"
+        echo ""
+        echo "Performance:"
+        echo "  - Performance profiles (gaming, desktop, server)"
+        echo "  - CPU governor tuning"
+        echo "  - Memory and I/O optimization"
+        echo ""
+        echo "Power Management:"
+        echo "  - TLP power management"
+        echo "  - thermald thermal management"
+        echo "  - Laptop mode tools"
+        echo "  - Custom power profiles"
+        echo ""
+        echo "Multimedia:"
+        echo "  - Complete codec support"
+        echo "  - FFmpeg with custom presets"
+        echo "  - GStreamer configuration"
+        echo "  - VA-API and VDPAU acceleration"
+        echo ""
+        echo "Development:"
+        echo "  - Python, Node.js, Java development"
+        echo "  - Git configuration"
+        echo "  - Docker and Podman"
+        echo "  - IDE support"
+        ;;
+    troubleshooting)
+        echo "=========================================="
+        echo "MaxRegner OS - Troubleshooting"
+        echo "=========================================="
+        echo ""
+        echo "Common issues and their solutions:"
+        echo ""
+        echo "1. No sound:"
+        echo "   - Check if PulseAudio is running: systemctl status pulseaudio"
+        echo "   - Check volume: alsamixer"
+        echo "   - Check audio devices: aplay -l"
+        echo ""
+        echo "2. No network:"
+        echo "   - Check if NetworkManager is running: systemctl status NetworkManager"
+        echo "   - Check interfaces: ip a"
+        echo "   - Check routes: ip route"
+        echo ""
+        echo "3. Slow performance:"
+        echo "   - Check CPU usage: top"
+        echo "   - Check memory usage: free -h"
+        echo "   - Try switching profile: sudo maxregner-performance/switch-profile gaming"
+        echo ""
+        echo "4. High temperature:"
+        echo "   - Check sensors: sensors"
+        echo "   - Check fan control: systemctl status fancontrol"
+        echo "   - Check thermal daemon: systemctl status thermald"
+        echo ""
+        echo "5. Graphics issues:"
+        echo "   - Check GPU: lspci | grep VGA"
+        echo "   - Check drivers: lspci -k | grep -A 3 VGA"
+        echo "   - Check Vulkan: vulkaninfo | grep GPU"
+        echo ""
+        echo "6. Package management issues:"
+        echo "   - Fix broken packages: sudo apt --fix-broken install"
+        echo "   - Update package lists: sudo apt update"
+        echo "   - Clean cache: sudo apt clean"
+        ;;
+    *)
+        echo "Error: Unknown topic '$TOPIC'"
+        echo "Type 'maxregner-help' for a list of available topics."
+        exit 1
+        ;;
+esac
+MAXHELP
+
+chmod +x /usr/local/bin/maxregner-help
+
+echo ""
+echo "========================================"
+echo "MaxRegner Documentation Complete!"
+echo "========================================"

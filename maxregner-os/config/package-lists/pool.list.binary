@@ -1,0 +1,72 @@
+# MaxRegner OS - Binary package lists
+# These packages are included in the binary stage of the build
+
+# ============================================
+# BOOTLOADER PACKAGES
+# ============================================
+
+b43-fwcutter
+firmware-b43-installer
+firmware-brcm80211
+dkms
+setserial
+user-setup
+
+efibootmgr
+shim-signed
+
+# ============================================
+# FIRMWARE PACKAGES
+# ============================================
+
+firmware-linux
+firmware-linux-nonfree
+firmware-iwlwifi
+firmware-realtek
+firmware-atheros
+firmware-b43-installer
+firmware-brcm80211
+firmware-sof-signed
+firmware-intel-graphics
+firmware-intel-misc
+firmware-misc-nonfree
+
+# ============================================
+# MICROCODE PACKAGES
+# ============================================
+
+#if ARCHITECTURES amd64
+intel-microcode
+iucode-tool
+
+grub-efi-amd64
+grub-efi-amd64-bin
+grub-efi-amd64-signed
+shim-helpers-amd64-signed
+#endif
+
+#if ARCHITECTURES arm64
+grub-efi-arm64
+grub-efi-arm64-bin
+grub-efi-arm64-signed
+shim-helpers-arm64-signed
+
+intel-microcode
+amd64-microcode
+#endif
+
+# ============================================
+# ADDITIONAL BINARY PACKAGES
+# ============================================
+
+# Compression
+xz-utils
+zstd
+
+# Filesystem tools
+e2fsprogs
+squashfs-tools
+
+# ============================================
+# END OF BINARY PACKAGE LIST
+# ============================================

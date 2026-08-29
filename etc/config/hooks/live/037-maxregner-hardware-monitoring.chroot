@@ -1,0 +1,351 @@
+#!/bin/bash
+# MaxRegner OS - Hardware Monitoring Configuration Hook
+# Configures comprehensive hardware monitoring support
+
+set -e
+
+echo "========================================"
+echo "MaxRegner OS - Hardware Monitoring Hook"
+echo "========================================"
+
+# ============================================
+# 1. INSTALL HARDWARE MONITORING TOOLS
+# ============================================
+
+echo "[1/5] Installing hardware monitoring tools..."
+
+# Install hardware monitoring packages
+apt-get install -y lm-sensors psensor fancontrol hddtemp \
+    smartmontools smart-notifier gsmartcontrol \
+    nvtop btop htop iotop nmon glmark2 2>/dev/null || true
+
+# Install GPU monitoring
+apt-get install -y nvidia-settings nvidia-utils-535 \
+    amdgpu-pro-tools radeontop intel-gpu-tools 2>/dev/null || true
+
+# Install system monitoring
+apt-get install -y sysstat iostat mpstat sar collectl \
+    vmstat dstat netdata 2>/dev/null || true
+
+# ============================================
+# 2. CONFIGURE LM-SENSORS
+# ============================================
+
+echo "[2/5] Configuring lm-sensors..."
+
+# Detect sensors
+yes | sensors-detect 2>/dev/null || true
+
+# Configure sensors
+cat > /etc/sensors3.conf << 'SENSORSCONF'
+# MaxRegner OS Sensors Configuration
+
+# Chip drivers
+chip "coretemp-*"
+chip "k10temp-*"
+chip "radeon-*"
+chip "nouveau-*"
+chip "nct6775-*"
+chip "it87-*"
+
+# Temperature settings
+set coretemp-* temp1_input 0
+set coretemp-* temp1_max 100
+set coretemp-* temp1_crit 105
+set coretemp-* temp1_crit_alarm 1
+
+set k10temp-* temp1_input 0
+set k10temp-* temp1_max 70
+set k10temp-* temp1_crit 90
+set k10temp-* temp1_crit_alarm 1
+
+# Fan settings
+set fan1_min 1000
+set fan1_max 5000
+set fan1_start_pwm 100
+set fan1_stop_pwm 0
+
+# Voltage settings
+set in0_min 0.8
+set in0_max 1.5
+set in1_min 1.0
+set in1_max 2.0
+
+# MaxRegner specific
+set temp1_beep 0
+set temp1_beep_alarm 0
+SENSORSCONF
+
+# Configure fancontrol
+cat > /etc/fancontrol << 'FANCONTROLCONF'
+# MaxRegner OS Fan Control Configuration
+
+INTERVAL=10
+DEVPATH=hwmon0=devices/platform/coretemp.0 hwmon1=devices/platform/nct6775.656
+DEVNAME=hwmon0=coretemp hwmon1=nct6775
+FCTEMPS=hwmon0/pwm1=hwmon0/temp1_input hwmon1/pwm1=hwmon1/temp1_input
+FCFANS=hwmon0/pwm1=hwmon0/fan1_input hwmon1/pwm1=hwmon1/fan1_input
+MINTEMP=hwmon0/pwm1=40 hwmon1/pwm1=40
+MAXTEMP=hwmon0/pwm1=70 hwmon1/pwm1=70
+MINSTART=hwmon0/pwm1=150 hwmon1/pwm1=150
+MINSTOP=hwmon0/pwm1=100 hwmon1/pwm1=100
+MINPWM=hwmon0/pwm1=0 hwmon1/pwm1=0
+MAXPWM=hwmon0/pwm1=255 hwmon1/pwm1=255
+FANCONTROLCONF
+
+# ============================================
+# 3. CONFIGURE PSENSOR
+# ============================================
+
+echo "[3/5] Configuring Psensor..."
+
+# Create Psensor configuration
+mkdir -p /home/maxregner/.config/psensor
+cat > /home/maxregner/.config/psensor/psensor.cfg << 'PSENSORCONF'
+# MaxRegner OS Psensor Configuration
+
+[general]
+start_minimized=false
+start_hidden=false
+
+[display]
+unit=temperature_celsius
+
+[appearance]
+application_font=Liberation Sans 10
+
+[graph]
+width=600
+height=400
+
+[sensor]
+monitoring=true
+logging=true
+
+[alert]
+enabled=true
+temperature_high=80
+temperature_critical=90
+
+# MaxRegner specific
+maxregner=true
+PSENSORCONF
+
+chown -R maxregner:maxregner /home/maxregner/.config/psensor
+
+# ============================================
+# 4. CONFIGURE SMART MONITORING
+# ============================================
+
+echo "[4/5] Configuring SMART monitoring..."
+
+# Configure smartd
+cat > /etc/smartd.conf << 'SMARTDCONF'
+# MaxRegner OS SMART Monitoring Configuration
+
+# Enable SMART monitoring for all devices
+DEVICESCAN -d removable -n standby -s on -o on -S on -a -I 194 -W 5,40,45 -m root@localhost -M exec /usr/share/smartmontools/smartd-runner
+
+# Specific devices
+/dev/sda -a -I 194 -W 5,40,45 -m root@localhost
+/dev/sdb -a -I 194 -W 5,40,45 -m root@localhost
+/dev/nvme0n1 -a -I 194 -W 5,40,45 -m root@localhost
+
+# Check interval
+checkinterval 300
+
+# MaxRegner specific
+maxregner_check=true
+SMARTDCONF
+
+# Configure smartd notifications
+cat > /etc/smartd_notify.sh << 'SMARTDNOTIFY'
+#!/bin/bash
+# MaxRegner OS SMART Notification Script
+
+# Get the smartd message
+read -r SUBJECT
+read -r BODY
+
+# Log the message
+logger -t smartd "$SUBJECT: $BODY"
+
+# Send email notification
+if command -v mail &>/dev/null; then
+    echo "$BODY" | mail -s "$SUBJECT" root@localhost
+fi
+
+# Display notification
+if [ -n "$DISPLAY" ]; then
+    notify-send "SMART Alert" "$SUBJECT\n$BODY"
+fi
+
+# Log to file
+echo "$(date): $SUBJECT - $BODY" >> /var/log/smartd_notifications.log
+SMARTDNOTIFY
+
+chmod +x /etc/smartd_notify.sh
+
+# ============================================
+# 5. CONFIGURE HARDWARE MONITORING SCRIPTS
+# ============================================
+
+echo "[5/5] Configuring hardware monitoring scripts..."
+
+# Create hardware monitoring scripts
+mkdir -p /usr/local/bin/maxregner-hwmon
+cat > /usr/local/bin/maxregner-hwmon/cpu-monitor << 'CPUMON'
+#!/bin/bash
+# MaxRegner OS CPU Monitor Script
+
+echo "========================================"
+echo "MaxRegner OS CPU Monitor"
+echo "========================================"
+echo ""
+
+# CPU information
+CPU_MODEL=$(grep -m 1 'model name' /proc/cpuinfo | cut -d: -f2 | xargs)
+CPU_CORES=$(nproc)
+CPU_VENDOR=$(grep -m 1 'vendor_id' /proc/cpuinfo | cut -d: -f2 | xargs)
+
+echo "CPU: $CPU_MODEL"
+echo "Vendor: $CPU_VENDOR"
+echo "Cores: $CPU_CORES"
+echo ""
+
+# CPU usage
+CPU_USAGE=$(top -bn1 | grep "Cpu(s)" | sed "s/.*, *\([0-9.]*\)%* id.*/\1/" | awk '{print 100 - $1}')
+echo "CPU Usage: ${CPU_USAGE}%"
+
+# CPU frequency
+CPU_FREQ=$(grep -m 1 'cpu MHz' /proc/cpuinfo | cut -d: -f2 | xargs)
+echo "Frequency: ${CPU_FREQ} MHz"
+
+# CPU temperature
+if command -v sensors &>/dev/null; then
+    CPU_TEMP=$(sensors | grep -E "Package id 0|temp1" | head -1 | awk '{print $4}' | tr -d '+°C')
+    echo "Temperature: ${CPU_TEMP}°C"
+fi
+
+# CPU load
+LOAD_1=$(awk '{print $1}' /proc/loadavg)
+LOAD_5=$(awk '{print $2}' /proc/loadavg)
+LOAD_15=$(awk '{print $3}' /proc/loadavg)
+echo "Load Average: $LOAD_1 (1m), $LOAD_5 (5m), $LOAD_15 (15m)"
+
+echo ""
+echo "========================================"
+CPUMON
+
+cat > /usr/local/bin/maxregner-hwmon/memory-monitor << 'MEMMON'
+#!/bin/bash
+# MaxRegner OS Memory Monitor Script
+
+echo "========================================"
+echo "MaxRegner OS Memory Monitor"
+echo "========================================"
+echo ""
+
+# Memory information
+free -h | awk '/^Mem:/ {print "Total: " $2 "\nUsed: " $3 "\nFree: " $4 "\nShared: " $5 "\nBuff/Cache: " $6 "\nAvailable: " $7}'
+
+echo ""
+
+# Swap information
+free -h | awk '/^Swap:/ {print "Total: " $2 "\nUsed: " $3 "\nFree: " $4}'
+
+echo ""
+
+# Memory usage percentage
+MEM_USAGE=$(free | awk '/Mem:/ {printf "%.2f", $3/$2*100}')
+echo "Memory Usage: ${MEM_USAGE}%"
+
+# Swap usage percentage
+SWAP_USAGE=$(free | awk '/Swap:/ {if ($2 != "0") printf "%.2f", $3/$2*100; else print "0.00"}')
+echo "Swap Usage: ${SWAP_USAGE}%"
+
+echo ""
+echo "========================================"
+MEMMON
+
+cat > /usr/local/bin/maxregner-hwmon/disk-monitor << 'DISKMON'
+#!/bin/bash
+# MaxRegner OS Disk Monitor Script
+
+echo "========================================"
+echo "MaxRegner OS Disk Monitor"
+echo "========================================"
+echo ""
+
+# Disk information
+echo "Disk Usage:"
+df -h | awk 'NR==1 || /^\/dev\// {printf "  %-20s %10s %10s %10s %5s\n", $1, $4, $5, $6, $2}'
+
+echo ""
+
+# Disk health
+if command -v smartctl &>/dev/null; then
+    echo "Disk Health:"
+    for disk in /dev/sd[a-z] /dev/nvme[0-9]n[0-9]; do
+        if [ -e "$disk" ]; then
+            HEALTH=$(smartctl -H $disk 2>/dev/null | grep -i "overall" | awk '{print $6}')
+            TEMP=$(smartctl -A $disk 2>/dev/null | grep Temperature | awk '{print $10}')
+            POWER=$(smartctl -A $disk 2>/dev/null | grep Power_On_Hours | awk '{print $10}')
+            echo "  $disk: Health=$HEALTH, Temp=${TEMP}°C, PowerOn=${POWER}h"
+        fi
+    done
+fi
+
+echo ""
+echo "========================================"
+DISKMON
+
+cat > /usr/local/bin/maxregner-hwmon/full-monitor << 'FULLMON'
+#!/bin/bash
+# MaxRegner OS Full Hardware Monitor Script
+
+clear
+
+echo "=========================================="
+echo "MaxRegner OS Full Hardware Monitor"
+echo "=========================================="
+echo ""
+
+# Run all monitors
+/usr/local/bin/maxregner-hwmon/cpu-monitor
+/usr/local/bin/maxregner-hwmon/memory-monitor
+/usr/local/bin/maxregner-hwmon/disk-monitor
+
+# Network information
+echo ""
+echo "Network Information:"
+ip -br addr show | awk '{print "  " $1 " - " $3}'
+
+# GPU information
+if lspci | grep -q "VGA"; then
+    echo ""
+    echo "GPU Information:"
+    lspci | grep VGA | awk -F': ' '{print "  " $2}'
+fi
+
+echo ""
+echo "=========================================="
+FULLMON
+
+chmod +x /usr/local/bin/maxregner-hwmon/*
+
+# Enable and start services
+systemctl enable lm-sensors 2>/dev/null || true
+systemctl enable fancontrol 2>/dev/null || true
+systemctl enable smartd 2>/dev/null || true
+systemctl enable smartmontools 2>/dev/null || true
+
+# Start services
+systemctl start lm-sensors 2>/dev/null || true
+systemctl start fancontrol 2>/dev/null || true
+systemctl start smartd 2>/dev/null || true
+
+echo ""
+echo "========================================"
+echo "MaxRegner Hardware Monitoring Complete!"
+echo "========================================"

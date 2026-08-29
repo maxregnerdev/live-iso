@@ -1,0 +1,259 @@
+#!/bin/bash
+# MaxRegner OS - Container Configuration Hook
+# Configures Docker, Podman, and container tools
+
+set -e
+
+echo "========================================"
+echo "MaxRegner OS - Container Hook"
+echo "========================================"
+
+# ============================================
+# 1. INSTALL CONTAINER RUNTIMES
+# ============================================
+
+echo "[1/5] Installing container runtimes..."
+
+# Install Docker
+apt-get install -y docker.io docker-ce docker-ce-cli containerd.io \
+    docker-buildx-plugin docker-compose-plugin 2>/dev/null || true
+
+# Install Podman
+apt-get install -y podman podman-docker podman-plugins podman-remote \
+    podman-compose podman-gvproxy 2>/dev/null || true
+
+# Install Buildah and Skopeo
+apt-get install -y buildah skopeo crun runc 2>/dev/null || true
+
+# ============================================
+# 2. CONFIGURE DOCKER
+# ============================================
+
+echo "[2/5] Configuring Docker..."
+
+# Configure Docker daemon
+cat > /etc/docker/daemon.json << 'DOCKEREOF'
+{
+  "exec-opts": ["native.cgroupdriver=systemd"],
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "100m",
+    "max-file": "3"
+  },
+  "storage-driver": "overlay2",
+  "storage-opts": [
+    "overlay2.override_kernel_check=true",
+    "overlay2.size=50G"
+  ],
+  "default-ulimits": {
+    "nofile": {
+      "Name": "nofile",
+      "Hard": 65536,
+      "Soft": 65536
+    },
+    "nproc": {
+      "Name": "nproc",
+      "Hard": 4096,
+      "Soft": 2048
+    }
+  },
+  "max-concurrent-downloads": 10,
+  "max-download-attempts": 5,
+  "dns": ["8.8.8.8", "8.8.4.4", "1.1.1.1"],
+  "dns-opts": ["use-vc"],
+  "features": {
+    "buildkit": true
+  },
+  "experimental": false,
+  "ip-masq": true,
+  "iptables": true,
+  "ipv6": true,
+  "live-restore": true,
+  "userland-proxy": false,
+  "no-new-privileges": true,
+  "selinux-enabled": false,
+  "userns-remap": ""
+}
+DOCKEREOF
+
+# Configure Docker service
+cat > /etc/systemd/system/docker.service.d/override.conf << 'DOCKEROVERRIDE'
+[Service]
+ExecStart=
+ExecStart=/usr/bin/dockerd -H fd:// -H tcp://127.0.0.1:2375 -H unix:///var/run/docker.sock
+DOCKEROVERRIDE
+
+# ============================================
+# 3. CONFIGURE PODMAN
+# ============================================
+
+echo "[3/5] Configuring Podman..."
+
+# Configure Podman
+cat > /etc/containers/containers.conf << 'PODMANEOF'
+# MaxRegner OS Podman Configuration
+
+[containers]
+# Storage configuration
+storage_driver = "overlay"
+storage_path = "/var/lib/containers/storage"
+storage_options = [
+    "overlay.mount_program=/usr/bin/fuse-overlayfs",
+    "overlay.mountopt=nodev,metacopy=on"
+]
+
+# Network configuration
+network_cmd_path = ["/usr/bin/slirp4netns", "/usr/bin/fuse-overlayfs"]
+network_cmd_args = ["-c", "/etc/containers/oci/hooks.json"]
+
+# Cgroup configuration
+cgroup_manager = "systemd"
+cgroups = "enabled"
+
+# Security configuration
+seccomp_profile = "default"
+selinux = false
+apparmor = true
+cap_drop = ["CAP_NET_RAW"]
+cap_add = ["CAP_SYS_ADMIN"]
+
+# Logging configuration
+log_driver = "k8s-file"
+log_opts = {
+    "path": "/var/log/podman/containers"
+}
+
+# Runtime configuration
+runtime = "/usr/bin/crun"
+runtime_supports_json = true
+no_pivot = false
+
+# Infrastructure configuration
+infrastructure_command = "/usr/bin/podman"
+PODMANEOF
+
+# Configure Podman registries
+cat > /etc/containers/registries.conf << 'REGISTRIESEOF'
+# MaxRegner OS Registries Configuration
+
+[[registry]]
+location = "docker.io"
+mirror-by-digest-only = false
+prefix = ""
+blocked = false
+insecure = false
+
+[[registry]]
+location = "quay.io"
+mirror-by-digest-only = false
+prefix = ""
+blocked = false
+insecure = false
+
+[[registry]]
+location = "ghcr.io"
+mirror-by-digest-only = false
+prefix = ""
+blocked = false
+insecure = false
+
+[[registry]]
+location = "localhost:5000"
+mirror-by-digest-only = false
+prefix = ""
+blocked = false
+insecure = true
+REGISTRIESEOF
+
+# ============================================
+# 4. CONFIGURE BUILDAH
+# ============================================
+
+echo "[4/5] Configuring Buildah..."
+
+# Configure Buildah
+cat > /etc/containers/buildah.conf << 'BUILDAHEOF'
+# MaxRegner OS Buildah Configuration
+
+[buildah]
+# Storage configuration
+storage_driver = "overlay"
+storage_path = "/var/lib/containers/storage"
+
+# Network configuration
+network_cmd_path = ["/usr/bin/slirp4netns"]
+
+# Format configuration
+format = "oci"
+
+# Compression configuration
+compression = "gzip"
+
+# Log configuration
+log_level = "info"
+BUILDAHEOF
+
+# ============================================
+# 5. ENABLE AND START SERVICES
+# ============================================
+
+echo "[5/5] Enabling container services..."
+
+# Enable and start services
+systemctl enable docker 2>/dev/null || true
+systemctl enable containerd 2>/dev/null || true
+
+# Start services
+systemctl start docker 2>/dev/null || true
+systemctl start containerd 2>/dev/null || true
+
+# Add user to docker group
+usermod -aG docker maxregner 2>/dev/null || true
+
+# Create container storage
+mkdir -p /var/lib/containers/storage
+mkdir -p /var/lib/docker
+chmod 775 /var/lib/containers/storage
+chmod 775 /var/lib/docker
+
+# Configure container networking
+cat > /etc/cni/net.d/10-podman.conf << 'CNIEOF'
+{
+  "cniVersion": "0.4.0",
+  "name": "podman",
+  "plugins": [
+    {
+      "type": "bridge",
+      "bridge": "cni-podman0",
+      "isGateway": true,
+      "ipMasq": true,
+      "ipam": {
+        "type": "host-local",
+        "ranges": [
+          [
+            {
+              "subnet": "10.88.0.0/16"
+            }
+          ]
+        ],
+        "routes": [
+          {
+            "dst": "0.0.0.0/0"
+          }
+        ]
+      }
+    },
+    {
+      "type": "portmap",
+      "capabilities": {
+        "portMappings": true
+      }
+    }
+  ]
+}
+CNIEOF
+
+echo ""
+echo "========================================"
+echo "MaxRegner Container Configuration Complete!"
+echo "========================================"

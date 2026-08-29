@@ -1,0 +1,28 @@
+# MaxRegner OS Build Configuration
+
+# target architecture - i386, amd64, arm64, or leave empty to use host architecture
+ARCH=""
+
+# base codename
+BASECODENAME="sid"
+
+# distribution codename
+CODENAME="maxregner"
+
+# distribution version
+VERSION="1.0"
+
+# distribution channel
+CHANNEL="stable"
+
+# distribution name
+NAME="MaxRegner OS"
+
+# mirror to fetch packages from
+MIRROR_URL="https://deb.debian.org/debian/"
+
+# suffix for generated .iso files
+OUTPUT_SUFFIX="-maxregner"
+
+# folder suffix for the package lists to use
+PACKAGE_LISTS_SUFFIX="maxregner-installer"

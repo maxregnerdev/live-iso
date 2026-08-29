@@ -1,0 +1,283 @@
+#!/bin/bash
+# MaxRegner OS - Update System Configuration Hook
+# Configures automatic update and upgrade system
+
+set -e
+
+echo "========================================"
+echo "MaxRegner OS - Update System Hook"
+echo "========================================"
+
+# ============================================
+# 1. INSTALL UPDATE TOOLS
+# ============================================
+
+echo "[1/5] Installing update tools..."
+
+# Install update packages
+apt-get install -y unattended-upgrades apt-listchanges \
+    apt-listbugs apt-utils debsums debsigs 2>/dev/null || true
+
+# Install update notifier
+apt-get install -y update-notifier update-notifier-common \
+    update-manager update-manager-core 2>/dev/null || true
+
+# Install cron for scheduling
+apt-get install -y cron anacron 2>/dev/null || true
+
+# ============================================
+# 2. CONFIGURE UNATTENDED UPGRADES
+# ============================================
+
+echo "[2/5] Configuring unattended upgrades..."
+
+# Configure unattended-upgrades
+cat > /etc/apt/apt.conf.d/20auto-upgrades << 'AUTOUPDATE'
+# MaxRegner OS Automatic Updates Configuration
+
+# Enable automatic updates
+APT::Periodic::Enable "1";
+
+# Update frequency
+APT::Periodic::Update-Package-Lists "1";
+APT::Periodic::Download-Upgradeable-Packages "1";
+APT::Periodic::AutocleanInterval "7";
+APT::Periodic::Unattended-Upgrade "1";
+
+# Reboot settings
+APT::Periodic::Unattended-Upgrade::Automatic-Reboot "true";
+APT::Periodic::Unattended-Upgrade::Automatic-Reboot-Time "02:00";
+
+# Mail notification
+APT::Periodic::Unattended-Upgrade::OnlyOnError "true";
+
+# MaxRegner specific
+APT::Periodic::MaxAge "30";
+APT::Periodic::MinAge "1";
+AUTOUPDATE
+
+# Configure unattended-upgrades
+cat > /etc/apt/apt.conf.d/50unattended-upgrades << 'UNATTENDEDUPDATE'
+// MaxRegner OS Unattended Upgrades Configuration
+
+Unattended-Upgrade::Allowed-Origins {
+    "${distro_id}:${distro_codename}";
+    "${distro_id}:${distro_codename}-security";
+    "${distro_id}ESM:${distro_codename}";
+};
+
+Unattended-Upgrade::Package-Blacklist {
+    "vim";
+    "emacs";
+    "libc6";
+    "libstdc++6";
+};
+
+Unattended-Upgrade::Automatic-Reboot "true";
+Unattended-Upgrade::Automatic-Reboot-Time "02:00";
+
+Unattended-Upgrade::Remove-Unused-Dependencies "true";
+Unattended-Upgrade::AutocleanInterval "7";
+
+Unattended-Upgrade::OnlyOnError "true";
+
+// MaxRegner specific
+Unattended-Upgrade::MaxDownloadSize "1000";
+Unattended-Upgrade::MinimalStepsBetweenRuns "1";
+UNATTENDEDUPDATE
+
+# ============================================
+# 3. CONFIGURE UPDATE NOTIFIER
+# ============================================
+
+echo "[3/5] Configuring update notifier..."
+
+# Configure update-notifier
+cat > /etc/default/update-notifier << 'UPDATENOTIFIER'
+# MaxRegner OS Update Notifier Configuration
+
+# Enable update notifier
+ENABLED=1
+
+# Check interval (in days)
+CHECK_INTERVAL=1
+
+# Notification settings
+NOTIFY_USER=maxregner
+NOTIFY_METHOD=notify-send
+
+# Reboot required notification
+REBOOT_REQUIRED_NOTIFY=1
+
+# MaxRegner specific
+MAXREGNER_NOTIFY=1
+UPDATENOTIFIER
+
+# Configure update-notifier-common
+cat > /etc/update-notifier/update-notifier.conf << 'UPDATENOTIFIERCONF'
+# MaxRegner OS Update Notifier Configuration
+
+[general]
+check_interval=1
+
+[releases]
+active_distro_upgrade=true
+
+[security]
+check_interval=1
+
+[updates]
+check_interval=1
+
+[reboot]
+check_interval=1
+
+# MaxRegner specific
+[maxregner]
+enabled=true
+check_interval=1
+UPDATENOTIFIERCONF
+
+# ============================================
+# 4. CREATE UPDATE SCRIPTS
+# ============================================
+
+echo "[4/5] Creating update scripts..."
+
+# Create MaxRegner update check script
+cat > /usr/local/bin/maxregner-update-check << 'UPDATECHECK'
+#!/bin/bash
+# MaxRegner OS Update Check Script
+
+set -e
+
+echo "========================================"
+echo "MaxRegner OS Update Check"
+echo "========================================"
+echo ""
+
+# Check for updates
+UPDATES=$(apt-get -s upgrade 2>/dev/null | grep -c "^Inst")
+
+if [ "$UPDATES" -gt 0 ]; then
+    echo "Updates available: $UPDATES"
+    echo ""
+    echo "Run 'sudo maxregner-update' to install updates"
+    
+    # Show details
+    apt-get -s upgrade 2>/dev/null | grep "^Inst" | head -10
+    
+    # Notify user
+    if [ -n "$DISPLAY" ]; then
+        notify-send "MaxRegner OS Updates" "$UPDATES updates available"
+    fi
+    
+    exit 1
+else
+    echo "System is up to date!"
+    exit 0
+fi
+UPDATECHECK
+
+chmod +x /usr/local/bin/maxregner-update-check
+
+# Create MaxRegner update log script
+cat > /usr/local/bin/maxregner-update-log << 'UPDATELOG'
+#!/bin/bash
+# MaxRegner OS Update Log Script
+
+set -e
+
+LOG_FILE="/var/log/maxregner-updates.log"
+
+# Check if running as root
+if [ "$(id -u)" -ne 0 ]; then
+    echo "Please run as root!"
+    exit 1
+fi
+
+# Create log file
+touch "$LOG_FILE"
+chmod 644 "$LOG_FILE"
+
+# Log update
+TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
+UPDATES=$(apt-get -s upgrade 2>/dev/null | grep -c "^Inst")
+
+echo "[$TIMESTAMP] Updates available: $UPDATES" >> "$LOG_FILE"
+
+# Log installed packages
+apt-get -s upgrade 2>/dev/null | grep "^Inst" >> "$LOG_FILE"
+
+# Log system information
+echo "[$TIMESTAMP] System: $(uname -a)" >> "$LOG_FILE"
+echo "[$TIMESTAMP] Uptime: $(uptime -p)" >> "$LOG_FILE"
+
+# Show log
+tail -20 "$LOG_FILE"
+
+UPDATELOG
+
+chmod +x /usr/local/bin/maxregner-update-log
+
+# ============================================
+# 5. CONFIGURE CRON JOBS
+# ============================================
+
+echo "[5/5] Configuring cron jobs..."
+
+# Configure root cron
+cat > /etc/cron.d/maxregner-updates << 'MAXCRON'
+# MaxRegner OS Update Cron Jobs
+
+# Check for updates daily at 6 AM
+0 6 * * * root /usr/local/bin/maxregner-update-check >> /var/log/maxregner-update-check.log 2>&1
+
+# Log updates daily at 6:30 AM
+30 6 * * * root /usr/local/bin/maxregner-update-log
+
+# Clean up weekly on Sunday at 3 AM
+0 3 * * 0 root /usr/local/bin/maxregner-cleanup >> /var/log/maxregner-cleanup.log 2>&1
+
+# Backup weekly on Saturday at 2 AM
+0 2 * * 6 root /usr/local/bin/maxregner-backup >> /var/log/maxregner-backup.log 2>&1
+
+# Performance monitoring daily at 12 AM
+0 12 * * * root /usr/local/bin/maxregner-performance/monitor >> /var/log/maxregner-performance.log 2>&1
+
+# MaxRegner specific
+0 * * * * root /usr/local/bin/maxregner-update-check --quiet
+MAXCRON
+
+# Configure user cron
+mkdir -p /var/spool/cron/crontabs
+cat > /var/spool/cron/crontabs/maxregner << 'USERCRON'
+# MaxRegner OS User Cron Jobs
+
+# Check for updates every 6 hours
+0 */6 * * * /usr/local/bin/maxregner-update-check --quiet
+
+# Notify about updates at login
+@reboot /usr/local/bin/maxregner-update-check --quiet
+
+# Clean user cache weekly
+0 4 * * 0 rm -rf ~/.cache/* >> ~/.maxregner-cleanup.log 2>&1
+
+# MaxRegner welcome at first login
+@reboot if [ ! -f ~/.maxregner-welcome-shown ]; then /usr/local/bin/maxregner-welcome; touch ~/.maxregner-welcome-shown; fi
+USERCRON
+
+chown maxregner:maxregner /var/spool/cron/crontabs/maxregner
+
+# Enable and start services
+systemctl enable cron 2>/dev/null || true
+systemctl enable anacron 2>/dev/null || true
+
+# Start services
+systemctl start cron 2>/dev/null || true
+systemctl start anacron 2>/dev/null || true
+
+echo ""
+echo "========================================"
+echo "MaxRegner Update System Complete!"
+echo "========================================"

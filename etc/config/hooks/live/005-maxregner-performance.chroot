@@ -1,0 +1,126 @@
+#!/bin/bash
+# MaxRegner OS - Performance Optimization Hook
+# This hook applies performance optimizations to the system
+
+set -e
+
+echo "========================================"
+echo "MaxRegner OS - Performance Optimization Hook"
+echo "========================================"
+
+# ============================================
+# 1. CPU GOVERNOR CONFIGURATION
+# ============================================
+
+echo "[1/5] Configuring CPU governor..."
+
+# Install cpufrequtils
+apt-get install -y cpufrequtils 2>/dev/null || true
+
+# Set performance governor
+if [ -f /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor ]; then
+    echo performance > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor 2>/dev/null || true
+fi
+
+# Configure cpufreq
+cat > /etc/default/cpufrequtils <<EOF
+# MaxRegner OS CPU Governor Configuration
+GOVERNOR="performance"
+EOF
+
+# ============================================
+# 2. I/O SCHEDULER CONFIGURATION
+# ============================================
+
+echo "[2/5] Configuring I/O scheduler..."
+
+# Set BFQ scheduler for all block devices
+for dev in /sys/block/*/queue/scheduler; do
+    if [ -f "$dev" ]; then
+        echo bfq > "$dev" 2>/dev/null || true
+    fi
+done
+
+# Configure I/O scheduler permanently
+cat > /etc/default/grub.d/40-io-scheduler.cfg <<'EOF'
+# MaxRegner OS I/O Scheduler Configuration
+echo "Setting I/O scheduler to bfq..."
+for dev in /sys/block/*/queue/scheduler; do
+    echo bfq > "$dev"
+done
+EOF
+
+# ============================================
+# 3. MEMORY MANAGEMENT
+# ============================================
+
+echo "[3/5] Optimizing memory management..."
+
+# Configure swappiness
+cat > /etc/sysctl.d/99-maxregner-memory.conf <<EOF
+# MaxRegner OS Memory Optimization
+
+# Reduce swappiness (prefer RAM over swap)
+vm.swappiness=10
+
+# Increase overcommit memory
+vm.overcommit_memory=1
+vm.overcommit_ratio=80
+
+# Enable transparent huge pages
+vm.thp_enabled=1
+EOF
+
+# Apply sysctl settings
+sysctl -p /etc/sysctl.d/99-maxregner-memory.conf 2>/dev/null || true
+
+# ============================================
+# 4. SYSTEM SERVICES OPTIMIZATION
+# ============================================
+
+echo "[4/5] Optimizing system services..."
+
+# Disable unnecessary services
+systemctl disable avahi-daemon 2>/dev/null || true
+systemctl disable cups 2>/dev/null || true
+systemctl disable bluetooth 2>/dev/null || true
+systemctl disable ModemManager 2>/dev/null || true
+systemctl disable rpcbind 2>/dev/null || true
+systemctl disable isc-dhcp-server 2>/dev/null || true
+systemctl disable apache2 2>/dev/null || true
+
+# Enable performance services
+systemctl enable irqbalance 2>/dev/null || true
+systemctl enable tlp 2>/dev/null || true
+
+# ============================================
+# 5. PRELOAD CONFIGURATION
+# ============================================
+
+echo "[5/5] Configuring preload..."
+
+# Install preload
+apt-get install -y preload 2>/dev/null || true
+
+# Configure preload
+cat > /etc/preload.conf <<EOF
+# MaxRegner OS Preload Configuration
+modelperiod=600
+modelcycle=300
+savemodel=1
+usemodel=1
+rootlog=0
+EOF
+
+# Enable and start preload
+systemctl enable preload 2>/dev/null || true
+systemctl start preload 2>/dev/null || true
+
+# ============================================
+# FINAL CLEANUP
+# ============================================
+
+echo ""
+echo "========================================"
+echo "MaxRegner Performance Optimization Complete!"
+echo "========================================"

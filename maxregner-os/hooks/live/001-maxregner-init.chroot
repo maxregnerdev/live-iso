@@ -1,0 +1,348 @@
+#!/bin/bash
+# MaxRegner OS - Initialization Hook
+# This is the first hook that runs in the chroot
+# It sets up the foundation for all MaxRegner OS customizations
+
+set -e
+
+echo "========================================"
+echo "MaxRegner OS - Initialization Hook"
+echo "========================================"
+
+# ============================================
+# 1. SETUP ENVIRONMENT
+# ============================================
+
+echo "[1/10] Setting up environment..."
+
+# Source configuration
+if [ -f /working_dir/maxregner-os/config/terraform-maxregner.conf ]; then
+    source /working_dir/maxregner-os/config/terraform-maxregner.conf
+elif [ -f /etc/terraform.conf ]; then
+    source /etc/terraform.conf
+fi
+
+# Set default values
+MAXREGNER_VERSION="${VERSION:-4.4}"
+MAXREGNER_CODENAME="${CODENAME:-maxregner}"
+MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
+MAXREGNER_PASSWORD="${LIVE_PASSWORD:-maxregner}"
+MAXREGNER_HOME="/home/$MAXREGNER_USER"
+
+# Create temporary directory
+mkdir -p /tmp/maxregner-setup
+cd /tmp/maxregner-setup
+
+# ============================================
+# 2. CREATE MAXREGNER USER
+# ============================================
+
+echo "[2/10] Creating MaxRegner user..."
+
+# Check if user exists
+if ! id "$MAXREGNER_USER" >/dev/null 2>&1; then
+    echo "Creating user: $MAXREGNER_USER"
+    
+    # Create user with all necessary groups
+    useradd -m -s /bin/bash \
+        -G sudo,adm,dialout,cdrom,floppy,audio,dip,video,plugdev,netdev,lpadmin,sambashare \
+        -c "MaxRegner OS User" \
+        "$MAXREGNER_USER"
+    
+    # Set password
+    echo "$MAXREGNER_USER:$MAXREGNER_PASSWORD" | chpasswd
+    
+    # Ensure home directory exists
+    mkdir -p "$MAXREGNER_HOME"
+    chown "$MAXREGNER_USER:$MAXREGNER_USER" "$MAXREGNER_HOME"
+    chmod 755 "$MAXREGNER_HOME"
+    
+    # Set proper permissions
+    chmod 700 "$MAXREGNER_HOME/.ssh" 2>/dev/null || true
+    chmod 600 "$MAXREGNER_HOME/.ssh/authorized_keys" 2>/dev/null || true
+else
+    echo "User $MAXREGNER_USER already exists, updating..."
+    usermod -aG sudo,adm,dialout,cdrom,floppy,audio,dip,video,plugdev,netdev,lpadmin,sambashare "$MAXREGNER_USER"
+    echo "$MAXREGNER_USER:$MAXREGNER_PASSWORD" | chpasswd
+fi
+
+# ============================================
+# 3. SETUP SUDOERS
+# ============================================
+
+echo "[3/10] Configuring sudoers..."
+
+# Ensure sudo group has passwordless sudo
+if [ -f /etc/sudoers ]; then
+    # Backup original
+    cp /etc/sudoers /etc/sudoers.bak
+    
+    # Add passwordless sudo for sudo group
+    if ! grep -q "%sudo.*NOPASSWD" /etc/sudoers; then
+        echo "%sudo ALL=(ALL:ALL) NOPASSWD: ALL" >> /etc/sudoers
+    fi
+    
+    # Add specific user
+    if ! grep -q "$MAXREGNER_USER.*NOPASSWD" /etc/sudoers; then
+        echo "$MAXREGNER_USER ALL=(ALL:ALL) NOPASSWD: ALL" >> /etc/sudoers
+    fi
+    
+    # Validate sudoers
+    visudo -cf /etc/sudoers || true
+fi
+
+# ============================================
+# 4. SETUP AUTOLOGIN
+# ============================================
+
+echo "[4/10] Configuring autologin..."
+
+# Create live-config files
+mkdir -p /etc/live/config
+cat > /etc/live/config/autologin-user <<EOF
+$MAXREGNER_USER
+EOF
+
+cat > /etc/live/config/user-fullname <<EOF
+MaxRegner OS User
+EOF
+
+cat > /etc/live/config/password <<EOF
+$MAXREGNER_PASSWORD
+EOF
+
+# Configure GDM for autologin
+mkdir -p /etc/gdm3
+cat > /etc/gdm3/daemon.conf <<EOF
+[daemon]
+AutomaticLoginEnable = true
+AutomaticLogin = $MAXREGNER_USER
+TimedLoginEnable = true
+TimedLogin = $MAXREGNER_USER
+TimedLoginDelay = 3
+
+[security]
+
+[xdmcp]
+
+[chooser]
+
+[debug]
+EOF
+
+# Configure LightDM for autologin (fallback)
+mkdir -p /etc/lightdm
+cat > /etc/lightdm/lightdm.conf <<EOF
+[Seat:*]
+autologin-user=$MAXREGNER_USER
+autologin-user-timeout=0
+EOF
+
+# Configure SDDM for autologin (fallback)
+mkdir -p /etc/sddm.conf.d
+cat > /etc/sddm.conf.d/autologin.conf <<EOF
+[Autologin]
+User=$MAXREGNER_USER
+Session=gnome.desktop
+EOF
+
+# Create systemd autologin service
+mkdir -p /etc/systemd/system/getty@tty1.service.d
+cat > /etc/systemd/system/getty@tty1.service.d/override.conf <<EOF
+[Service]
+ExecStart=
+ExecStart=-/sbin/agetty --autologin $MAXREGNER_USER --noclear %I \$TERM
+Type=idle
+EOF
+
+# Also for tty7 (X11)
+mkdir -p /etc/systemd/system/getty@tty7.service.d
+cat > /etc/systemd/system/getty@tty7.service.d/override.conf <<EOF
+[Service]
+ExecStart=
+ExecStart=-/sbin/agetty --autologin $MAXREGNER_USER --noclear %I \$TERM
+Type=idle
+EOF
+
+# ============================================
+# 5. SETUP MAXREGNER BRANDING
+# ============================================
+
+echo "[5/10] Setting up MaxRegner branding..."
+
+# Create branding directory
+mkdir -p /usr/share/maxregner/branding
+
+# Create logo (placeholder)
+cat > /usr/share/maxregner/branding/logo.svg <<'EOF'
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="maxregner" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#16213e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e94560;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect x="10" y="10" width="236" height="236" rx="40" fill="url(#maxregner)"/>
+  <text x="128" y="140" font-family="Sans" font-size="48" font-weight="bold" fill="white" text-anchor="middle">MR</text>
+  <text x="128" y="180" font-family="Sans" font-size="24" fill="white" text-anchor="middle">OS</text>
+</svg>
+EOF
+
+# Create OS release info
+cat > /etc/os-release <<EOF
+NAME="MaxRegner OS"
+VERSION="$MAXREGNER_VERSION"
+VERSION_ID="$MAXREGNER_VERSION"
+PRETTY_NAME="MaxRegner OS $MAXREGNER_VERSION"
+ID=maxregner
+ID_LIKE=debian
+HOME_URL="https://maxregner.dev"
+SUPPORT_URL="https://maxregner.dev/support"
+BUG_REPORT_URL="https://github.com/maxregnerdev/live-iso/issues"
+PRIVACY_POLICY_URL="https://maxregner.dev/privacy"
+VERSION_CODENAME="$MAXREGNER_CODENAME"
+UBUNTU_CODENAME="sid"
+ANSI_COLOR="35;1"
+LOGO="maxregner"
+EOF
+
+# Create lsb-release
+cat > /etc/lsb-release <<EOF
+DISTRIB_ID=MaxRegner
+DISTRIB_RELEASE=$MAXREGNER_VERSION
+DISTRIB_CODENAME=$MAXREGNER_CODENAME
+DISTRIB_DESCRIPTION="MaxRegner OS $MAXREGNER_VERSION"
+EOF
+
+# Set hostname
+cat > /etc/hostname <<EOF
+maxregner
+EOF
+
+# Set issue
+cat > /etc/issue <<EOF
+MaxRegner OS $MAXREGNER_VERSION \n \l
+EOF
+
+cat > /etc/issue.net <<EOF
+MaxRegner OS $MAXREGNER_VERSION
+EOF
+
+# ============================================
+# 6. SETUP LOCALES
+# ============================================
+
+echo "[6/10] Configuring locales..."
+
+# Generate locales
+if [ -f /usr/sbin/locale-gen ]; then
+    # Enable multiple locales
+    sed -i 's/^# *en_US.UTF-8/en_US.UTF-8/' /etc/locale.gen
+    sed -i 's/^# *de_DE.UTF-8/de_DE.UTF-8/' /etc/locale.gen
+    sed -i 's/^# *fr_FR.UTF-8/fr_FR.UTF-8/' /etc/locale.gen
+    sed -i 's/^# *es_ES.UTF-8/es_ES.UTF-8/' /etc/locale.gen
+    sed -i 's/^# *it_IT.UTF-8/it_IT.UTF-8/' /etc/locale.gen
+    
+    # Generate locales
+    locale-gen
+    
+    # Set default locale
+    update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
+    export LANG=en_US.UTF-8
+    export LC_ALL=en_US.UTF-8
+fi
+
+# ============================================
+# 7. SETUP TIMEZONE
+# ============================================
+
+echo "[7/10] Configuring timezone..."
+
+# Set timezone to UTC
+ln -sf /usr/share/zoneinfo/UTC /etc/localtime
+if [ -f /etc/timezone ]; then
+    echo "UTC" > /etc/timezone
+fi
+
+# ============================================
+# 8. SETUP NETWORK
+# ============================================
+
+echo "[8/10] Configuring network..."
+
+# Configure NetworkManager
+mkdir -p /etc/NetworkManager/conf.d
+cat > /etc/NetworkManager/conf.d/10-maxregner.conf <<EOF
+[main]
+plugins=keyfile,ifupdown
+
+[keyfile]
+unmanaged-devices=none
+
+[device]
+wifi.scan-rand-mac-address=no
+
+[ifupdown]
+managed=true
+EOF
+
+# Configure resolv.conf
+mkdir -p /etc/resolv.conf
+cat > /etc/resolv.conf <<EOF
+nameserver 1.1.1.1
+nameserver 8.8.8.8
+nameserver 9.9.9.9
+EOF
+
+# ============================================
+# 9. SETUP PACKAGE SOURCES
+# ============================================
+
+echo "[9/10] Configuring package sources..."
+
+# Add MaxRegner repository
+if [ -n "$MAXREGNER_REPO" ]; then
+    cat > /etc/apt/sources.list.d/maxregner.list <<EOF
+ deb $MAXREGNER_REPO $BASECODENAME $CHANNEL
+EOF
+    
+    # Add repository key
+    if [ -n "$MAXREGNER_REPO_SIGNED_BY" ]; then
+        mkdir -p /usr/share/keyrings
+        # In a real build, we would download the key here
+        # For now, just create a placeholder
+        touch /usr/share/keyrings/maxregner-archive-keyring.gpg
+    fi
+fi
+
+# ============================================
+# 10. FINAL CLEANUP
+# ============================================
+
+echo "[10/10] Final cleanup..."
+
+# Clean up temporary files
+rm -rf /tmp/maxregner-setup
+
+# Update package lists
+apt-get update 2>/dev/null || true
+
+# Fix broken dependencies
+apt-get install -y -f 2>/dev/null || true
+
+# Ensure all services are enabled
+systemctl enable gdm3 2>/dev/null || true
+systemctl enable NetworkManager 2>/dev/null || true
+systemctl enable bluetooth 2>/dev/null || true
+
+echo ""
+echo "========================================"
+echo "MaxRegner OS Initialization Complete!"
+echo "========================================"
+echo "User: $MAXREGNER_USER"
+echo "Password: $MAXREGNER_PASSWORD"
+echo "Version: $MAXREGNER_VERSION"
+echo "Codename: $MAXREGNER_CODENAME"
+echo "========================================"

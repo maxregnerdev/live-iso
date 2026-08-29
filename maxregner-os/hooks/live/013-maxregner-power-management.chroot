@@ -1,0 +1,204 @@
+#!/bin/bash
+# MaxRegner OS - Power Management Configuration Hook
+# Configures power saving and performance settings
+
+set -e
+
+echo "========================================"
+echo "MaxRegner OS - Power Management Hook"
+echo "========================================"
+
+# ============================================
+# 1. INSTALL POWER TOOLS
+# ============================================
+
+echo "[1/5] Installing power management tools..."
+
+# Install power management packages
+apt-get install -y tlp tlp-rdw powertop cpufrequtils thermald fancontrol 2>/dev/null || true
+
+# ============================================
+# 2. CONFIGURE TLP
+# ============================================
+
+echo "[2/5] Configuring TLP..."
+
+# Main TLP configuration
+cat > /etc/default/tlp <<EOF
+# MaxRegner OS TLP Configuration
+
+# General settings
+TLP_ENABLE=1
+TLP_DEFAULT_MODE=AC
+TLP_PERSISTENT_DEFAULT=0
+
+# AC power settings
+CPU_SCALING_GOVERNOR_ON_AC=performance
+CPU_SCALING_MIN_FREQ_ON_AC=0
+CPU_SCALING_MAX_FREQ_ON_AC=0
+CPU_BOOST_ON_AC=1
+CPU_HWP_DYN_BOOST_ON_AC=1
+
+# Battery power settings
+CPU_SCALING_GOVERNOR_ON_BAT=powersave
+CPU_SCALING_MIN_FREQ_ON_BAT=0
+CPU_SCALING_MAX_FREQ_ON_BAT=0
+CPU_BOOST_ON_BAT=0
+CPU_HWP_DYN_BOOST_ON_BAT=0
+
+# Screen settings
+SCREEN_BRIGHTNESS_ON_AC=100
+SCREEN_BRIGHTNESS_ON_BAT=75
+
+# Disk settings
+DISK_DEVICES="sda sdb nvme0n1"
+DISK_APM_LEVEL_ON_AC="254"
+DISK_APM_LEVEL_ON_BAT="128"
+DISK_SPINDOWN_TIMEOUT_ON_AC="0"
+DISK_SPINDOWN_TIMEOUT_ON_BAT="0"
+
+# USB settings
+USB_BLACKLIST="05e3:0608 046d:c52b 8087:0024 045e:0745 046d:c52b"
+USB_AUTOSUSPEND=1
+USB_AUTOSUSPEND_DISABLE_ON_BAT=0
+USB_AUTOSUSPEND_TIMEOUT_AC=2
+USB_AUTOSUSPEND_TIMEOUT_BAT=4
+
+# Audio settings
+SOUND_POWER_SAVE_ON_AC=0
+SOUND_POWER_SAVE_ON_BAT=1
+SOUND_POWER_SAVE_CONTROLLER=1
+
+# PCIe settings
+PCIE_ASPM_ON_AC=performance
+PCIE_ASPM_ON_BAT=powersave
+
+# RAID settings
+RAID_POWER_SAVE_ON_AC=0
+RAID_POWER_SAVE_ON_BAT=1
+
+# AHCI settings
+AHCI_RUNTIME_PM_ON_AC=on
+AHCI_RUNTIME_PM_ON_BAT=auto
+
+# Runtime PM
+RUNTIME_PM_ON_AC=on
+RUNTIME_PM_ON_BAT=auto
+RUNTIME_PM_BLACKLIST="05ac:8289 8086:0153 8086:09d3"
+
+# NMI watchdog
+NMI_WATCHDOG=0
+EOF
+
+# TLP radio device configuration
+cat > /etc/tlp.d/00-radiodev.conf <<EOF
+# MaxRegner OS Radio Device Configuration
+
+# Disable radio devices when not in use
+DEVICES_TO_DISABLE_ON_BAT_NOT_IN_USE="bluetooth wifi wwan"
+DEVICES_TO_ENABLE_ON_AC="bluetooth wifi wwan"
+
+# Bluetooth
+USB_BLACKLIST_BTUSB="04ca:2009 0a12:0001 0a5c:216c 0b05:17cb 0b05:17cc 0cf3:3004 413c:8197"
+
+# WWAN
+USB_BLACKLIST_WWAN="1c9e:9806 2c7c:0125 413c:81a2"
+EOF
+
+# ============================================
+# 3. CONFIGURE POWERTOP
+# ============================================
+
+echo "[3/5] Configuring Powertop..."
+
+# Powertop configuration
+cat > /etc/powertop/autosave.d/maxregner.conf <<EOF
+# MaxRegner OS Powertop Configuration
+
+# Auto-tune settings
+AUTO_TUNE=1
+
+# Good settings (apply on AC power)
+GOOD_ENABLE_S2IDLE=1
+GOOD_ENABLE_EPCI_L1=1
+GOOD_ENABLE_PCIE_ASPM=1
+GOOD_ENABLE_AHCI_ALPM=1
+GOOD_ENABLE_USB_AUTOSUSPEND=1
+GOOD_ENABLE_USB_BLACKLIST=1
+GOOD_ENABLE_AUDIO_POWERSAVE=0
+GOOD_ENABLE_RAID_POWERSAVE=0
+GOOD_ENABLE_NMI_WATCHDOG=0
+
+# Bad settings (disable on AC power)
+BAD_ENABLE_S2IDLE=0
+BAD_ENABLE_EPCI_L1=0
+BAD_ENABLE_PCIE_ASPM=0
+BAD_ENABLE_AHCI_ALPM=0
+BAD_ENABLE_USB_AUTOSUSPEND=0
+BAD_ENABLE_AUDIO_POWERSAVE=1
+BAD_ENABLE_RAID_POWERSAVE=1
+BAD_ENABLE_NMI_WATCHDOG=1
+EOF
+
+# ============================================
+# 4. CONFIGURE CPUFREQ
+# ============================================
+
+echo "[4/5] Configuring CPU frequency scaling..."
+
+# CPU frequency configuration
+cat > /etc/default/cpufrequtils <<EOF
+# MaxRegner OS CPU Frequency Configuration
+GOVERNOR="performance"
+MIN_SPEED="0"
+MAX_SPEED="0"
+EOF
+
+# Set governor for all CPUs
+for cpu in /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor; do
+    if [ -f "$cpu" ]; then
+        echo performance > "$cpu" 2>/dev/null || true
+    fi
+done
+
+# ============================================
+# 5. CONFIGURE THERMAL
+# ============================================
+
+echo "[5/5] Configuring thermal management..."
+
+# Thermal configuration
+cat > /etc/thermald/thermald.conf <<EOF
+# MaxRegner OS Thermal Configuration
+
+[THERMALD]
+PIDIntervalSec = 10
+PollingIntervalSec = 10
+
+[THERMAL ZONES]
+Zone0 = /sys/class/thermal/thermal_zone0
+Zone1 = /sys/class/thermal/thermal_zone1
+
+[COOLING DEVICES]
+CPUFAN = /sys/class/thermal/cooling_device0
+GPUFAN = /sys/class/thermal/cooling_device1
+
+[THERMAL POLICIES]
+DefaultPolicy = performance
+PerformancePolicy = performance
+PowerSavePolicy = powersave
+EOF
+
+# Enable and start services
+systemctl enable tlp 2>/dev/null || true
+systemctl enable thermald 2>/dev/null || true
+systemctl enable powertop 2>/dev/null || true
+
+# Start services
+systemctl start tlp 2>/dev/null || true
+systemctl start thermald 2>/dev/null || true
+
+echo ""
+echo "========================================"
+echo "MaxRegner Power Management Complete!"
+echo "========================================"

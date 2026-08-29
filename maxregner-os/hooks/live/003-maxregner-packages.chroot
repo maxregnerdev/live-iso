@@ -1,0 +1,61 @@
+#!/bin/bash
+# MaxRegner OS - Additional Packages Installation Hook
+# This hook installs additional packages from the MaxRegner repository
+
+set -e
+
+echo "========================================"
+echo "MaxRegner OS - Packages Installation Hook"
+echo "========================================"
+
+# Source configuration
+if [ -f /working_dir/maxregner-os/config/terraform-maxregner.conf ]; then
+    source /working_dir/maxregner-os/config/terraform-maxregner.conf
+elif [ -f /etc/terraform.conf ]; then
+    source /etc/terraform.conf
+fi
+
+# ============================================
+# INSTALL MAXREGNER SPECIFIC PACKAGES
+# ============================================
+
+echo "[1/5] Installing MaxRegner kernel packages..."
+
+# Install kernel headers for current architecture
+ARCH=$(dpkg --print-architecture)
+if [ "$ARCH" = "amd64" ]; then
+    apt-get install -y linux-headers-amd64 2>/dev/null || true
+elif [ "$ARCH" = "arm64" ]; then
+    apt-get install -y linux-headers-arm64 2>/dev/null || true
+elif [ "$ARCH" = "i386" ]; then
+    apt-get install -y linux-headers-686-pae 2>/dev/null || true
+fi
+
+echo "[2/5] Installing development tools..."
+
+# Install build essentials
+apt-get install -y build-essential git cmake ninja-build meson 2>/dev/null || true
+
+echo "[3/5] Installing multimedia codecs..."
+
+# Install all multimedia codecs
+apt-get install -y ffmpeg gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly \
+    gstreamer1.0-libav libavcodec-extra 2>/dev/null || true
+
+echo "[4/5] Installing virtualization support..."
+
+# Install virtualization tools
+apt-get install -y qemu-guest-agent open-vm-tools open-vm-tools-desktop 2>/dev/null || true
+
+echo "[5/5] Installing additional utilities..."
+
+# Install various utilities
+apt-get install -y htop iotop nmon sysstat glances bpytop tree mc 2>/dev/null || true
+
+# Fix broken dependencies
+apt-get install -y -f 2>/dev/null || true
+
+echo ""
+echo "========================================"
+echo "MaxRegner Packages Installation Complete!"
+echo "========================================"

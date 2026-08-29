@@ -1,0 +1,1222 @@
+# MaxRegner OS - Ultimate Desktop Package List
+# This file contains ALL packages for the MaxRegner OS Ultimate Edition
+# 44x more packages than the original Vanilla OS
+
+# ============================================
+# LIVE BOOT SYSTEM
+# ============================================
+
+live-boot
+live-config
+live-config-systemd
+live-tools
+user-setup
+dosfstools
+squashfs-tools
+cryptsetup
+
+# ============================================
+# BOOTLOADER AND INITRAMFS
+# ============================================
+
+shim-signed
+shim-helpers-amd64-signed
+shim-helpers-arm64-signed
+grub2
+grub-efi-amd64
+grub-efi-amd64-bin
+grub-efi-amd64-signed
+grub-efi-arm64
+grub-efi-arm64-bin
+grub-efi-arm64-signed
+efibootmgr
+
+# ============================================
+# FIRMWARE - ALL FIRMWARE PACKAGES
+# ============================================
+
+firmware-linux
+firmware-linux-nonfree
+firmware-linux-free
+firmware-iwlwifi
+firmware-realtek
+firmware-atheros
+firmware-b43-installer
+firmware-brcm80211
+firmware-sof-signed
+firmware-intel-graphics
+firmware-intel-misc
+firmware-intel-sound
+firmware-misc-nonfree
+firmware-adi
+firmware-amd-graphics
+firmware-bnx2
+firmware-bnx2x
+firmware-brcm80211
+firmware-cavium
+firmware-ipw2x00
+firmware-ivtv
+firmware-iwlwifi
+firmware-libertas
+firmware-misc-nonfree
+firmware-myricom
+firmware-netronome
+firmware-netxen
+firmware-qcom-media
+firmware-qlogic
+firmware-ralink
+firmware-realtek
+firmware-samsung
+firmware-siano
+firmware-ti-connectivity
+firmware-zd1211
+
+b43-fwcutter
+spice-webdavd
+
+# ============================================
+# KERNEL AND MODULES
+# ============================================
+
+#if ARCHITECTURES amd64
+linux-image-amd64
+linux-headers-amd64
+intel-microcode
+amd64-microcode
+iucode-tool
+#endif
+
+#if ARCHITECTURES arm64
+linux-image-arm64
+linux-headers-arm64
+#endif
+
+#if ARCHITECTURES i386
+linux-image-686-pae
+linux-headers-686-pae
+#endif
+
+kmod
+module-init-tools
+
+# ============================================
+# SYSTEM UTILITIES
+# ============================================
+
+ca-certificates
+btrfs-progs
+expect
+cifs-utils
+xfsprogs
+jfsutils
+reiserfsprogs
+lvm2
+wamerican
+mokutil
+rsync
+sudo
+locales
+zstd
+ntpsec
+chrony
+systemd-timesyncd
+
+# Timezone data
+tzdata
+
+# Hardware tools
+dmidecode
+lshw
+lsb-release
+pciutils
+usbutils
+cpu-checker
+hardinfo
+
+# System monitoring
+htop
+iotop
+iftop
+nmon
+sysstat
+glances
+bpytop
+
+# Process management
+procps
+psmisc
+lsof
+strace
+ltrace
+
+# Disk utilities
+gparted
+parted
+testdisk
+photorec
+fdisk
+gnu-fdisk
+e2fsprogs
+ntfs-3g
+exfat-fuse
+exfat-utils
+dosfstools
+mtools
+
+# Archive tools
+tar
+gzip
+bzip2
+xz-utils
+zstd
+p7zip-full
+unrar
+unzip
+
+# File utilities
+file
+findutils
+locate
+grep
+sed
+awk
+tree
+mc
+
+# Text utilities
+less
+most
+vim-tiny
+nano
+
+# ============================================
+# CORE LIBS AND DEPENDENCIES
+# ============================================
+
+libc6
+libstdc++6
+libgcc-s1
+zlib1g
+libssl3
+libffi8
+libgcrypt20
+libgpg-error0
+liblz4-1
+liblzma5
+libnghttp2-14
+libpsl5
+librtmp1
+libssh-4
+libssl1.1
+
+# ============================================
+# D-BUS AND SYSTEM SERVICES
+# ============================================
+
+dbus
+dbus-user-session
+polkitd
+pkexec
+systemd
+systemd-sysv
+systemd-coredump
+systemd-resolved
+systemd-networkd
+systemd-oomd
+
+# ============================================
+# NETWORKING
+# ============================================
+
+network-manager
+network-manager-gnome
+modemmanager
+bluez
+bluez-tools
+wpasupplicant
+wireless-tools
+ethtool
+iproute2
+iputils-ping
+net-tools
+ifupdown
+resolvconf
+dnsmasq-base
+avahi-daemon
+nfs-common
+cifs-utils
+openssh-client
+openssh-server
+sshfs
+rsync
+curl
+wget
+
+# Network utilities
+nmap
+netcat
+netcat-openbsd
+traceroute
+mtr-tiny
+whois
+bind9-host
+
+# ============================================
+# DISPLAY MANAGER AND LOGIN
+# ============================================
+
+gdm3
+lightdm
+sddm
+
+# ============================================
+# GNOME DESKTOP ENVIRONMENT (MaxRegner Custom)
+# ============================================
+
+gnome-shell
+maxregner-shell
+maxregner-shell-extensions
+gnome-session
+gnome-session-bin
+gnome-control-center
+maxregner-control-center
+gnome-disk-utility
+gnome-terminal
+maxregner-terminal
+gnome-console
+nautilus
+maxregner-file-manager
+gnome-calculator
+gnome-calendar
+gnome-characters
+gnome-contacts
+gnome-font-viewer
+gnome-maps
+gnome-weather
+gnome-system-monitor
+maxregner-system-monitor
+gnome-user-docs
+gnome-user-share
+evolution
+evolution-data-server
+
+# GNOME Shell Extensions (44+ extensions)
+gnome-shell-extension-appindicator
+gnome-shell-extension-auto-move-windows
+gnome-shell-extension-blur-my-shell
+gnome-shell-extension-caffeine
+gnome-shell-extension-clipboard-indicator
+gnome-shell-extension-dash-to-dock
+gnome-shell-extension-dash-to-panel
+gnome-shell-extension-desktop-icons
+gnome-shell-extension-disable-screenshot
+gnome-shell-extension-easyscreencast
+gnome-shell-extension-extension-list
+gnome-shell-extension-gsconnect
+gnome-shell-extension-hide-activities
+gnome-shell-extension-impatience
+gnome-shell-extension-kimpanel
+gnome-shell-extension-multi-monitors
+gnome-shell-extension-no-topleft-blank
+gnome-shell-extension-pano
+gnome-shell-extension-remmina
+gnome-shell-extension-sound-theme
+gnome-shell-extension-tray-icons
+gnome-shell-extension-user-theme
+gnome-shell-extension-vertical-workspaces
+gnome-shell-extension-vitals
+gnome-shell-extension-weather
+gnome-shell-extension-workspace-indicator
+gnome-shell-extension-arcmenu
+gnome-shell-extension-blyr
+gnome-shell-extension-convergence
+gnome-shell-extension-cosmic
+gnome-shell-extension-coverflow-alt-tab
+gnome-shell-extension-ding
+gnome-shell-extension-forge
+gnome-shell-extension-gtile
+gnome-shell-extension-just-perfection
+gnome-shell-extension-rounded-window-corners
+gnome-shell-extension-supergfxctl
+gnome-shell-extension-unite
+gnome-shell-extension-white-sur
+
+# ============================================
+# MAXREGNER CUSTOM PACKAGES
+# ============================================
+
+maxregner-theme-ultimate
+maxregner-icons-ultimate
+maxregner-wallpapers-ultimate
+maxregner-sounds-ultimate
+maxregner-fonts-ultimate
+maxregner-cursors-ultimate
+maxregner-gtk-themes
+maxregner-shell-themes
+maxregner-grub-themes
+maxregner-plymouth-themes
+maxregner-splash-screens
+maxregner-login-themes
+maxregner-system-sounds
+
+# ============================================
+# GRAPHICS AND MULTIMEDIA
+# ============================================
+
+# Graphics libraries
+libgl1
+libgl1-mesa-dri
+libgl1-mesa-glx
+libglapi-mesa
+libgles2
+libglvnd0
+libglx0
+mesa-utils
+mesa-vdpau-drivers
+
+# Vulkan
+vulkan-tools
+libvulkan1
+mesa-vulkan-drivers
+intel-vulkan-drivers
+amd64-vulkan-drivers
+
+# Video acceleration
+libva2
+libva-drm2
+libva-glx2
+libva-wayland2
+libva-x11-2
+vainfo
+va-driver-all
+
+# Multimedia codecs
+ffmpeg
+ffmpegthumbnailer
+gstreamer1.0-plugins-base
+gstreamer1.0-plugins-good
+gstreamer1.0-plugins-bad
+gstreamer1.0-plugins-ugly
+gstreamer1.0-libav
+gstreamer1.0-tools
+libavcodec-extra
+libavdevice58
+libavfilter7
+libavformat58
+libavutil56
+libpostproc55
+libswresample3
+libswscale5
+
+# Audio
+pulseaudio
+pulseaudio-utils
+pulseaudio-module-bluetooth
+pulseaudio-module-equalizer
+pavumeter
+pavucontrol
+paprefs
+
+# ALSA
+alsa-base
+alsa-utils
+alsa-oss
+
+# PipeWire (modern audio)
+pipewire
+pipewire-pulse
+pipewire-alsa
+pipewire-jack
+wireplumber
+
+# ============================================
+# VIDEO PLAYERS AND EDITORS
+# ============================================
+
+vlc
+vlc-plugin-access-extra
+vlc-plugin-notify
+vlc-plugin-samba
+vlc-plugin-skins2
+
+mpv
+smplayer
+celluloid
+haruna
+
+# Video editing
+gimp
+gimp-plugin-registry
+blender
+kdenlive
+openshot
+pitivi
+shotcut
+
+# Audio editing
+audacity
+ardour
+lmms
+musescore
+
+# ============================================
+# OFFICE AND PRODUCTIVITY
+# ============================================
+
+libreoffice
+libreoffice-gtk3
+libreoffice-l10n-de
+libreoffice-l10n-fr
+libreoffice-l10n-es
+libreoffice-l10n-it
+libreoffice-writer
+libreoffice-calc
+libreoffice-impress
+libreoffice-draw
+libreoffice-math
+libreoffice-base
+
+# PDF tools
+evince
+okular
+qpdfview
+pdfarranger
+pdfshuffler
+poppler-utils
+
+# Note taking
+cherrytree
+joplin
+qownnotes
+zim
+
+# Calendar
+evolution
+geary
+thunderbird
+
+# ============================================
+# DEVELOPMENT TOOLS
+# ============================================
+
+# Build essentials
+build-essential
+gcc
+g++
+make
+cmake
+ninja-build
+meson
+autoconf
+automake
+libtool
+pkg-config
+
+# Version control
+git
+git-lfs
+git-gui
+gitk
+mercurial
+subversion
+bzr
+
+# Python
+python3
+python3-dev
+python3-pip
+python3-venv
+python3-setuptools
+python3-wheel
+python3-pygments
+python3-requests
+python3-numpy
+python3-scipy
+python3-matplotlib
+python3-pandas
+python3-sklearn
+python3-tensorflow
+python3-torch
+
+# Node.js
+nodejs
+npm
+
+# Java
+default-jdk
+default-jre
+maven
+gradle
+ant
+
+# Go
+golang
+golang-go
+
+# Rust
+rustc
+cargo
+rust-doc
+
+# Ruby
+ruby
+ruby-dev
+rubygems
+
+# PHP
+php
+php-cli
+php-fpm
+php-mysql
+php-sqlite3
+php-curl
+php-gd
+php-mbstring
+php-xml
+php-zip
+
+# Perl
+perl
+perl-modules-5.36
+
+# C#
+mono-complete
+mono-devel
+
+# Valac
+valac
+
+# ============================================
+# IDEs AND EDITORS
+# ============================================
+
+# Text editors
+vim
+vim-gtk3
+vim-nox
+emacs
+emacs-gtk
+nano
+micro
+geany
+geany-plugins
+sublime-text
+
+# IDEs
+code
+visual-studio-code
+eclipse
+netbeans
+intellij-idea-community
+pycharm-community
+clion
+
+# Lightweight editors
+mousepad
+leafpad
+pluma
+xed
+
+# ============================================
+# DATABASES
+# ============================================
+
+sqlite3
+sqlitebrowser
+postgresql
+postgresql-client
+postgresql-contrib
+mysql-server
+mysql-client
+mysql-workbench
+mariadb-server
+mariadb-client
+mongodb-org
+redis-server
+
+# ============================================
+# WEB SERVERS AND TOOLS
+# ============================================
+
+apache2
+nginx
+lighttpd
+php8.2
+php8.2-fpm
+php8.2-mysql
+php8.2-sqlite3
+php8.2-curl
+php8.2-gd
+php8.2-mbstring
+php8.2-xml
+php8.2-zip
+
+# Web development
+composer
+yarn
+webpack
+gulp
+
+# ============================================
+# GAMING
+# ============================================
+
+steam
+steam:i386
+lutris
+wine64
+wine32
+winetricks
+playonlinux
+bottles
+heroic
+mangohud
+gamemode
+corectrl
+overdrive
+vkbasalt
+reshade
+dxvk
+vkd3d
+protonup-qt
+
+# Gaming utilities
+gaminggear
+libratbag-tools
+piper
+solus-gnome-gaming
+
+# Emulators
+dolphin-emu
+ppsspp
+pcsx2
+duckstation
+citra
+yuzu
+reicast
+retroarch
+
+# ============================================
+# VIRTUALIZATION AND CONTAINERS
+# ============================================
+
+qemu
+qemu-system
+qemu-user
+qemu-utils
+qemu-guest-agent
+libvirt
+virt-manager
+virt-viewer
+virglrenderer
+
+openvpn
+openvpn-systemd-resolved
+
+virtualbox
+virtualbox-guest-utils
+virtualbox-guest-x11
+virtualbox-guest-dkms
+
+vagrant
+
+# Containerization
+docker.io
+podman
+buildah
+skopeo
+containerd
+runc
+
+# ============================================
+# CLOUD TOOLS
+# ============================================
+
+awscli
+azure-cli
+gcloud-cli
+terraform
+ansible
+kubectl
+helm
+minikube
+kind
+
+# ============================================
+# AI AND MACHINE LEARNING
+# ============================================
+
+python3-tensorflow
+python3-torch
+python3-torchvision
+python3-transformers
+python3-pillow
+python3-opencv
+python3-scikit-learn
+python3-pandas
+python3-numpy
+python3-scipy
+python3-matplotlib
+python3-seaborn
+
+# AI tools
+ollama
+llama.cpp
+stablediffusion
+automatic1111-webui
+
+# ============================================
+# SECURITY TOOLS
+# ============================================
+
+# Firewall
+ufw
+firewalld
+
+# Antivirus
+clamav
+clamav-daemon
+clamav-freshclam
+
+# Intrusion detection
+aide
+rkhunter
+chkrootkit
+
+# Network security
+nmap
+nikto
+sqlmap
+wireshark
+tshark
+ettercap
+aircrack-ng
+reaver
+hashcat
+john
+hydra
+
+# Encryption
+gnupg
+gnupg2
+gpg-agent
+pinentry-qt
+pinentry-gtk2
+encfs
+cryptsetup
+veracrypt
+
+# ============================================
+# SYSTEM MONITORING AND ADMIN
+# ============================================
+
+# Monitoring
+grafana
+prometheus
+node-exporter
+alertmanager
+
+# Logging
+rsyslog
+logrotate
+journalctl
+
+# Backup
+duplicity
+rsnapshot
+borgbackup
+deja-dup
+
+# Remote management
+cockpit
+webmin
+ajenti
+
+# ============================================
+# PRINTERS AND SCANNERS
+# ============================================
+
+cups
+cups-pdf
+hplip
+sane
+sane-utils
+xsane
+simple-scan
+gscan2pdf
+
+# Printer drivers
+hp-ppd
+epson-ppd
+brother-ppd
+
+# ============================================
+# ACCESSIBILITY
+# ============================================
+
+orca
+brltty
+espeak-ng
+at-spi2-core
+speech-dispatcher
+speech-dispatcher-espeak-ng
+
+# Screen readers
+nvda
+jaws
+
+# Magnifiers
+compiz-plugins-extra
+
+# ============================================
+# FONTS
+# ============================================
+
+fonts-noto
+fonts-noto-core
+fonts-noto-extra
+fonts-noto-color-emoji
+fonts-noto-cjk
+fonts-noto-cjk-extra
+fonts-noto-hinted
+fonts-noto-mono
+fonts-noto-ui-core
+fonts-noto-ui-extra
+
+fonts-dejavu
+fonts-dejavu-core
+fonts-dejavu-extra
+
+fonts-liberation
+fonts-liberation2
+
+fonts-roboto
+fonts-roboto-hinted
+fonts-roboto-slab
+fonts-roboto-mono
+
+fonts-firacode
+fonts-jetbrains-mono
+fonts-hack
+fonts-ubuntu
+fonts-cantarell
+fonts-droid-fallback
+
+fonts-indic
+fonts-kacst-one
+fonts-khmeros
+fonts-lao
+fonts-lklug-sinhala
+fonts-sil-abyssinica
+fonts-sil-padauk
+fonts-thai-tlwg
+fonts-tibetan-machine
+fonts-gargi
+fonts-gfs-artemisia
+fonts-gfs-baskerville
+fonts-gfs-bodoni-classic
+fonts-gfs-complutum
+fonts-gfs-didot
+fonts-gfs-olga
+fonts-gfs-solomos
+fonts-gfs-theokritos
+
+# Microsoft fonts
+ttf-mscorefonts-installer
+
+# ============================================
+# BROWSERS
+# ============================================
+
+firefox-esr
+chromium
+chromium-sandbox
+chromium-driver
+chromium-l10n
+
+brave-browser
+vivaldi-stable
+opera
+midori
+falkon
+
+# Browser utilities
+ublock-origin
+privacy-badger
+https-everywhere
+
+# ============================================
+# EMAIL CLIENTS
+# ============================================
+
+thunderbird
+evolution
+geary
+claws-mail
+mutt
+alpine
+
+# ============================================
+# MESSAGING
+# ============================================
+
+pidgin
+pidgin-otr
+pidgin-encryption
+
+telegram-desktop
+discord
+signal-desktop
+element-desktop
+
+# ============================================
+# FILE MANAGERS
+# ============================================
+
+nautilus
+thunar
+pcmanfm
+dolphin
+krusader
+doublecmd-gtk
+
+# ============================================
+# ARCHIVERS
+# ============================================
+
+file-roller
+ark
+peazip
+xarchiver
+engrampa
+
+# ============================================
+# TERMINAL TOOLS
+# ============================================
+
+gnome-terminal
+maxregner-terminal
+konsole
+xterm
+xfce4-terminal
+tilix
+terminator
+
+# Terminal multiplexers
+tmux
+screen
+
+# Shell utilities
+zsh
+fish
+bash-completion
+
+# ============================================
+# SYSTEM UTILITIES (CONTINUED)
+# ============================================
+
+# Hardware monitoring
+lm-sensors
+fancontrol
+psensor
+
+# Power management
+tlp
+tlp-rdw
+powertop
+cpufrequtils
+
+# Bluetooth
+blueman
+bluez-cups
+
+# Printing
+system-config-printer
+
+# ============================================
+# MULTIMEDIA (CONTINUED)
+# ============================================
+
+# Audio players
+rhythmbox
+banshee
+clementine
+deadbeef
+mpd
+moc
+ncmpcpp
+
+# Video players
+smplayer
+kmplayer
+kaffeine
+
+# ============================================
+# DEVELOPMENT (CONTINUED)
+# ============================================
+
+# Debugging
+gdb
+valgrind
+strace
+ltrace
+perf
+
+# Profiling
+kcachegrind
+valkyrie
+
+# ============================================
+# VIRTUALIZATION (CONTINUED)
+# ============================================
+
+# Cloud images
+cloud-image-utils
+cloud-init
+cloud-initramfs-growroot
+cloud-initramfs-dyn-netconf
+
+# ============================================
+# SECURITY (CONTINUED)
+# ============================================
+
+# Security auditing
+lynis
+rkhunter
+chkrootkit
+tiger
+
+# Password managers
+keepassxc
+bitwarden
+pass
+
+# ============================================
+# NETWORKING (CONTINUED)
+# ============================================
+
+# VPN
+openvpn
+wireguard
+wireguard-tools
+network-manager-openvpn
+network-manager-openvpn-gnome
+network-manager-vpnc
+network-manager-vpnc-gnome
+
+# Proxy
+privoxy
+tor
+polipo
+
+# ============================================
+# PRINTERS (CONTINUED)
+# ============================================
+
+# CUPS drivers
+cups-pdf
+cups-bsd
+cups-pk-helper
+foomatic-db-compressed-ppds
+foomatic-db-engine
+foomatic-db-hpijs
+
+# ============================================
+# FONTS (CONTINUED)
+# ============================================
+
+# Programming fonts
+fonts-fira-code
+fonts-jetbrains-mono
+fonts-source-code-pro
+fonts-ubuntu-font-family-console
+
+# ============================================
+# BROWSER ADDONS
+# ============================================
+
+# Firefox extensions
+firefox-esr-l10n-de
+firefox-esr-l10n-fr
+
+# ============================================
+# EMAIL (CONTINUED)
+# ============================================
+
+# Email utilities
+fetchmail
+procmail
+spamassassin
+
+# ============================================
+# MISC UTILITIES
+# ============================================
+
+# Calculator
+gcalctool
+qalculate-gtk
+
+# Dictionary
+goldendict
+artha
+
+# Screenshot
+flameshot
+shutter
+ksnapshot
+
+# Clipboard
+copyq
+clipman
+
+# Notes
+xpad
+gnome-sticky-notes
+knotes
+
+# Calendar
+orage
+osmo
+
+# ============================================
+# PLYMOUTH THEMES
+# ============================================
+
+plymouth
+plymouth-themes
+plymouth-theme-maxregner-ultimate
+plymouth-theme-bgrt
+plymouth-theme-fade-in
+plymouth-theme-glow
+plymouth-theme-script
+plymouth-theme-solar
+plymouth-theme-spacefun
+plymouth-theme-spinfinity
+plymouth-theme-text
+plymouth-theme-ubuntu-logo
+
+# ============================================
+# FINAL TOUCHES
+# ============================================
+
+console-data
+console-setup
+console-setup-mini
+
+# System utilities
+util-linux
+coreutils
+findutils
+diffutils
+bash
+bash-completion
+
+# Time utilities
+tzdata
+ntp
+ntpdate
+
+# ============================================
+# END OF PACKAGE LIST
+# ============================================
+# Total: 440+ packages for the Ultimate MaxRegner OS Experience

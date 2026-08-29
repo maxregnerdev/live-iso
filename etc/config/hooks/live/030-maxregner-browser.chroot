@@ -1,0 +1,398 @@
+#!/bin/bash
+# MaxRegner OS - Browser Configuration Hook
+# Configures web browsers with MaxRegner settings
+
+set -e
+
+echo "========================================"
+echo "MaxRegner OS - Browser Hook"
+echo "========================================"
+
+# ============================================
+# 1. INSTALL WEB BROWSERS
+# ============================================
+
+echo "[1/5] Installing web browsers..."
+
+# Install Firefox
+apt-get install -y firefox firefox-esr firefox-l10n-en-us \
+    firefox-l10n-de firefox-l10n-fr firefox-l10n-es firefox-l10n-it \
+    firefox-l10n-pt firefox-l10n-ru firefox-l10n-zh-cn 2>/dev/null || true
+
+# Install Chromium
+apt-get install -y chromium chromium-common chromium-l10n \
+    chromium-sandbox chromium-driver 2>/dev/null || true
+
+# Install additional browsers
+apt-get install -y epiphany-browser gnome-web gnome-web-data \
+    falkon qutebrowser w3m elinks lynx 2>/dev/null || true
+
+# ============================================
+# 2. CONFIGURE FIREFOX
+# ============================================
+
+echo "[2/5] Configuring Firefox..."
+
+# Create Firefox configuration
+mkdir -p /home/maxregner/.mozilla/firefox
+cat > /home/maxregner/.mozilla/firefox/profiles.ini << 'FFPROFILES'
+# MaxRegner OS Firefox Profiles
+
+[Profile0]
+Name=default
+IsRelative=1
+Path=default
+Default=1
+
+[General]
+StartWithLastProfile=1
+Version=2
+FFPROFILES
+
+# Create Firefox user.js
+mkdir -p /home/maxregner/.mozilla/firefox/default
+cat > /home/maxregner/.mozilla/firefox/default/user.js << 'FFUSERJS'
+// MaxRegner OS Firefox Configuration
+
+// General settings
+user_pref("browser.startup.homepage", "https://maxregneros.com");
+user_pref("browser.startup.page", 1);
+user_pref("browser.newtabpage.enabled", true);
+
+// Privacy settings
+user_pref("privacy.trackingprotection.enabled", true);
+user_pref("privacy.trackingprotection.pbmode.enabled", true);
+user_pref("privacy.donottrackheader.enabled", true);
+user_pref("privacy.firstparty.isolate", false);
+user_pref("privacy.resistFingerprinting", false);
+
+// Security settings
+user_pref("security.tls.version.max", 4);
+user_pref("security.tls.version.min", 1);
+user_pref("security.ssl3.dhe_rsa_aes_128_sha", false);
+user_pref("security.ssl3.dhe_rsa_aes_256_sha", false);
+user_pref("security.ssl.enable_ssl3", false);
+
+// Performance settings
+user_pref("config.gpu_process_priority", -1);
+user_pref("layers.acceleration.force-enabled", true);
+user_pref("gfx.webrender.all", true);
+user_pref("gfx.webrender.blob-images", true);
+user_pref("gfx.webrender.force-enabled", true);
+
+// Network settings
+user_pref("network.http.pipelining", true);
+user_pref("network.http.pipelining.maxrequests", 8);
+user_pref("network.http.proxy.pipelining", true);
+user_pref("network.dns.disablePrefetch", false);
+user_pref("network.predictor.enabled", true);
+
+// Cache settings
+user_pref("browser.cache.disk.capacity", 1048576);
+user_pref("browser.cache.disk.filesystem_reported", 1);
+user_pref("browser.cache.disk.smart_size.enabled", false);
+user_pref("browser.cache.disk.smart_size.first_run", false);
+
+// Download settings
+user_pref("browser.download.folderList", 2);
+user_pref("browser.download.manager.showWhenStarting", false);
+user_pref("browser.download.useDownloadDir", false);
+
+// Search settings
+user_pref("browser.search.defaultenginename", "DuckDuckGo");
+user_pref("browser.search.selectedEngine", "DuckDuckGo");
+user_pref("browser.search.suggest.enabled", true);
+
+// UI settings
+user_pref("browser.uidensity", 1);
+user_pref("browser.uitour.enabled", false);
+user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);
+
+// MaxRegner specific
+user_pref("app.update.auto", true);
+user_pref("app.update.checkInstallTime", false);
+user_pref("app.update.enabled", true);
+user_pref("app.update.silent", true);
+user_pref("browser.aboutConfig.showProfile", true);
+FFUSERJS
+
+chown -R maxregner:maxregner /home/maxregner/.mozilla
+
+# ============================================
+# 3. CONFIGURE CHROMIUM
+# ============================================
+
+echo "[3/5] Configuring Chromium..."
+
+# Create Chromium configuration
+mkdir -p /home/maxregner/.config/chromium
+cat > /home/maxregner/.config/chromium/First Run << 'CHROMIUMFIRST'
+# MaxRegner OS Chromium First Run Configuration
+
+--force-fieldtrials=*//*MaxRegner/Control/*
+--force-fieldtrial-params=*//*:maxregner/*
+CHROMIUMFIRST
+
+cat > /home/maxregner/.config/chromium/Default/Preferences << 'CHROMIUMPREFS'
+{
+  "alternate_error_pages": {
+    "enabled": false
+  },
+  "autofill": {
+    "enabled": true
+  },
+  "browser": {
+    "custom_chrome_button": false,
+    "default_geolocation_setting": 2,
+    "download": {
+      "default_directory": "/home/maxregner/Downloads",
+      "directory_upgrade": true,
+      "prompt_for_download": false
+    },
+    "enable_spellchecking": true,
+    "first_run": false,
+    "home_page": "https://maxregneros.com",
+    "show_home_button": true
+  },
+  "cookies": {
+    "default": {
+      "block_third_party": false
+    }
+  },
+  "default_geolocation_setting": 2,
+  "default_search_provider_data": {
+    "alternate_urls": [],
+    "encoding": "UTF-8",
+    "favicon_url": "",
+    "image_url": "",
+    "is_default": true,
+    "keyword": "",
+    "name": "DuckDuckGo",
+    "prepopulated_id": 0,
+    "search_url": "https://duckduckgo.com/?q={searchTerms}",
+    "suggest_url": ""
+  },
+  "dns_prefetching": {
+    "enabled": true
+  },
+  "extensions": {
+    "chrome_url_overrides": {}
+  },
+  "homepage": "https://maxregneros.com",
+  "homepage_is_newtabpage": false,
+  "intl": {
+    "accept_languages": "en-US,en"
+  },
+  "profile": {
+    "content_settings": {
+      "exceptions": {
+        "cookies": {},
+        "images": {},
+        "javascript": {},
+        "notifications": {},
+        "popups": {}
+      },
+      "pattern_pairs": {}
+    },
+    "default_content_setting_values": {
+      "cookies": 0,
+      "images": 1,
+      "javascript": 1,
+      "notifications": 1,
+      "popups": 1
+    },
+    "managed_default_content_settings": {}
+  },
+  "proxy": {
+    "mode": "direct"
+  },
+  "search": {
+    "suggest_enabled": true
+  },
+  "settings": {
+    "clear_on_exit": false,
+    "default_zoom_level": 1.0,
+    "enable_automatic_spelling_correction": true,
+    "enable_do_not_track": true,
+    "enable_fullscreen": true,
+    "enable_hyperlink_auditing": false,
+    "enable_javascript": true,
+    "enable_load_on_startup": true,
+    "enable_mouse_wheel_scrolling": true,
+    "enable_offline_auto_reload": true,
+    "enable_offline_auto_reload_visible_only": true,
+    "enable_plugins": true,
+    "enable_smooth_scrolling": true,
+    "enable_tab_to_search": false,
+    "enable_touch_feedback": true
+  },
+  "sync": {
+    "enabled": false
+  },
+  "translate": {
+    "enabled": true
+  }
+}
+CHROMIUMPREFS
+
+chown -R maxregner:maxregner /home/maxregner/.config/chromium
+
+# ============================================
+# 4. CONFIGURE BROWSER EXTENSIONS
+# ============================================
+
+echo "[4/5] Configuring browser extensions..."
+
+# Create browser extension directories
+mkdir -p /usr/share/maxregner/browser/extensions/firefox
+mkdir -p /usr/share/maxregner/browser/extensions/chromium
+
+# Create MaxRegner browser extension for Firefox
+cat > /usr/share/maxregner/browser/extensions/firefox/maxregner@maxregneros.com/manifest.json << 'FFMANIFEST'
+{
+  "manifest_version": 2,
+  "name": "MaxRegner OS Extension",
+  "version": "1.0",
+  "description": "MaxRegner OS integration for Firefox",
+  "author": "MaxRegner Team",
+  "homepage_url": "https://maxregneros.com",
+  
+  "permissions": [
+    "storage",
+    "tabs",
+    "http://*/",
+    "https://*/"
+  ],
+  
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  
+  "browser_action": {
+    "default_icon": "icon.png",
+    "default_title": "MaxRegner OS"
+  },
+  
+  "icons": {
+    "48": "icon.png",
+    "96": "icon.png"
+  }
+}
+FFMANIFEST
+
+cat > /usr/share/maxregner/browser/extensions/firefox/maxregner@maxregneros.com/background.js << 'FFBACKGROUND'
+// MaxRegner OS Firefox Extension Background Script
+
+chrome.runtime.onInstalled.addListener(function() {
+    console.log("MaxRegner OS Extension installed");
+    
+    // Set default settings
+    chrome.storage.local.set({
+        enabled: true,
+        theme: "maxregner",
+        showLogo: true,
+        checkUpdates: true
+    });
+});
+
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+    if (request.action === "getSettings") {
+        chrome.storage.local.get(null, function(settings) {
+            sendResponse(settings);
+        });
+        return true;
+    }
+});
+FFBACKGROUND
+
+# ============================================
+# 5. CONFIGURE BROWSER SETTINGS
+# ============================================
+
+echo "[5/5] Configuring browser settings..."
+
+# Configure default browser
+cat > /etc/gnome/defaults.list << 'DEFAULTSBROWSER'
+# MaxRegner OS Default Applications
+
+[Default Applications]
+web-browser=firefox.desktop
+text/html=firefox.desktop
+application/xhtml+xml=firefox.desktop
+application/xml=firefox.desktop
+text/xml=firefox.desktop
+x-scheme-handler/http=firefox.desktop
+x-scheme-handler/https=firefox.desktop
+x-scheme-handler/ftp=firefox.desktop
+
+[Added Associations]
+text/plain=firefox.desktop
+DEFAULTSBROWSER
+
+# Configure MIME types
+cat > /etc/mime.types << 'MIMETYPES'
+# MaxRegner OS MIME Types
+
+# HTML
+type=text/html exts=html,htm,shtml,shtm,xhtml,xht
+
+# XHTML
+type=application/xhtml+xml exts=xhtml,xht
+
+# XML
+type=application/xml exts=xml,xsl,xsd,rng
+
+type=text/xml exts=xml
+
+# JavaScript
+type=application/javascript exts=js,mjs
+
+type=text/javascript exts=js
+
+# CSS
+type=text/css exts=css
+
+# JSON
+type=application/json exts=json
+
+# Images
+type=image/png exts=png
+type=image/jpeg exts=jpg,jpeg,jpe,jfif
+
+type=image/gif exts=gif
+
+type=image/svg+xml exts=svg,svgz
+
+type=image/webp exts=webp
+
+# Video
+type=video/mp4 exts=mp4,m4v,mp4v
+
+type=video/webm exts=webm
+
+type=video/ogg exts=ogv
+
+# Audio
+type=audio/mp3 exts=mp3
+
+type=audio/ogg exts=ogg,oga
+
+type=audio/webm exts=webm
+
+# Documents
+type=application/pdf exts=pdf
+
+type=application/msword exts=doc,dot
+
+type=application/vnd.openxmlformats-officedocument.wordprocessingml.document exts=docx
+
+type=application/vnd.ms-excel exts=xls,xlt
+
+type=application/vnd.openxmlformats-officedocument.spreadsheetml.sheet exts=xlsx,xlsm
+MIMETYPES
+
+echo ""
+echo "========================================"
+echo "MaxRegner Browser Configuration Complete!"
+echo "========================================"

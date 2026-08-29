@@ -1,0 +1,300 @@
+#!/bin/bash
+# MaxRegner OS - Services Configuration Hook
+# Configures all system services
+
+set -e
+
+echo "========================================"
+echo "MaxRegner OS - Services Configuration Hook"
+echo "========================================"
+
+# ============================================
+# 1. ENABLE ESSENTIAL SERVICES
+# ============================================
+
+echo "[1/5] Enabling essential services..."
+
+# Display manager
+systemctl enable gdm3 2>/dev/null || true
+systemctl set-default gdm3 2>/dev/null || true
+
+# Network services
+systemctl enable NetworkManager 2>/dev/null || true
+systemctl enable systemd-networkd 2>/dev/null || true
+systemctl enable systemd-resolved 2>/dev/null || true
+
+# Time synchronization
+systemctl enable systemd-timesyncd 2>/dev/null || true
+systemctl enable chrony 2>/dev/null || true
+
+# Logging
+systemctl enable rsyslog 2>/dev/null || true
+
+# Cron
+systemctl enable cron 2>/dev/null || true
+
+# ============================================
+# 2. DISABLE UNNECESSARY SERVICES
+# ============================================
+
+echo "[2/5] Disabling unnecessary services..."
+
+# Print services (disable for live ISO)
+systemctl disable cups 2>/dev/null || true
+systemctl disable cups-browsed 2>/dev/null || true
+
+# Bluetooth (enable on demand)
+systemctl disable bluetooth 2>/dev/null || true
+
+# Modem manager (not needed for most users)
+systemctl disable ModemManager 2>/dev/null || true
+
+# RPC services
+systemctl disable rpcbind 2>/dev/null || true
+systemctl disable rpc.statd 2>/dev/null || true
+
+# Avahi (zeroconf)
+systemctl disable avahi-daemon 2>/dev/null || true
+
+# DHCP server (not needed on live ISO)
+systemctl disable isc-dhcp-server 2>/dev/null || true
+
+# Apache (web server - enable on demand)
+systemctl disable apache2 2>/dev/null || true
+
+# FTP server
+systemctl disable vsftpd 2>/dev/null || true
+
+# ============================================
+# 3. CONFIGURE SERVICE SETTINGS
+# ============================================
+
+echo "[3/5] Configuring service settings..."
+
+# Configure systemd-logind
+mkdir -p /etc/systemd/logind.conf.d
+cat > /etc/systemd/logind.conf.d/maxregner.conf <<EOF
+[Login]
+# MaxRegner OS Login Configuration
+
+# Session timeout
+IdleAction=ignore
+IdleActionSec=30min
+
+# User sessions
+UserTasksMax=12288
+SessionsMax=1024
+
+# Device handling
+HandleLidSwitch=suspend
+HandleLidSwitchExternalPower=suspend
+HandleLidSwitchDocked=ignore
+HandleSuspendKey=suspend
+HandleHibernateKey=hibernate
+HandlePowerKey=poweroff
+
+# Power management
+PowerKeyIgnoreInhibited=no
+SuspendKeyIgnoreInhibited=no
+HibernateKeyIgnoreInhibited=no
+LidSwitchIgnoreInhibited=no
+
+# Inactivity
+InhibitDelayMaxSec=5
+UserStopDelaySec=10
+
+# Device access
+DevicesPolicy=auto
+EOF
+
+# Configure systemd-timesyncd
+mkdir -p /etc/systemd/timesyncd.conf.d
+cat > /etc/systemd/timesyncd.conf.d/maxregner.conf <<EOF
+[Time]
+# MaxRegner OS Time Synchronization
+
+# NTP servers
+NTP=pool.ntp.org
+FallbackNTP=0.pool.ntp.org 1.pool.ntp.org 2.pool.ntp.org 3.pool.ntp.org
+
+# Root distance threshold
+RootDistanceMaxSec=5
+
+# Poll interval
+PollIntervalMinSec=32
+PollIntervalMaxSec=2048
+EOF
+
+# Configure systemd-resolved
+mkdir -p /etc/systemd/resolved.conf.d
+cat > /etc/systemd/resolved.conf.d/maxregner.conf <<EOF
+[Resolve]
+# MaxRegner OS DNS Resolution
+
+# DNS servers
+DNS=1.1.1.1 8.8.8.8 9.9.9.9
+FallbackDNS=1.0.0.1 8.8.4.4
+
+# Domains
+Domains=~.
+
+# LLMNR
+LLMNR=no
+
+# Multicast DNS
+MulticastDNS=no
+
+# Cache
+Cache=yes
+
+# DNS stub listener
+DNSStubListener=yes
+EOF
+
+# ============================================
+# 4. CREATE CUSTOM SERVICES
+# ============================================
+
+echo "[4/5] Creating custom services..."
+
+# MaxRegner welcome service
+cat > /etc/systemd/system/maxregner-welcome.service <<EOF
+[Unit]
+Description=MaxRegner OS Welcome Service
+After=graphical.target
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/maxregner-welcome
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# MaxRegner update checker
+cat > /etc/systemd/system/maxregner-update-check.service <<EOF
+[Unit]
+Description=MaxRegner OS Update Checker
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/maxregner-update-check
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# MaxRegner system monitor
+cat > /etc/systemd/system/maxregner-monitor.service <<EOF
+[Unit]
+Description=MaxRegner OS System Monitor
+After=graphical.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/maxregner-monitor
+Restart=always
+RestartSec=60
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Enable custom services
+systemctl enable maxregner-welcome.service 2>/dev/null || true
+systemctl enable maxregner-update-check.service 2>/dev/null || true
+systemctl enable maxregner-monitor.service 2>/dev/null || true
+
+# ============================================
+# 5. SERVICE OPTIMIZATION
+# ============================================
+
+echo "[5/5] Optimizing services..."
+
+# Configure service timeouts
+mkdir -p /etc/systemd/system.conf.d
+cat > /etc/systemd/system.conf.d/maxregner.conf <<EOF
+[Manager]
+# MaxRegner OS Service Optimization
+
+# Default timeout
+DefaultTimeoutStartSec=10s
+DefaultTimeoutStopSec=10s
+
+# Task limits
+DefaultTasksMax=16384
+
+# Memory limits
+DefaultMemoryLow=512M
+DefaultMemoryMax=4G
+
+# CPU limits
+DefaultCPUWeight=100
+DefaultStartCPUWeight=150
+
+# I/O limits
+DefaultIOWeight=100
+DefaultStartIOWeight=150
+
+# Restart settings
+DefaultRestartSec=5s
+DefaultStartLimitIntervalSec=60s
+DefaultStartLimitBurst=5
+
+# Environment
+DefaultEnvironment="LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8"
+EOF
+
+# Configure journal settings
+mkdir -p /etc/systemd/journald.conf.d
+cat > /etc/systemd/journald.conf.d/maxregner.conf <<EOF
+[Journal]
+# MaxRegner OS Journal Configuration
+
+# Storage
+Storage=persistent
+
+# Size limits
+SystemMaxUse=1G
+SystemMaxFileSize=100M
+SystemMaxFiles=10
+RuntimeMaxUse=500M
+RuntimeMaxFileSize=50M
+RuntimeMaxFiles=5
+
+# Flush settings
+SyncIntervalSec=5m
+RateLimitIntervalSec=30s
+RateLimitBurst=10000
+
+# Compression
+Compress=yes
+
+# Forwarding
+ForwardToSyslog=no
+ForwardToWall=yes
+ForwardToKMsg=no
+ForwardToConsole=no
+
+# Max level
+MaxLevelStore=info
+MaxLevelSyslog=info
+MaxLevelKMsg=info
+MaxLevelConsole=info
+MaxLevelWall=warning
+EOF
+
+# ============================================
+# FINAL CLEANUP
+# ============================================
+
+echo ""
+echo "========================================"
+echo "MaxRegner Services Configuration Complete!"
+echo "========================================"

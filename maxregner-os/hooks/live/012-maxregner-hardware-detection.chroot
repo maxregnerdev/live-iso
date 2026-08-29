@@ -1,0 +1,237 @@
+#!/bin/bash
+# MaxRegner OS - Hardware Detection and Configuration Hook
+# Detects and configures hardware automatically
+
+set -e
+
+echo "========================================"
+echo "MaxRegner OS - Hardware Detection Hook"
+echo "========================================"
+
+# ============================================
+# 1. CPU DETECTION AND OPTIMIZATION
+# ============================================
+
+echo "[1/5] Detecting CPU..."
+
+# Get CPU info
+CPU_VENDOR=$(cat /proc/cpuinfo | grep vendor_id | head -1 | cut -d':' -f2 | xargs)
+CPU_MODEL=$(cat /proc/cpuinfo | grep "model name" | head -1 | cut -d':' -f2 | xargs)
+CPU_CORES=$(nproc)
+CPU_ARCH=$(uname -m)
+
+echo "CPU: $CPU_VENDOR $CPU_MODEL ($CPU_CORES cores, $CPU_ARCH)"
+
+# Apply CPU-specific optimizations
+if [[ "$CPU_VENDOR" == *"Intel"* ]]; then
+    echo "Applying Intel CPU optimizations..."
+    # Intel-specific settings
+    cat > /etc/sysctl.d/99-intel-cpu.conf <<EOF
+# Intel CPU Optimizations
+kernel.sched_migration_cost_ns = 5000000
+kernel.sched_latency_ns = 10000000
+EOF
+    sysctl -p /etc/sysctl.d/99-intel-cpu.conf 2>/dev/null || true
+    
+elif [[ "$CPU_VENDOR" == *"AMD"* ]]; then
+    echo "Applying AMD CPU optimizations..."
+    # AMD-specific settings
+    cat > /etc/sysctl.d/99-amd-cpu.conf <<EOF
+# AMD CPU Optimizations
+kernel.sched_migration_cost_ns = 2000000
+kernel.sched_latency_ns = 6000000
+EOF
+    sysctl -p /etc/sysctl.d/99-amd-cpu.conf 2>/dev/null || true
+fi
+
+# ============================================
+# 2. MEMORY DETECTION
+# ============================================
+
+echo "[2/5] Detecting memory..."
+
+TOTAL_MEM=$(free -b | awk '/Mem:/ {print $2}')
+MEM_GB=$((TOTAL_MEM / 1024 / 1024 / 1024))
+
+echo "Memory: ${MEM_GB}GB"
+
+# Apply memory-specific settings
+if [ "$MEM_GB" -ge 16 ]; then
+    echo "High memory system detected (>= 16GB)"
+    # Aggressive caching
+    cat > /etc/sysctl.d/99-highmem.conf <<EOF
+# High Memory Optimizations
+vm.swappiness = 5
+vm.vfs_cache_pressure = 20
+EOF
+    sysctl -p /etc/sysctl.d/99-highmem.conf 2>/dev/null || true
+elif [ "$MEM_GB" -ge 8 ]; then
+    echo "Medium memory system detected (8-16GB)"
+    # Balanced caching
+    cat > /etc/sysctl.d/99-medmem.conf <<EOF
+# Medium Memory Optimizations
+vm.swappiness = 10
+vm.vfs_cache_pressure = 50
+EOF
+    sysctl -p /etc/sysctl.d/99-medmem.conf 2>/dev/null || true
+else
+    echo "Low memory system detected (< 8GB)"
+    # Conservative caching
+    cat > /etc/sysctl.d/99-lowmem.conf <<EOF
+# Low Memory Optimizations
+vm.swappiness = 20
+vm.vfs_cache_pressure = 100
+EOF
+    sysctl -p /etc/sysctl.d/99-lowmem.conf 2>/dev/null || true
+fi
+
+# ============================================
+# 3. STORAGE DETECTION
+# ============================================
+
+echo "[3/5] Detecting storage..."
+
+# Detect storage devices
+STORAGE_DEVICES=$(lsblk -d -n -o NAME,TYPE | grep disk | wc -l)
+SSD_COUNT=$(lsblk -d -n -o NAME,TYPE,ROTA | grep disk | grep -v "1" | wc -l)
+HDD_COUNT=$((STORAGE_DEVICES - SSD_COUNT))
+
+echo "Storage: $STORAGE_DEVICES devices ($SSD_COUNT SSD, $HDD_COUNT HDD)"
+
+# Configure I/O scheduler based on storage type
+if [ "$SSD_COUNT" -gt 0 ]; then
+    echo "SSD detected, using none scheduler for SSDs"
+    for dev in /sys/block/nvme*; do
+        echo none > "$dev/queue/scheduler" 2>/dev/null || true
+    done
+    for dev in /sys/block/sd*; do
+        if [ -f "$dev/queue/rotational" ] && [ "$(cat $dev/queue/rotational)" = "0" ]; then
+            echo none > "$dev/queue/scheduler" 2>/dev/null || true
+        fi
+    done
+fi
+
+if [ "$HDD_COUNT" -gt 0 ]; then
+    echo "HDD detected, using bfq scheduler for HDDs"
+    for dev in /sys/block/sd*; do
+        if [ -f "$dev/queue/rotational" ] && [ "$(cat $dev/queue/rotational)" = "1" ]; then
+            echo bfq > "$dev/queue/scheduler" 2>/dev/null || true
+        fi
+    done
+fi
+
+# ============================================
+# 4. GRAPHICS DETECTION
+# ============================================
+
+echo "[4/5] Detecting graphics..."
+
+# Detect GPU
+if lspci | grep -q "NVIDIA"; then
+    echo "NVIDIA GPU detected"
+    GPU_TYPE="nvidia"
+elif lspci | grep -q "AMD\|Radeon"; then
+    echo "AMD GPU detected"
+    GPU_TYPE="amd"
+elif lspci | grep -q "Intel"; then
+    echo "Intel GPU detected"
+    GPU_TYPE="intel"
+else
+    echo "Unknown GPU"
+    GPU_TYPE="unknown"
+fi
+
+# Apply GPU-specific settings
+case "$GPU_TYPE" in
+    nvidia)
+        echo "Configuring for NVIDIA..."
+        # NVIDIA-specific optimizations
+        cat > /etc/X11/xorg.conf.d/20-nvidia.conf <<EOF
+Section "Device"
+    Identifier "NVIDIA"
+    Driver "nvidia"
+    Option "NoLogo" "true"
+    Option "Coolbits" "28"
+    Option "TripleBuffer" "true"
+    Option "AllowIndirectGLXProtocol" "true"
+    Option "RenderAccel" "true"
+EndSection
+EOF
+        ;;
+    amd)
+        echo "Configuring for AMD..."
+        # AMD-specific optimizations
+        cat > /etc/X11/xorg.conf.d/20-amd.conf <<EOF
+Section "Device"
+    Identifier "AMD"
+    Driver "amdgpu"
+    Option "TearFree" "true"
+    Option "VariableRefresh" "true"
+EndSection
+EOF
+        ;;
+    intel)
+        echo "Configuring for Intel..."
+        # Intel-specific optimizations
+        cat > /etc/X11/xorg.conf.d/20-intel.conf <<EOF
+Section "Device"
+    Identifier "Intel"
+    Driver "intel"
+    Option "TearFree" "true"
+    Option "AccelMethod" "sna"
+    Option "Backlight" "intel_backlight"
+EndSection
+EOF
+        ;;
+esac
+
+# ============================================
+# 5. NETWORK DETECTION
+# ============================================
+
+echo "[5/5] Detecting network..."
+
+# Detect network interfaces
+NET_INTERFACES=$(ip -o link show | awk -F': ' '{print $2}' | grep -v lo | head -3)
+
+echo "Network interfaces: $NET_INTERFACES"
+
+# Configure each interface
+for iface in $NET_INTERFACES; do
+    echo "Configuring $iface..."
+    
+    # Get MAC address
+    MAC=$(cat /sys/class/net/$iface/address 2>/dev/null || echo "unknown")
+    
+    # Get interface type
+    IFACE_TYPE=$(cat /sys/class/net/$iface/type 2>/dev/null || echo "1")
+    
+    case "$IFACE_TYPE" in
+        1)
+            echo "  $iface: Ethernet ($MAC)"
+            # Ethernet optimizations
+            if [ -f /etc/network/interfaces ]; then
+                echo "auto $iface" >> /etc/network/interfaces
+                echo "iface $iface inet dhcp" >> /etc/network/interfaces
+            fi
+            ;;
+        801)
+            echo "  $iface: Wireless ($MAC)"
+            # Wireless optimizations
+            ;;
+        *)
+            echo "  $iface: Unknown type ($IFACE_TYPE)"
+            ;;
+    esac
+done
+
+echo ""
+echo "========================================"
+echo "MaxRegner Hardware Detection Complete!"
+echo "========================================"
+echo "CPU: $CPU_MODEL ($CPU_CORES cores)"
+echo "Memory: ${MEM_GB}GB"
+echo "Storage: $SSD_COUNT SSD, $HDD_COUNT HDD"
+echo "GPU: $GPU_TYPE"
+echo "Network: $NET_INTERFACES"
+echo "========================================"
