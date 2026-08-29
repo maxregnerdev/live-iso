@@ -94,10 +94,11 @@ build () {
       ln -sf "package-lists.vanilla-installer" "config/package-lists"
   fi
 
-  # Symlink MaxRegner hooks
+  # Ensure MaxRegner hooks are in the correct location
   if [ -d "config/hooks/live" ]; then
-      mkdir -p config/hooks/live/maxregner
-      cp -f config/hooks/live/*.chroot config/hooks/live/maxregner/ 2>/dev/null || true
+      # Hooks are already in config/hooks/live/ from the cp commands above
+      # No need to create a subdirectory
+      true
   fi
 
   echo -e "

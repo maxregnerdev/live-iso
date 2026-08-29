@@ -1,4 +1,4 @@
-#!/usr/bin/pulseaudio -nF
+#!/bin/bash
 set -e
 
 # MaxRegner user configuration

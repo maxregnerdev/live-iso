@@ -419,7 +419,7 @@ echo "[5/5] Creating system integration scripts..."
 cat > /usr/local/bin/maxregner-hook-runner << 'HOOKRUNNER'
 # MaxRegner OS Hook Runner Script
 
-HOOK_DIR="/workspace/github__maxregnerdev__live-iso/maxregner-os/hooks/live"
+HOOK_DIR="/root"
 
 if [ -z "$1" ]; then
     echo "Usage: maxregner-hook-runner <hook-name>"
