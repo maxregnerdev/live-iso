@@ -43,6 +43,11 @@ echo "[2/10] Creating MaxRegner user..."
 if ! id "$MAXREGNER_USER" >/dev/null 2>&1; then
     echo "Creating user: $MAXREGNER_USER"
     
+    # Create sambashare group if it doesn't exist
+    if ! getent group sambashare >/dev/null 2>&1; then
+        groupadd sambashare 2>/dev/null || true
+    fi
+    
     # Create user with all necessary groups
     useradd -m -s /bin/bash \
         -G sudo,adm,dialout,cdrom,floppy,audio,dip,video,plugdev,netdev,lpadmin,sambashare \
