@@ -109,7 +109,7 @@ picture-options=zoom
 picture-opacity=100
 GNOMETERMCONF
 
-chown "$MAXREGNER_USER" "$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/dconf/user
+chown ${MAXREGNER_USER}:${MAXREGNER_USER} /home/$MAXREGNER_USER/.config/dconf/user
 
 # Create GNOME Terminal profile
 mkdir -p /home/$MAXREGNER_USER/.bash_profile.d
@@ -155,7 +155,7 @@ export PAGER=less
 export LESS='-R --shift 5'
 TERMPROFILE
 
-chown "$MAXREGNER_USER" "$MAXREGNER_USER" /home/$MAXREGNER_USER/.bash_profile.d/terminal.sh
+chown ${MAXREGNER_USER}:${MAXREGNER_USER} /home/$MAXREGNER_USER/.bash_profile.d/terminal.sh
 
 # ============================================
 # 3. CONFIGURE TERMINATOR
@@ -449,7 +449,7 @@ echo "Welcome to MaxRegner OS Terminal!"
 echo "Type 'help' for available commands."
 BASHRC
 
-chown "$MAXREGNER_USER" "$MAXREGNER_USER" /home/$MAXREGNER_USER/.bashrc
+chown ${MAXREGNER_USER}:${MAXREGNER_USER} /home/$MAXREGNER_USER/.bashrc
 
 # Configure profile
 cat > /home/$MAXREGNER_USER/.profile << 'PROFILE'
@@ -492,7 +492,7 @@ MAXREGNER_ICONS=MaxRegner-Icons
 export MAXREGNER_ICONS
 PROFILE
 
-chown "$MAXREGNER_USER" "$MAXREGNER_USER" /home/$MAXREGNER_USER/.profile
+chown ${MAXREGNER_USER}:${MAXREGNER_USER} /home/$MAXREGNER_USER/.profile
 
 # Create MaxRegner bashrc
 mkdir -p /etc/maxregner

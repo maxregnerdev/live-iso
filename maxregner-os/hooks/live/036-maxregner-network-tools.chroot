@@ -136,7 +136,7 @@ cat > /home/$MAXREGNER_USER/.nmaprc << 'NMAPRC'
 --exclude 172.16.0.0/12
 NMAPRC
 
-chown "$MAXREGNER_USER" "$MAXREGNER_USER" /home/$MAXREGNER_USER/.nmaprc
+chown ${MAXREGNER_USER}:${MAXREGNER_USER} /home/$MAXREGNER_USER/.nmaprc
 
 # ============================================
 # 4. CONFIGURE WIRELESS TOOLS

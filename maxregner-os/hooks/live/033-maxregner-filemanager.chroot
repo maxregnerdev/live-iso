@@ -318,7 +318,7 @@ inode/directory=nautilus.desktop;dolphin.desktop;thunar.desktop;pcmanfm.desktop;
 text/plain=gedit.desktop;mousepad.desktop;leafpad.desktop;
 MIMEAPPS
 
-chown "$MAXREGNER_USER" "$MAXREGNER_USER" /home/$MAXREGNER_USER/.local/share/applications/mimeapps.list
+chown ${MAXREGNER_USER}:${MAXREGNER_USER} /home/$MAXREGNER_USER/.local/share/applications/mimeapps.list
 
 # Create file manager launcher scripts
 mkdir -p /usr/local/bin/maxregner-filemanager

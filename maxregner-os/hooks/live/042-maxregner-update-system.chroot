@@ -277,7 +277,7 @@ cat > /var/spool/cron/crontabs/maxregner << 'USERCRON'
 @reboot if [ ! -f ~/.maxregner-welcome-shown ]; then /usr/local/bin/maxregner-welcome; touch ~/.maxregner-welcome-shown; fi
 USERCRON
 
-chown "$MAXREGNER_USER" "$MAXREGNER_USER" /var/spool/cron/crontabs/maxregner
+chown ${MAXREGNER_USER}:${MAXREGNER_USER} /var/spool/cron/crontabs/maxregner
 
 # Enable and start services
 systemctl enable cron 2>/dev/null || true

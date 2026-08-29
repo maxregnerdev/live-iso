@@ -252,7 +252,7 @@ echo "=========================================="
 WELCOME
 
 chmod +x /home/$MAXREGNER_USER/.local/bin/maxregner-welcome
-chown "$MAXREGNER_USER" "$MAXREGNER_USER" /home/$MAXREGNER_USER/.local/bin/maxregner-welcome
+chown ${MAXREGNER_USER}:${MAXREGNER_USER} /home/$MAXREGNER_USER/.local/bin/maxregner-welcome
 
 # ============================================
 # 4. CREATE DEVELOPMENT SCRIPTS

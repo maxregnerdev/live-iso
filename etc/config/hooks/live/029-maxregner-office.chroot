@@ -212,7 +212,7 @@ automatic-reload=true
 text-selection=true
 EVINCECONF
 
-chown "$MAXREGNER_USER" "$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/dconf/user
+chown ${MAXREGNER_USER}:${MAXREGNER_USER} /home/$MAXREGNER_USER/.config/dconf/user
 
 # ============================================
 # 5. CONFIGURE OFFICE TEMPLATES

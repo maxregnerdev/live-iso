@@ -345,7 +345,7 @@ ctl.!default {
 }
 ALSAEOF
 
-chown "$MAXREGNER_USER" "$MAXREGNER_USER" /home/$MAXREGNER_USER/.asoundrc
+chown ${MAXREGNER_USER}:${MAXREGNER_USER} /home/$MAXREGNER_USER/.asoundrc
 
 # ============================================
 # 5. ENABLE AND START SERVICES
