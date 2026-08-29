@@ -144,6 +144,7 @@ ufw allow 53/udp 2>/dev/null || true
 ufw --force enable 2>/dev/null || true
 
 # Configure iptables rules
+mkdir -p /etc/iptables
 cat > /etc/iptables/rules.v4 <<EOF
 *filter
 :INPUT DROP [0:0]
@@ -179,6 +180,7 @@ cat > /etc/iptables/rules.v4 <<EOF
 COMMIT
 EOF
 
+mkdir -p /etc/iptables
 cat > /etc/iptables/rules.v6 <<EOF
 *filter
 :INPUT DROP [0:0]
