@@ -1,0 +1,5 @@
+#!/bin/bash
+# Vanilla OS - Set OS Info (kept for compatibility)
+set -e
+
+echo "Setting OS info..."

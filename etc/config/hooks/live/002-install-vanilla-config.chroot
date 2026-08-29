@@ -1,0 +1,3 @@
+#!/bin/bash
+# Vanilla OS hook - kept for compatibility
+set -e
