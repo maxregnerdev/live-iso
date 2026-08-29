@@ -38,6 +38,7 @@ apt-get install -y pandoc pandoc-data pandoc-citeproc \
 echo "[2/5] Configuring man pages..."
 
 # Configure man-db
+mkdir -p /etc
 cat > /etc/manpath.config << 'MANPATHCONF'
 # MaxRegner OS Manpath Configuration
 
@@ -363,7 +364,9 @@ cat > /usr/share/maxregner/doc/html/index.html << 'MAXDOCHTML'
             <ul>
                 <li>GNOME Settings application</li>
                 <li>Command line tools</li>
+mkdir -p /etc/maxregner
                 <li>Configuration files in <code>/etc/maxregner/</code></li>
+mkdir -p /usr/local/bin
                 <li>Custom scripts in <code>/usr/local/bin/maxregner-*</code></li>
             </ul>
         </section>
@@ -445,6 +448,7 @@ MAXDOCHTML
 echo "[5/5] Creating help system..."
 
 # Create help command
+mkdir -p /usr/local/bin
 cat > /usr/local/bin/maxregner-help << 'MAXHELP'
 #!/bin/bash
 # MaxRegner OS Help System

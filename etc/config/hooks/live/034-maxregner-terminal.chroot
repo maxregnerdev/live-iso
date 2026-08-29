@@ -487,6 +487,7 @@ PROFILE
 chown maxregner:maxregner /home/maxregner/.profile
 
 # Create MaxRegner bashrc
+mkdir -p /etc/maxregner
 cat > /etc/maxregner/bashrc << 'MAXREGNERBASHRC'
 # MaxRegner OS Global Bash Configuration
 

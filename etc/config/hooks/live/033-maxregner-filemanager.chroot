@@ -142,14 +142,23 @@ cat > /home/maxregner/.config/Thunar/accels.scm << 'THUNARACCELS'
 # MaxRegner OS Thunar Accelerators
 
 ; Custom keyboard shortcuts
+mkdir -p /ThunarActions/ThunarStandardView
 (gtk_accel_path "<Actions>/ThunarActions/ThunarStandardView/Up" "<Alt>Up")
+mkdir -p /ThunarActions/ThunarStandardView
 (gtk_accel_path "<Actions>/ThunarActions/ThunarStandardView/Back" "<Alt>Left")
+mkdir -p /ThunarActions/ThunarStandardView
 (gtk_accel_path "<Actions>/ThunarActions/ThunarStandardView/Forward" "<Alt>Right")
+mkdir -p /ThunarActions/ThunarStandardView
 (gtk_accel_path "<Actions>/ThunarActions/ThunarStandardView/Refresh" "F5")
+mkdir -p /ThunarActions/ThunarStandardView
 (gtk_accel_path "<Actions>/ThunarActions/ThunarStandardView/NewFolder" "<Control>n")
+mkdir -p /ThunarActions/ThunarStandardView
 (gtk_accel_path "<Actions>/ThunarActions/ThunarStandardView/NewBlankFile" "<Control><Shift>n")
+mkdir -p /ThunarActions/ThunarStandardView
 (gtk_accel_path "<Actions>/ThunarActions/ThunarStandardView/Delete" "Delete")
+mkdir -p /ThunarActions/ThunarStandardView
 (gtk_accel_path "<Actions>/ThunarActions/ThunarStandardView/Rename" "F2")
+mkdir -p /ThunarActions/ThunarStandardView
 (gtk_accel_path "<Actions>/ThunarActions/ThunarStandardView/Properties" "<Alt>Return")
 THUNARACCELS
 
@@ -214,6 +223,7 @@ echo "[4/5] Configuring PCManFM..."
 
 # Create PCManFM configuration
 mkdir -p /home/maxregner/.config/pcmanfm
+mkdir -p /home/maxregner/.config/pcmanfm/default
 cat > /home/maxregner/.config/pcmanfm/default/pcmanfm.conf << 'PCMANFMCONF'
 # MaxRegner OS PCManFM Configuration
 
@@ -251,6 +261,7 @@ max_file_size=4194304
 show_thumbnails=1
 PCMANFMCONF
 
+mkdir -p /home/maxregner/.config/pcmanfm/default/lxde
 cat > /home/maxregner/.config/pcmanfm/default/lxde/pcmanfm.conf << 'PCMANFMLXDECONF'
 # MaxRegner OS PCManFM LXDE Configuration
 
@@ -285,6 +296,7 @@ gsettings set org.gnome.desktop.default-applications.terminal exec "gnome-termin
 gsettings set org.gnome.desktop.default-applications.terminal exec-arg "-x" 2>/dev/null || true
 
 # Configure MIME types
+mkdir -p /home/maxregner/.local/share/applications
 cat > /home/maxregner/.local/share/applications/mimeapps.list << 'MIMEAPPS'
 # MaxRegner OS MIME Applications
 

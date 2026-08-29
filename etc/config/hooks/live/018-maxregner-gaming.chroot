@@ -100,6 +100,7 @@ apt-get install -y mangohud gamemode libgamemodeauto0 \
     glmark2 glxinfo glxgears 2>/dev/null || true
 
 # Configure GameMode
+mkdir -p /etc
 cat > /etc/gamemode.ini << 'GAMEOF'
 [gamemode]
 # Enable GameMode by default
@@ -125,6 +126,7 @@ net_prio=1
 GAMEOF
 
 # Configure MangoHud
+mkdir -p /etc/MangoHud
 cat > /etc/MangoHud/MangoHud.conf << 'MANGOOF'
 [preset]
 preset=1
@@ -165,6 +167,7 @@ apt-get install -y vulkan-tools libvulkan1 vulkan-icd-loader \
     ocl-icd-opencl-dev 2>/dev/null || true
 
 # Configure Vulkan
+mkdir -p /etc/vulkan/icd.d
 cat > /etc/vulkan/icd.d/10_maxregner.json << 'VULKANOF'
 {
     "file_format_version" : "1.0.0",
@@ -176,6 +179,7 @@ cat > /etc/vulkan/icd.d/10_maxregner.json << 'VULKANOF'
 VULKANOF
 
 # Configure VA-API for hardware video decoding
+mkdir -p /etc/environment.d
 cat > /etc/environment.d/99-maxregner-gaming.conf << 'VAEOF'
 # MaxRegner OS Gaming Environment
 LIBVA_DRIVER_NAME=iHD

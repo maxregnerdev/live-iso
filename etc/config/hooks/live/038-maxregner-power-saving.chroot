@@ -26,6 +26,7 @@ apt-get install -y powertop thermald cpupowerutils \
 echo "[2/5] Configuring Powertop..."
 
 # Configure Powertop
+mkdir -p /etc/powertop/autosave.d
 cat > /etc/powertop/autosave.d/maxregner-powertop.conf << 'POWERTOPCONF'
 # MaxRegner OS Powertop Configuration
 
@@ -62,6 +63,7 @@ MAXREGNER_POWERSAVE=1
 POWERTOPCONF
 
 # Create Powertop service
+mkdir -p /etc/systemd/system
 cat > /etc/systemd/system/powertop.service << 'POWERTOPSERVICE'
 [Unit]
 Description=Powertop power saving tool
@@ -83,6 +85,7 @@ POWERTOPSERVICE
 echo "[3/5] Configuring thermald..."
 
 # Configure thermald
+mkdir -p /etc/thermald
 cat > /etc/thermald/thermald.conf << 'THERMALDCONF'
 # MaxRegner OS Thermald Configuration
 
@@ -127,6 +130,7 @@ THERMALDCONF
 echo "[4/5] Configuring laptop mode..."
 
 # Configure laptop mode
+mkdir -p /etc/laptop-mode/conf.d
 cat > /etc/laptop-mode/conf.d/maxregner-laptop-mode.conf << 'LAPTOPMODECONF'
 # MaxRegner OS Laptop Mode Configuration
 

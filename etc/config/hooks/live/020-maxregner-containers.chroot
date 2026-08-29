@@ -32,6 +32,7 @@ apt-get install -y buildah skopeo crun runc 2>/dev/null || true
 echo "[2/5] Configuring Docker..."
 
 # Configure Docker daemon
+mkdir -p /etc/docker
 cat > /etc/docker/daemon.json << 'DOCKEREOF'
 {
   "exec-opts": ["native.cgroupdriver=systemd"],
@@ -77,6 +78,7 @@ cat > /etc/docker/daemon.json << 'DOCKEREOF'
 DOCKEREOF
 
 # Configure Docker service
+mkdir -p /etc/systemd/system/docker.service.d
 cat > /etc/systemd/system/docker.service.d/override.conf << 'DOCKEROVERRIDE'
 [Service]
 ExecStart=
@@ -90,6 +92,7 @@ DOCKEROVERRIDE
 echo "[3/5] Configuring Podman..."
 
 # Configure Podman
+mkdir -p /etc/containers
 cat > /etc/containers/containers.conf << 'PODMANEOF'
 # MaxRegner OS Podman Configuration
 
@@ -133,6 +136,7 @@ infrastructure_command = "/usr/bin/podman"
 PODMANEOF
 
 # Configure Podman registries
+mkdir -p /etc/containers
 cat > /etc/containers/registries.conf << 'REGISTRIESEOF'
 # MaxRegner OS Registries Configuration
 
@@ -172,6 +176,7 @@ REGISTRIESEOF
 echo "[4/5] Configuring Buildah..."
 
 # Configure Buildah
+mkdir -p /etc/containers
 cat > /etc/containers/buildah.conf << 'BUILDAHEOF'
 # MaxRegner OS Buildah Configuration
 
@@ -217,6 +222,7 @@ chmod 775 /var/lib/containers/storage
 chmod 775 /var/lib/docker
 
 # Configure container networking
+mkdir -p /etc/cni/net.d
 cat > /etc/cni/net.d/10-podman.conf << 'CNIEOF'
 {
   "cniVersion": "0.4.0",

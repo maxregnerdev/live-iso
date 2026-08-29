@@ -35,6 +35,7 @@ apt-get install -y prometheus prometheus-node-exporter \
 echo "[2/5] Configuring Prometheus..."
 
 # Configure Prometheus
+mkdir -p /etc/prometheus
 cat > /etc/prometheus/prometheus.yml << 'PROMETHEUSYML'
 # MaxRegner OS Prometheus Configuration
 
@@ -150,6 +151,7 @@ PROMRULES
 echo "[3/5] Configuring Grafana..."
 
 # Configure Grafana
+mkdir -p /etc/grafana
 cat > /etc/grafana/grafana.ini << 'GRAFANAINI'
 # MaxRegner OS Grafana Configuration
 
@@ -264,6 +266,7 @@ GRAFDATASOURCE
 echo "[4/5] Configuring Node Exporter..."
 
 # Configure Node Exporter
+mkdir -p /etc/default
 cat > /etc/default/prometheus-node-exporter << 'NODEEXPORTER'
 # MaxRegner OS Node Exporter Configuration
 

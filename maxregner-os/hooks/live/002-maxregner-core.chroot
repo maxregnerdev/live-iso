@@ -287,6 +287,7 @@ echo "[9/10] Installing MaxRegner utilities..."
 mkdir -p /usr/share/maxregner/utils
 
 # Create system info script
+mkdir -p /usr/bin
 cat > /usr/bin/maxregner-info <<'UTILEOF'
 #!/bin/bash
 echo "MaxRegner OS Information"

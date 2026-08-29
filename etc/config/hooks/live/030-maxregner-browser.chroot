@@ -133,6 +133,7 @@ cat > /home/maxregner/.config/chromium/First Run << 'CHROMIUMFIRST'
 --force-fieldtrial-params=*//*:maxregner/*
 CHROMIUMFIRST
 
+mkdir -p /home/maxregner/.config/chromium/Default
 cat > /home/maxregner/.config/chromium/Default/Preferences << 'CHROMIUMPREFS'
 {
   "alternate_error_pages": {
@@ -313,6 +314,7 @@ FFBACKGROUND
 echo "[5/5] Configuring browser settings..."
 
 # Configure default browser
+mkdir -p /etc/gnome
 cat > /etc/gnome/defaults.list << 'DEFAULTSBROWSER'
 # MaxRegner OS Default Applications
 
@@ -331,6 +333,7 @@ text/plain=firefox.desktop
 DEFAULTSBROWSER
 
 # Configure MIME types
+mkdir -p /etc
 cat > /etc/mime.types << 'MIMETYPES'
 # MaxRegner OS MIME Types
 

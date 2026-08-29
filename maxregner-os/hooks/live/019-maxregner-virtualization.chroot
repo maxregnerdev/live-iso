@@ -36,6 +36,7 @@ modprobe kvm_intel 2>/dev/null || true
 modprobe kvm_amd 2>/dev/null || true
 
 # Configure KVM permissions
+mkdir -p /etc
 cat > /etc/group << 'KVMEOF'
 # MaxRegner OS KVM Configuration
 kvm:x:135:maxregner
@@ -48,6 +49,7 @@ usermod -aG libvirt maxregner 2>/dev/null || true
 usermod -aG libvirt-qemu maxregner 2>/dev/null || true
 
 # Configure QEMU
+mkdir -p /etc/libvirt
 cat > /etc/libvirt/qemu.conf << 'QEMUEOF'
 # MaxRegner OS QEMU Configuration
 
@@ -89,6 +91,7 @@ QEMUEOF
 echo "[3/5] Configuring libvirt..."
 
 # Configure libvirt daemon
+mkdir -p /etc/libvirt
 cat > /etc/libvirt/libvirtd.conf << 'LIBVIRTEOF'
 # MaxRegner OS libvirt Configuration
 
@@ -116,6 +119,7 @@ max_queued_workers = 100
 LIBVIRTEOF
 
 # Configure libvirt network
+mkdir -p /etc/libvirt/qemu/networks
 cat > /etc/libvirt/qemu/networks/default.xml << 'NETEOF'
 <network>
   <name>default</name>
@@ -137,6 +141,7 @@ NETEOF
 echo "[4/5] Configuring VirtualBox..."
 
 # Configure VirtualBox
+mkdir -p /etc/vbox
 cat > /etc/vbox/vbox.cfg << 'VBOXEOF'
 # MaxRegner OS VirtualBox Configuration
 
@@ -157,6 +162,7 @@ VBOX_VRDP_PROPERTY_STRING=""
 VBOXEOF
 
 # Configure VirtualBox networks
+mkdir -p /etc/vbox
 cat > /etc/vbox/networks.conf << 'NETEOF'
 # MaxRegner OS VirtualBox Networks
 * 0.0.0.0/0 ::/0

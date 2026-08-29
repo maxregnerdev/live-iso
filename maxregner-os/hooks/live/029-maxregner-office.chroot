@@ -126,6 +126,7 @@ echo "[3/5] Configuring Evolution..."
 
 # Create Evolution configuration
 mkdir -p /home/maxregner/.config/evolution
+mkdir -p /home/maxregner/.config/evolution/mail
 cat > /home/maxregner/.config/evolution/mail/config << 'EVOMAILCONF'
 # MaxRegner OS Evolution Mail Configuration
 
@@ -153,6 +154,7 @@ warn_about_unsigned=false
 warn_about_encrypted=false
 EVOMAILCONF
 
+mkdir -p /home/maxregner/.config/evolution/calendar
 cat > /home/maxregner/.config/evolution/calendar/config << 'EVOCALCONF'
 # MaxRegner OS Evolution Calendar Configuration
 
@@ -186,6 +188,7 @@ apt-get install -y evince evince-common evince-dbg evince-dev \
     zathura-ps zathura-pdf-poppler 2>/dev/null || true
 
 # Configure Evince
+mkdir -p /home/maxregner/.config/dconf
 cat > /home/maxregner/.config/dconf/user << 'EVINCECONF'
 [org/gnome/evince]
 continuous=true

@@ -151,6 +151,7 @@ echo "[3/5] Configuring Evolution..."
 
 # Create Evolution configuration
 mkdir -p /home/maxregner/.config/evolution
+mkdir -p /home/maxregner/.config/evolution/mail
 cat > /home/maxregner/.config/evolution/mail/accounts.xml << 'EVOACCOUNTS'
 <?xml version="1.0" encoding="UTF-8"?>
 <accounts>
@@ -195,6 +196,7 @@ https://maxregneros.com</signature>
 </accounts>
 EVOACCOUNTS
 
+mkdir -p /home/maxregner/.config/evolution/calendar
 cat > /home/maxregner/.config/evolution/calendar/sources.xml << 'EVOCALSOURCES'
 <?xml version="1.0" encoding="UTF-8"?>
 <sources>
@@ -234,6 +236,7 @@ apt-get install -y postfix mailutils postfix-mysql postfix-pcre \
     postfix-ldap postfix-pgsql 2>/dev/null || true
 
 # Configure Postfix
+mkdir -p /etc/postfix
 cat > /etc/postfix/main.cf << 'POSTFIXMAIN'
 # MaxRegner OS Postfix Configuration
 
@@ -289,6 +292,7 @@ virtual_alias_maps = hash:/etc/postfix/virtual
 transport_maps = hash:/etc/postfix/transport
 POSTFIXMAIN
 
+mkdir -p /etc/postfix
 cat > /etc/postfix/master.cf << 'POSTFIXMASTER'
 # MaxRegner OS Postfix Master Configuration
 
@@ -358,6 +362,7 @@ systemctl start dovecot 2>/dev/null || true
 systemctl start spamassassin 2>/dev/null || true
 
 # Configure default email client
+mkdir -p /etc/alternatives
 cat > /etc/alternatives/mailx << 'MAILXALTERNATIVE'
 # MaxRegner OS Mailx Alternative
 

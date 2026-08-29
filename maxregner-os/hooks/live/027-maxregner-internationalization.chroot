@@ -34,6 +34,7 @@ apt-get install -y ibus ibus-gtk ibus-gtk3 ibus-qt4 ibus-libpinyin \
 echo "[2/5] Generating locales..."
 
 # Configure locales
+mkdir -p /etc
 cat > /etc/locale.gen << 'LOCALEGEN'
 # MaxRegner OS Locale Generation
 
@@ -95,6 +96,7 @@ LOCALEGEN
 locale-gen 2>/dev/null || true
 
 # Configure default locale
+mkdir -p /etc/default
 cat > /etc/default/locale << 'LOCALEDEFAULT'
 # MaxRegner OS Default Locale
 
@@ -114,6 +116,7 @@ update-locale LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8 2>/dev/null 
 echo "[3/5] Configuring input methods..."
 
 # Configure IBus
+mkdir -p /etc/default
 cat > /etc/default/ibus << 'IBUSDEFAULT'
 # MaxRegner OS IBus Configuration
 
@@ -163,6 +166,7 @@ prev_engine=Shift+Super+Space
 IBUSCONF
 
 # Configure Fcitx
+mkdir -p /etc/X11/xinit
 cat > /etc/X11/xinit/xinputrc << 'FCITXCONF'
 # MaxRegner OS Fcitx Configuration
 
@@ -179,6 +183,7 @@ FCITXCONF
 echo "[4/5] Configuring keyboard layouts..."
 
 # Configure keyboard layouts
+mkdir -p /etc/default
 cat > /etc/default/keyboard << 'KEYBOARDCONF'
 # MaxRegner OS Keyboard Configuration
 
@@ -197,6 +202,7 @@ CONSOLE_CHARMAP=UTF-8
 KEYBOARDCONF
 
 # Configure X11 keyboard
+mkdir -p /etc/X11/xorg.conf.d
 cat > /etc/X11/xorg.conf.d/00-keyboard.conf << 'XKEYBOARDCONF'
 # MaxRegner OS X11 Keyboard Configuration
 

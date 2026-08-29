@@ -23,6 +23,7 @@ MAXREGNER_CODENAME="${CODENAME:-maxregner}"
 echo "[1/5] Applying system branding..."
 
 # OS release
+mkdir -p /etc
 cat > /etc/os-release <<EOF
 NAME="MaxRegner OS"
 VERSION="$MAXREGNER_VERSION"
@@ -41,6 +42,7 @@ LOGO="maxregner"
 EOF
 
 # LSB release
+mkdir -p /etc
 cat > /etc/lsb-release <<EOF
 DISTRIB_ID=MaxRegner
 DISTRIB_RELEASE=$MAXREGNER_VERSION
@@ -49,16 +51,19 @@ DISTRIB_DESCRIPTION="MaxRegner OS $MAXREGNER_VERSION"
 EOF
 
 # Hostname
+mkdir -p /etc
 cat > /etc/hostname <<EOF
 maxregner
 EOF
 
 # Issue files
+mkdir -p /etc
 cat > /etc/issue <<EOF
 MaxRegner OS $MAXREGNER_VERSION \n \l
 
 EOF
 
+mkdir -p /etc
 cat > /etc/issue.net <<EOF
 MaxRegner OS $MAXREGNER_VERSION
 

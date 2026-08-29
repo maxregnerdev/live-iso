@@ -242,6 +242,7 @@ echo "[5/5] Configuring Timeshift..."
 apt-get install -y timeshift 2>/dev/null || true
 
 # Configure Timeshift
+mkdir -p /etc/timeshift
 cat > /etc/timeshift/timeshift.json << 'TIMESHIFTJSON'
 {
     "backup_device_uuid": "",

@@ -24,6 +24,7 @@ apt-get install -y tlp tlp-rdw powertop cpufrequtils thermald fancontrol 2>/dev/
 echo "[2/5] Configuring TLP..."
 
 # Main TLP configuration
+mkdir -p /etc/default
 cat > /etc/default/tlp <<EOF
 # MaxRegner OS TLP Configuration
 
@@ -91,6 +92,7 @@ NMI_WATCHDOG=0
 EOF
 
 # TLP radio device configuration
+mkdir -p /etc/tlp.d
 cat > /etc/tlp.d/00-radiodev.conf <<EOF
 # MaxRegner OS Radio Device Configuration
 
@@ -112,6 +114,7 @@ EOF
 echo "[3/5] Configuring Powertop..."
 
 # Powertop configuration
+mkdir -p /etc/powertop/autosave.d
 cat > /etc/powertop/autosave.d/maxregner.conf <<EOF
 # MaxRegner OS Powertop Configuration
 
@@ -147,6 +150,7 @@ EOF
 echo "[4/5] Configuring CPU frequency scaling..."
 
 # CPU frequency configuration
+mkdir -p /etc/default
 cat > /etc/default/cpufrequtils <<EOF
 # MaxRegner OS CPU Frequency Configuration
 GOVERNOR="performance"
@@ -168,6 +172,7 @@ done
 echo "[5/5] Configuring thermal management..."
 
 # Thermal configuration
+mkdir -p /etc/thermald
 cat > /etc/thermald/thermald.conf <<EOF
 # MaxRegner OS Thermal Configuration
 

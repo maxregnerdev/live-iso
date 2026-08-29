@@ -32,6 +32,7 @@ apt-get install -y cron anacron 2>/dev/null || true
 echo "[2/5] Configuring unattended upgrades..."
 
 # Configure unattended-upgrades
+mkdir -p /etc/apt/apt.conf.d
 cat > /etc/apt/apt.conf.d/20auto-upgrades << 'AUTOUPDATE'
 # MaxRegner OS Automatic Updates Configuration
 
@@ -57,6 +58,7 @@ APT::Periodic::MinAge "1";
 AUTOUPDATE
 
 # Configure unattended-upgrades
+mkdir -p /etc/apt/apt.conf.d
 cat > /etc/apt/apt.conf.d/50unattended-upgrades << 'UNATTENDEDUPDATE'
 // MaxRegner OS Unattended Upgrades Configuration
 
@@ -93,6 +95,7 @@ UNATTENDEDUPDATE
 echo "[3/5] Configuring update notifier..."
 
 # Configure update-notifier
+mkdir -p /etc/default
 cat > /etc/default/update-notifier << 'UPDATENOTIFIER'
 # MaxRegner OS Update Notifier Configuration
 
@@ -114,6 +117,7 @@ MAXREGNER_NOTIFY=1
 UPDATENOTIFIER
 
 # Configure update-notifier-common
+mkdir -p /etc/update-notifier
 cat > /etc/update-notifier/update-notifier.conf << 'UPDATENOTIFIERCONF'
 # MaxRegner OS Update Notifier Configuration
 
@@ -145,6 +149,7 @@ UPDATENOTIFIERCONF
 echo "[4/5] Creating update scripts..."
 
 # Create MaxRegner update check script
+mkdir -p /usr/local/bin
 cat > /usr/local/bin/maxregner-update-check << 'UPDATECHECK'
 #!/bin/bash
 # MaxRegner OS Update Check Script
@@ -182,6 +187,7 @@ UPDATECHECK
 chmod +x /usr/local/bin/maxregner-update-check
 
 # Create MaxRegner update log script
+mkdir -p /usr/local/bin
 cat > /usr/local/bin/maxregner-update-log << 'UPDATELOG'
 #!/bin/bash
 # MaxRegner OS Update Log Script
@@ -227,22 +233,27 @@ chmod +x /usr/local/bin/maxregner-update-log
 echo "[5/5] Configuring cron jobs..."
 
 # Configure root cron
+mkdir -p /etc/cron.d
 cat > /etc/cron.d/maxregner-updates << 'MAXCRON'
 # MaxRegner OS Update Cron Jobs
 
 # Check for updates daily at 6 AM
+mkdir -p /var/log
 0 6 * * * root /usr/local/bin/maxregner-update-check >> /var/log/maxregner-update-check.log 2>&1
 
 # Log updates daily at 6:30 AM
 30 6 * * * root /usr/local/bin/maxregner-update-log
 
 # Clean up weekly on Sunday at 3 AM
+mkdir -p /var/log
 0 3 * * 0 root /usr/local/bin/maxregner-cleanup >> /var/log/maxregner-cleanup.log 2>&1
 
 # Backup weekly on Saturday at 2 AM
+mkdir -p /var/log
 0 2 * * 6 root /usr/local/bin/maxregner-backup >> /var/log/maxregner-backup.log 2>&1
 
 # Performance monitoring daily at 12 AM
+mkdir -p /var/log
 0 12 * * * root /usr/local/bin/maxregner-performance/monitor >> /var/log/maxregner-performance.log 2>&1
 
 # MaxRegner specific

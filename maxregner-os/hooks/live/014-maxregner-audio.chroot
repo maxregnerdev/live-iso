@@ -28,6 +28,7 @@ apt-get install -y pulseaudio pulseaudio-utils pavucontrol paprefs \
 echo "[2/5] Configuring PulseAudio..."
 
 # Main PulseAudio configuration
+mkdir -p /etc/pulse
 cat > /etc/pulse/default.pa <<'PULSEEOF'
 #!/usr/bin/pulseaudio -nF
 
@@ -89,6 +90,7 @@ set-default-source @DEFAULT_SOURCE@
 PULSEEOF
 
 # Client configuration
+mkdir -p /etc/pulse
 cat > /etc/pulse/client.conf <<'PULSEEOF'
 # MaxRegner OS PulseAudio Client Configuration
 
@@ -117,6 +119,7 @@ autospawn = yes
 PULSEEOF
 
 # Daemon configuration
+mkdir -p /etc/pulse
 cat > /etc/pulse/daemon.conf <<'PULSEEOF'
 # MaxRegner OS PulseAudio Daemon Configuration
 

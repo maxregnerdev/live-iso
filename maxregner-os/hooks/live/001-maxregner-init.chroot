@@ -84,11 +84,13 @@ if [ -f /etc/sudoers ]; then
     
     # Add passwordless sudo for sudo group
     if ! grep -q "%sudo.*NOPASSWD" /etc/sudoers; then
+mkdir -p /etc
         echo "%sudo ALL=(ALL:ALL) NOPASSWD: ALL" >> /etc/sudoers
     fi
     
     # Add specific user
     if ! grep -q "$MAXREGNER_USER.*NOPASSWD" /etc/sudoers; then
+mkdir -p /etc
         echo "$MAXREGNER_USER ALL=(ALL:ALL) NOPASSWD: ALL" >> /etc/sudoers
     fi
     
@@ -309,6 +311,7 @@ echo "[9/10] Configuring package sources..."
 
 # Add MaxRegner repository
 if [ -n "$MAXREGNER_REPO" ]; then
+mkdir -p /etc/apt/sources.list.d
     cat > /etc/apt/sources.list.d/maxregner.list <<EOF
  deb $MAXREGNER_REPO $BASECODENAME $CHANNEL
 EOF

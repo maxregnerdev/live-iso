@@ -68,9 +68,13 @@ if [ -f /etc/ssh/sshd_config ]; then
     sed -i 's/^#LoginGraceTime.*/LoginGraceTime 60/' /etc/ssh/sshd_config
     
     # Add custom settings
+mkdir -p /etc/ssh
     echo "" >> /etc/ssh/sshd_config
+mkdir -p /etc/ssh
     echo "# MaxRegner OS Security" >> /etc/ssh/sshd_config
+mkdir -p /etc/ssh
     echo "AllowUsers $MAXREGNER_USER" >> /etc/ssh/sshd_config
+mkdir -p /etc/ssh
     echo "DenyUsers root" >> /etc/ssh/sshd_config
 fi
 
@@ -81,6 +85,7 @@ fi
 echo "[4/5] Applying system hardening..."
 
 # Configure kernel parameters
+mkdir -p /etc/sysctl.d
 cat > /etc/sysctl.d/99-maxregner-hardening.conf <<EOF
 # MaxRegner OS Security Hardening
 

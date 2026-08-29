@@ -15,6 +15,7 @@ echo "========================================"
 echo "[1/5] Configuring filesystems..."
 
 # Configure fstab
+mkdir -p /etc
 cat > /etc/fstab <<EOF
 # MaxRegner OS Filesystem Configuration
 # <file system> <mount point> <type> <options> <dump> <pass>
@@ -55,6 +56,7 @@ echo "[2/5] Configuring LVM..."
 apt-get install -y lvm2 thin-provisioning-tools 2>/dev/null || true
 
 # Configure LVM
+mkdir -p /etc/lvm
 cat > /etc/lvm/lvm.conf <<EOF
 # MaxRegner OS LVM Configuration
 
@@ -121,6 +123,7 @@ EOF
 echo "[3/5] Configuring disk utilities..."
 
 # Configure smartd
+mkdir -p /etc
 cat > /etc/smartd.conf <<EOF
 # MaxRegner OS SMART Monitoring Configuration
 
@@ -135,6 +138,7 @@ DEVICESCAN -d removable -n standby -W 45 -H 50
 EOF
 
 # Configure hdparm
+mkdir -p /etc
 cat > /etc/hdparm.conf <<EOF
 # MaxRegner OS HDParm Configuration
 
@@ -165,6 +169,7 @@ EOF
 echo "[4/5] Optimizing storage performance..."
 
 # Configure sysctl for storage
+mkdir -p /etc/sysctl.d
 cat > /etc/sysctl.d/99-maxregner-storage.conf <<EOF
 # MaxRegner OS Storage Optimization
 
@@ -202,6 +207,7 @@ sysctl -p /etc/sysctl.d/99-maxregner-storage.conf 2>/dev/null || true
 echo "[5/5] Configuring mount options..."
 
 # Configure default mount options
+mkdir -p /etc/default
 cat > /etc/default/mountall <<EOF
 # MaxRegner OS Mount Options
 
@@ -219,6 +225,7 @@ TMPFSOPTS="-o defaults,noatime,nosuid,nodev,size=2G"
 EOF
 
 # Configure automount
+mkdir -p /etc
 cat > /etc/auto_master <<EOF
 # MaxRegner OS AutoFS Configuration
 
@@ -232,6 +239,7 @@ EOF
 mkdir -p /etc/auto.net /etc/auto.misc /etc/auto.media
 
 # Configure udev for storage
+mkdir -p /etc/udev/rules.d
 cat > /etc/udev/rules.d/99-maxregner-storage.rules <<EOF
 # MaxRegner OS Storage Udev Rules
 

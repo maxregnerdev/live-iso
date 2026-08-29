@@ -34,6 +34,7 @@ apt-get install -y gdb gdbserver strace ltrace valgrind \
 echo "[2/5] Configuring Apport..."
 
 # Configure Apport
+mkdir -p /etc/apport
 cat > /etc/apport/crashdb.conf << 'APPORTCONF'
 # MaxRegner OS Apport Configuration
 
@@ -62,6 +63,7 @@ post = /etc/apport/post-hook.d/maxregner
 APPORTCONF
 
 # Configure Apport settings
+mkdir -p /etc/default
 cat > /etc/default/apport << 'APPORTDEFAULT'
 # MaxRegner OS Apport Default Configuration
 
@@ -219,6 +221,7 @@ chmod 644 /var/log/maxregner/*
 echo "[4/5] Configuring logwatch..."
 
 # Configure logwatch
+mkdir -p /etc/logwatch/conf
 cat > /etc/logwatch/conf/logwatch.conf << 'LOGWATCHCONF'
 # MaxRegner OS Logwatch Configuration
 
@@ -298,6 +301,7 @@ chmod +x /etc/logwatch/scripts/services/maxregner
 echo "[5/5] Configuring error notification..."
 
 # Create error notification script
+mkdir -p /usr/local/bin
 cat > /usr/local/bin/maxregner-error-notify << 'ERRORNOTIFY'
 #!/bin/bash
 # MaxRegner OS Error Notification Script
@@ -369,6 +373,7 @@ ERRORNOTIFY
 chmod +x /usr/local/bin/maxregner-error-notify
 
 # Configure cron for error checking
+mkdir -p /etc/cron.d
 cat > /etc/cron.d/maxregner-error-check << 'ERRORCRON'
 # MaxRegner OS Error Check Cron
 

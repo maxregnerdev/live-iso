@@ -26,6 +26,7 @@ apt-get install -y bluez bluez-tools bluez-cups pulseaudio-module-bluetooth \
 echo "[2/5] Configuring BlueZ..."
 
 # Main BlueZ configuration
+mkdir -p /etc/bluetooth
 cat > /etc/bluetooth/main.conf <<'BLUEZEOF'
 # MaxRegner OS BlueZ Configuration
 
@@ -92,6 +93,7 @@ Enable=true
 BLUEZEOF
 
 # Audio configuration
+mkdir -p /etc/bluetooth
 cat > /etc/bluetooth/audio.conf <<'BLUEZEOF'
 # MaxRegner OS Bluetooth Audio Configuration
 
@@ -174,6 +176,7 @@ if [ -f /etc/pulse/default.pa ]; then
 fi
 
 # Configure Bluetooth audio profiles
+mkdir -p /etc/pulse
 cat > /etc/pulse/bluetooth.conf <<'PULSEBLUEZEOF'
 # MaxRegner OS PulseAudio Bluetooth Configuration
 
@@ -215,6 +218,7 @@ systemctl start bluetooth 2>/dev/null || true
 systemctl start blueman-applet 2>/dev/null || true
 
 # Configure udev rules for Bluetooth
+mkdir -p /etc/udev/rules.d
 cat > /etc/udev/rules.d/99-maxregner-bluetooth.rules <<'UDEVEOF'
 # MaxRegner OS Bluetooth Udev Rules
 

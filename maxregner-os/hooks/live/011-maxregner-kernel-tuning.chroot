@@ -15,6 +15,7 @@ echo "========================================"
 echo "[1/5] Tuning CPU and scheduler..."
 
 # Create sysctl configuration for CPU
+mkdir -p /etc/sysctl.d
 cat > /etc/sysctl.d/10-maxregner-cpu.conf <<EOF
 # MaxRegner OS CPU Tuning
 
@@ -43,6 +44,7 @@ sysctl -p /etc/sysctl.d/10-maxregner-cpu.conf 2>/dev/null || true
 
 echo "[2/5] Tuning memory management..."
 
+mkdir -p /etc/sysctl.d
 cat > /etc/sysctl.d/20-maxregner-memory.conf <<EOF
 # MaxRegner OS Memory Tuning
 
@@ -77,6 +79,7 @@ sysctl -p /etc/sysctl.d/20-maxregner-memory.conf 2>/dev/null || true
 
 echo "[3/5] Tuning I/O performance..."
 
+mkdir -p /etc/sysctl.d
 cat > /etc/sysctl.d/30-maxregner-io.conf <<EOF
 # MaxRegner OS I/O Tuning
 
@@ -104,6 +107,7 @@ sysctl -p /etc/sysctl.d/30-maxregner-io.conf 2>/dev/null || true
 
 echo "[4/5] Tuning network stack..."
 
+mkdir -p /etc/sysctl.d
 cat > /etc/sysctl.d/40-maxregner-network.conf <<EOF
 # MaxRegner OS Network Tuning
 
@@ -144,6 +148,7 @@ sysctl -p /etc/sysctl.d/40-maxregner-network.conf 2>/dev/null || true
 
 echo "[5/5] Tuning virtual memory..."
 
+mkdir -p /etc/sysctl.d
 cat > /etc/sysctl.d/50-maxregner-vm.conf <<EOF
 # MaxRegner OS Virtual Memory Tuning
 

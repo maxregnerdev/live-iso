@@ -103,6 +103,7 @@ echo "[4/5] Configuring Google Cloud SDK..."
 
 # Configure Google Cloud SDK
 mkdir -p /home/maxregner/.config/gcloud
+mkdir -p /home/maxregner/.config/gcloud/configurations
 cat > /home/maxregner/.config/gcloud/configurations/config_default << 'GCLOUDEOF'
 # MaxRegner OS Google Cloud SDK Configuration
 
@@ -143,6 +144,7 @@ echo "[5/5] Configuring cloud-init..."
 apt-get install -y cloud-init cloud-image-utils cloud-guest-utils 2>/dev/null || true
 
 # Configure cloud-init
+mkdir -p /etc/cloud/cloud.cfg.d
 cat > /etc/cloud/cloud.cfg.d/99-maxregner.cfg << 'CLOUDEOF'
 # MaxRegner OS cloud-init Configuration
 
@@ -218,6 +220,7 @@ network:
 CLOUDEOF
 
 # Configure cloud-init userdata
+mkdir -p /etc/cloud
 cat > /etc/cloud/userdata.yml << 'USERDATAEOF'
 #cloud-config
 

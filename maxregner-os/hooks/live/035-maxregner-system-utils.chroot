@@ -131,6 +131,7 @@ chown -R maxregner:maxregner /home/maxregner/.config/inxi
 echo "[4/5] Configuring sensors..."
 
 # Configure lm-sensors
+mkdir -p /etc
 cat > /etc/sensors3.conf << 'SENSORSCONF'
 # MaxRegner OS Sensors Configuration
 
@@ -171,6 +172,7 @@ set temp1_beep_alarm 0
 SENSORSCONF
 
 # Configure fancontrol
+mkdir -p /etc
 cat > /etc/fancontrol << 'FANCONTROLCONF'
 # MaxRegner OS Fan Control Configuration
 

@@ -15,6 +15,7 @@ echo "========================================"
 echo "[1/5] Configuring NetworkManager..."
 
 # Main configuration
+mkdir -p /etc/NetworkManager
 cat > /etc/NetworkManager/NetworkManager.conf <<EOF
 [main]
 plugins=keyfile,ifupdown
@@ -223,6 +224,7 @@ EOF
 echo "[4/5] Optimizing network performance..."
 
 # Configure sysctl for network
+mkdir -p /etc/sysctl.d
 cat > /etc/sysctl.d/99-maxregner-network.conf <<EOF
 # MaxRegner OS Network Optimization
 
@@ -279,6 +281,7 @@ systemctl enable systemd-resolved 2>/dev/null || true
 systemctl enable systemd-networkd 2>/dev/null || true
 
 # Configure avahi-daemon
+mkdir -p /etc/avahi
 cat > /etc/avahi/avahi-daemon.conf <<EOF
 [server]
 allow-interfaces=eth0,wlan0

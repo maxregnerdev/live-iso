@@ -26,6 +26,7 @@ echo "CPU: $CPU_VENDOR $CPU_MODEL ($CPU_CORES cores, $CPU_ARCH)"
 if [[ "$CPU_VENDOR" == *"Intel"* ]]; then
     echo "Applying Intel CPU optimizations..."
     # Intel-specific settings
+mkdir -p /etc/sysctl.d
     cat > /etc/sysctl.d/99-intel-cpu.conf <<EOF
 # Intel CPU Optimizations
 kernel.sched_migration_cost_ns = 5000000
@@ -36,6 +37,7 @@ EOF
 elif [[ "$CPU_VENDOR" == *"AMD"* ]]; then
     echo "Applying AMD CPU optimizations..."
     # AMD-specific settings
+mkdir -p /etc/sysctl.d
     cat > /etc/sysctl.d/99-amd-cpu.conf <<EOF
 # AMD CPU Optimizations
 kernel.sched_migration_cost_ns = 2000000
@@ -59,6 +61,7 @@ echo "Memory: ${MEM_GB}GB"
 if [ "$MEM_GB" -ge 16 ]; then
     echo "High memory system detected (>= 16GB)"
     # Aggressive caching
+mkdir -p /etc/sysctl.d
     cat > /etc/sysctl.d/99-highmem.conf <<EOF
 # High Memory Optimizations
 vm.swappiness = 5
@@ -68,6 +71,7 @@ EOF
 elif [ "$MEM_GB" -ge 8 ]; then
     echo "Medium memory system detected (8-16GB)"
     # Balanced caching
+mkdir -p /etc/sysctl.d
     cat > /etc/sysctl.d/99-medmem.conf <<EOF
 # Medium Memory Optimizations
 vm.swappiness = 10
@@ -77,6 +81,7 @@ EOF
 else
     echo "Low memory system detected (< 8GB)"
     # Conservative caching
+mkdir -p /etc/sysctl.d
     cat > /etc/sysctl.d/99-lowmem.conf <<EOF
 # Low Memory Optimizations
 vm.swappiness = 20
@@ -146,6 +151,7 @@ case "$GPU_TYPE" in
     nvidia)
         echo "Configuring for NVIDIA..."
         # NVIDIA-specific optimizations
+mkdir -p /etc/X11/xorg.conf.d
         cat > /etc/X11/xorg.conf.d/20-nvidia.conf <<EOF
 Section "Device"
     Identifier "NVIDIA"
@@ -161,6 +167,7 @@ EOF
     amd)
         echo "Configuring for AMD..."
         # AMD-specific optimizations
+mkdir -p /etc/X11/xorg.conf.d
         cat > /etc/X11/xorg.conf.d/20-amd.conf <<EOF
 Section "Device"
     Identifier "AMD"
@@ -173,6 +180,7 @@ EOF
     intel)
         echo "Configuring for Intel..."
         # Intel-specific optimizations
+mkdir -p /etc/X11/xorg.conf.d
         cat > /etc/X11/xorg.conf.d/20-intel.conf <<EOF
 Section "Device"
     Identifier "Intel"
@@ -211,7 +219,9 @@ for iface in $NET_INTERFACES; do
             echo "  $iface: Ethernet ($MAC)"
             # Ethernet optimizations
             if [ -f /etc/network/interfaces ]; then
+mkdir -p /etc/network
                 echo "auto $iface" >> /etc/network/interfaces
+mkdir -p /etc/network
                 echo "iface $iface inet dhcp" >> /etc/network/interfaces
             fi
             ;;

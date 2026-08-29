@@ -36,6 +36,7 @@ ufw allow 68/udp 2>/dev/null || true
 ufw --force enable 2>/dev/null || true
 
 # Configure firewall logging
+mkdir -p /etc/ufw
 cat > /etc/ufw/ufw.conf << 'UFWEOF'
 # MaxRegner OS UFW Configuration
 
@@ -77,6 +78,7 @@ systemctl enable apparmor 2>/dev/null || true
 systemctl start apparmor 2>/dev/null || true
 
 # Configure AppArmor profiles
+mkdir -p /etc/apparmor.d
 cat > /etc/apparmor.d/maxregner-tunables << 'APPEOF'
 # MaxRegner OS AppArmor Tunables
 
@@ -104,9 +106,11 @@ cat > /etc/apparmor.d/maxregner-tunables << 'APPEOF'
 APPEOF
 
 # Create custom AppArmor profile
+mkdir -p /etc/apparmor.d
 cat > /etc/apparmor.d/usr.local.bin.maxregner-hooks << 'APPEOF'
 # MaxRegner OS AppArmor Profile for Hooks
 
+mkdir -p /usr/local/bin
 #include <tunables/global>
 
 /usr/local/bin/maxregner-* {
@@ -161,6 +165,7 @@ apparmor_parser -r /etc/apparmor.d/usr.local.bin.maxregner-hooks 2>/dev/null || 
 echo "[3/5] Configuring SSH hardening..."
 
 # Configure SSH
+mkdir -p /etc/ssh
 cat > /etc/ssh/sshd_config << 'SSHEOF'
 # MaxRegner OS SSH Configuration
 
@@ -219,6 +224,7 @@ PrintMotd no
 SSHEOF
 
 # Create SSH banner
+mkdir -p /etc/maxregner
 cat > /etc/maxregner/ssh-banner << 'BANNEREOF'
 ==================================================
   MaxRegner OS - Secure Shell Access
@@ -246,6 +252,7 @@ usermod -aG ssh-users maxregner 2>/dev/null || true
 echo "[4/5] Configuring security kernel parameters..."
 
 # Kernel hardening
+mkdir -p /etc/sysctl.d
 cat > /etc/sysctl.d/60-maxregner-security.conf << 'SYSEOF'
 # MaxRegner OS Security Kernel Parameters
 
@@ -304,6 +311,7 @@ echo "[5/5] Configuring auditing..."
 apt-get install -y auditd audispd-plugins 2>/dev/null || true
 
 # Configure auditd
+mkdir -p /etc/audit
 cat > /etc/audit/auditd.conf << 'AUDITEOF'
 # MaxRegner OS Audit Configuration
 
@@ -344,6 +352,7 @@ freq = 50
 AUDITEOF
 
 # Configure audit rules
+mkdir -p /etc/audit/rules.d
 cat > /etc/audit/rules.d/maxregner.rules << 'RULESEOF'
 # MaxRegner OS Audit Rules
 

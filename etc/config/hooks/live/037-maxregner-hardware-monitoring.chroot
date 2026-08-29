@@ -37,6 +37,7 @@ echo "[2/5] Configuring lm-sensors..."
 yes | sensors-detect 2>/dev/null || true
 
 # Configure sensors
+mkdir -p /etc
 cat > /etc/sensors3.conf << 'SENSORSCONF'
 # MaxRegner OS Sensors Configuration
 
@@ -77,6 +78,7 @@ set temp1_beep_alarm 0
 SENSORSCONF
 
 # Configure fancontrol
+mkdir -p /etc
 cat > /etc/fancontrol << 'FANCONTROLCONF'
 # MaxRegner OS Fan Control Configuration
 
@@ -140,6 +142,7 @@ chown -R maxregner:maxregner /home/maxregner/.config/psensor
 echo "[4/5] Configuring SMART monitoring..."
 
 # Configure smartd
+mkdir -p /etc
 cat > /etc/smartd.conf << 'SMARTDCONF'
 # MaxRegner OS SMART Monitoring Configuration
 
@@ -159,6 +162,7 @@ maxregner_check=true
 SMARTDCONF
 
 # Configure smartd notifications
+mkdir -p /etc
 cat > /etc/smartd_notify.sh << 'SMARTDNOTIFY'
 #!/bin/bash
 # MaxRegner OS SMART Notification Script
@@ -181,6 +185,7 @@ if [ -n "$DISPLAY" ]; then
 fi
 
 # Log to file
+mkdir -p /var/log
 echo "$(date): $SUBJECT - $BODY" >> /var/log/smartd_notifications.log
 SMARTDNOTIFY
 

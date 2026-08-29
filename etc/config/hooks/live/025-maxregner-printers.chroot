@@ -31,6 +31,7 @@ apt-get install -y cups cups-daemon cups-client cups-common \
 echo "[2/5] Configuring CUPS..."
 
 # Configure CUPS
+mkdir -p /etc/cups
 cat > /etc/cups/cupsd.conf << 'CUPSCONF'
 # MaxRegner OS CUPS Configuration
 
@@ -129,6 +130,7 @@ JobCacheSize 1024
 CUPSCONF
 
 # Configure CUPS files
+mkdir -p /etc/cups
 cat > /etc/cups/cups-files.conf << 'CUPSCONFFILES'
 # MaxRegner OS CUPS Files Configuration
 
@@ -161,6 +163,7 @@ CUPSCONFFILES
 echo "[3/5] Configuring printer drivers..."
 
 # Configure HPLIP
+mkdir -p /etc/hp
 cat > /etc/hp/hplip.conf << 'HPLIPCONF'
 # MaxRegner OS HPLIP Configuration
 
@@ -197,6 +200,7 @@ cups=running
 HPLIPCONF
 
 # Configure SANE
+mkdir -p /etc/sane.d
 cat > /etc/sane.d/dll.conf << 'SANECONF'
 # MaxRegner OS SANE Configuration
 
@@ -285,6 +289,7 @@ SANECONF
 echo "[4/5] Configuring scanning..."
 
 # Configure SANE for network scanning
+mkdir -p /etc/sane.d
 cat > /etc/sane.d/net.conf << 'SANENETCONF'
 # MaxRegner OS SANE Network Configuration
 
@@ -302,6 +307,7 @@ fe80::/10
 SANENETCONF
 
 # Configure SANE for USB scanning
+mkdir -p /etc/sane.d
 cat > /etc/sane.d/hp.conf << 'HPSCANCONF'
 # MaxRegner OS HP Scanner Configuration
 

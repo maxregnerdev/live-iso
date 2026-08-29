@@ -30,6 +30,7 @@ apt-get install -y orca gnome-orca brltty brltty-espeak \
 echo "[2/5] Configuring Orca screen reader..."
 
 # Configure Orca
+mkdir -p /etc/orca
 cat > /etc/orca/orca-customizations.py << 'ORCACONF'
 # MaxRegner OS Orca Configuration
 
@@ -125,6 +126,7 @@ chown -R maxregner:maxregner /home/maxregner/.config/orca
 echo "[3/5] Configuring Speech Dispatcher..."
 
 # Configure Speech Dispatcher
+mkdir -p /etc/speech-dispatcher
 cat > /etc/speech-dispatcher/speechd.conf << 'SPEECHDCONF'
 # MaxRegner OS Speech Dispatcher Configuration
 
@@ -158,6 +160,7 @@ Voice "en_GB"         "english"
 SPEECHDCONF
 
 # Configure Speech Dispatcher client
+mkdir -p /etc/speech-dispatcher/clients
 cat > /etc/speech-dispatcher/clients/orca.conf << 'ORCASPEECHCONF'
 # MaxRegner OS Orca Speech Dispatcher Client
 
@@ -185,6 +188,7 @@ ORCASPEECHCONF
 echo "[4/5] Configuring keyboard accessibility..."
 
 # Configure Sticky Keys
+mkdir -p /etc/default
 cat > /etc/default/stickykeys << 'STICKYCONF'
 # MaxRegner OS Sticky Keys Configuration
 
@@ -200,6 +204,7 @@ STICKYKEYS_BEEP=0
 STICKYCONF
 
 # Configure Slow Keys
+mkdir -p /etc/default
 cat > /etc/default/slowkeys << 'SLOWCONF'
 # MaxRegner OS Slow Keys Configuration
 
@@ -210,6 +215,7 @@ SLOWKEYS_REPEAT=1
 SLOWCONF
 
 # Configure Bounce Keys
+mkdir -p /etc/default
 cat > /etc/default/bouncekeys << 'BOUNCECONF'
 # MaxRegner OS Bounce Keys Configuration
 
@@ -219,6 +225,7 @@ BOUNCEKEYS_DELAY=500
 BOUNCECONF
 
 # Configure Mouse Tweaks
+mkdir -p /etc/xdg/autostart
 cat > /etc/xdg/autostart/mousetweaks.desktop << 'MOUSEDESKTOP'
 [Desktop Entry]
 Type=Application

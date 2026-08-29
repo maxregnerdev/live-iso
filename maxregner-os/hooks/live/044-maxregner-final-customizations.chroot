@@ -23,6 +23,7 @@ sysctl net.core.default_qdisc=fq_codel 2>/dev/null || true
 sysctl net.ipv4.tcp_congestion_control=bbr 2>/dev/null || true
 
 # Increase file descriptor limits
+mkdir -p /etc/security/limits.d
 cat > /etc/security/limits.d/99-maxregner.conf << 'LIMITSCONF'
 # MaxRegner OS Limits Configuration
 
@@ -50,6 +51,7 @@ maxregner hard memlock unlimited
 LIMITSCONF
 
 # Configure PAM limits
+mkdir -p /etc/pam.d
 cat > /etc/pam.d/common-session << 'PAMCONF'
 # MaxRegner OS PAM Configuration
 
@@ -135,6 +137,7 @@ JOURNALCONF
 echo "[3/5] Configuring user environment..."
 
 # Configure bash profile
+mkdir -p /etc/profile.d
 cat > /etc/profile.d/maxregner.sh << 'MAXPROFILE'
 # MaxRegner OS Environment Configuration
 
@@ -305,6 +308,7 @@ else
 fi
 
 # Create final verification script
+mkdir -p /usr/local/bin
 cat > /usr/local/bin/maxregner-verify << 'VERIFY'
 #!/bin/bash
 # MaxRegner OS Verification Script

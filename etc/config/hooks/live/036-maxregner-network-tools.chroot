@@ -44,6 +44,7 @@ apt-get install -y privoxy tinyproxy squid squid-common \
 echo "[2/5] Configuring network monitoring..."
 
 # Configure vnstat
+mkdir -p /etc
 cat > /etc/vnstat.conf << 'VNSTATCONF'
 # MaxRegner OS vnStat Configuration
 
@@ -71,6 +72,7 @@ MaxDaily 100000
 VNSTATCONF
 
 # Configure iftop
+mkdir -p /etc
 cat > /etc/iftop.conf << 'IFTOPCONF'
 # MaxRegner OS iftop Configuration
 
@@ -101,6 +103,7 @@ IFTOPCONF
 echo "[3/5] Configuring Nmap..."
 
 # Create Nmap configuration
+mkdir -p /home/maxregner
 cat > /home/maxregner/.nmaprc << 'NMAPRC'
 # MaxRegner OS Nmap Configuration
 
@@ -141,6 +144,7 @@ apt-get install -y wireless-tools wpagui wpasupplicant \
     wavemon aircrack-ng reaver 2>/dev/null || true
 
 # Configure wireless settings
+mkdir -p /etc/wpa_supplicant
 cat > /etc/wpa_supplicant/wpa_supplicant.conf << 'WPASUPCONF'
 # MaxRegner OS WPA Supplicant Configuration
 
@@ -173,6 +177,7 @@ fast_reauth=1
 WPASUPCONF
 
 # Configure wireless regulatory domain
+mkdir -p /etc/default
 cat > /etc/default/crda << 'CRDACONF'
 # MaxRegner OS CRDA Configuration
 
