@@ -62,7 +62,7 @@ if ! id "$MAXREGNER_USER" >/dev/null 2>&1; then
     
     # Ensure home directory exists
     mkdir -p "$MAXREGNER_HOME"
-    chown "$MAXREGNER_USER" "$MAXREGNER_USER" "$MAXREGNER_HOME"
+    chown ${MAXREGNER_USER}:${MAXREGNER_USER} "$MAXREGNER_HOME"
     chmod 755 "$MAXREGNER_HOME"
     
     # Set proper permissions

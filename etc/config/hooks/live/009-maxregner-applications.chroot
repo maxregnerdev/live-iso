@@ -59,7 +59,7 @@ user_pref("browser.download.dir", "$MAXREGNER_HOME/Downloads");
 user_pref("browser.helperApps.neverAsk.saveToDisk", "application/pdf, application/x-pdf, application/octet-stream");
 EOF
 
-chown -R "$MAXREGNER_USER" "$MAXREGNER_USER" "$MAXREGNER_HOME/.mozilla"
+chown -R ${MAXREGNER_USER}:${MAXREGNER_USER} "$MAXREGNER_HOME/.mozilla"
 
 # ============================================
 # 2. LIBREOFFICE CONFIGURATION
@@ -87,8 +87,8 @@ cat > "$MAXREGNER_HOME/.local/share/templates/MaxRegner Template.ott" <<EOF
 PK
 EOF
 
-chown -R "$MAXREGNER_USER" "$MAXREGNER_USER" "$MAXREGNER_HOME/.config/libreoffice"
-chown -R "$MAXREGNER_USER" "$MAXREGNER_USER" "$MAXREGNER_HOME/.local"
+chown -R ${MAXREGNER_USER}:${MAXREGNER_USER} "$MAXREGNER_HOME/.config/libreoffice"
+chown -R ${MAXREGNER_USER}:${MAXREGNER_USER} "$MAXREGNER_HOME/.local"
 
 # ============================================
 # 3. TERMINAL CONFIGURATION
@@ -139,7 +139,7 @@ if [ -f /usr/bin/maxregner-welcome ]; then
 fi
 BASHEOF
 
-chown "$MAXREGNER_USER" "$MAXREGNER_USER" "$MAXREGNER_HOME/.bashrc"
+chown ${MAXREGNER_USER}:${MAXREGNER_USER} "$MAXREGNER_HOME/.bashrc"
 
 # ============================================
 # 4. FILE MANAGER CONFIGURATION
@@ -207,8 +207,8 @@ Hidden=true
 X-GNOME-Autostart-Delay=60
 EOF
 
-chown -R "$MAXREGNER_USER" "$MAXREGNER_USER" "$MAXREGNER_HOME/.local"
-chown -R "$MAXREGNER_USER" "$MAXREGNER_USER" "$MAXREGNER_HOME/.config"
+chown -R ${MAXREGNER_USER}:${MAXREGNER_USER} "$MAXREGNER_HOME/.local"
+chown -R ${MAXREGNER_USER}:${MAXREGNER_USER} "$MAXREGNER_HOME/.config"
 
 # ============================================
 # FINAL CLEANUP
