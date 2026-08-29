@@ -1,3 +1,8 @@
+
+# MaxRegner user configuration
+MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
+MAXREGNER_HOME="/home/$MAXREGNER_USER"
+
 #!/bin/bash
 # MaxRegner OS - Network Tools Configuration Hook
 # Configures comprehensive network utility support
@@ -103,8 +108,8 @@ IFTOPCONF
 echo "[3/5] Configuring Nmap..."
 
 # Create Nmap configuration
-mkdir -p /home/maxregner
-cat > /home/maxregner/.nmaprc << 'NMAPRC'
+mkdir -p /home/$MAXREGNER_USER
+cat > /home/$MAXREGNER_USER/.nmaprc << 'NMAPRC'
 # MaxRegner OS Nmap Configuration
 
 # Scan options
@@ -131,7 +136,7 @@ cat > /home/maxregner/.nmaprc << 'NMAPRC'
 --exclude 172.16.0.0/12
 NMAPRC
 
-chown maxregner:maxregner /home/maxregner/.nmaprc
+chown "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.nmaprc
 
 # ============================================
 # 4. CONFIGURE WIRELESS TOOLS

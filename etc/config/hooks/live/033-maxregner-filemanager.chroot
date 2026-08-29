@@ -1,3 +1,8 @@
+
+# MaxRegner user configuration
+MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
+MAXREGNER_HOME="/home/$MAXREGNER_USER"
+
 #!/bin/bash
 # MaxRegner OS - File Manager Configuration Hook
 # Configures comprehensive file management support
@@ -68,8 +73,8 @@ gsettings set org.gnome.nautilus.desktop trash-icon-visible true 2>/dev/null || 
 gsettings set org.gnome.nautilus.desktop volumes-visible true 2>/dev/null || true
 
 # Create Nautilus scripts
-mkdir -p /home/maxregner/.local/share/nautilus/scripts
-cat > /home/maxregner/.local/share/nautilus/scripts/MaxRegner-Open-Terminal << 'NAUTILUSSCRIPT'
+mkdir -p /home/$MAXREGNER_USER/.local/share/nautilus/scripts
+cat > /home/$MAXREGNER_USER/.local/share/nautilus/scripts/MaxRegner-Open-Terminal << 'NAUTILUSSCRIPT'
 #!/bin/bash
 # MaxRegner OS Nautilus Script - Open Terminal
 
@@ -84,7 +89,7 @@ else
 fi
 NAUTILUSSCRIPT
 
-cat > /home/maxregner/.local/share/nautilus/scripts/MaxRegner-Open-as-Root << 'NAUTILUSSCRIPT'
+cat > /home/$MAXREGNER_USER/.local/share/nautilus/scripts/MaxRegner-Open-as-Root << 'NAUTILUSSCRIPT'
 #!/bin/bash
 # MaxRegner OS Nautilus Script - Open as Root
 
@@ -103,7 +108,7 @@ else
 fi
 NAUTILUSSCRIPT
 
-cat > /home/maxregner/.local/share/nautilus/scripts/MaxRegner-Properties << 'NAUTILUSSCRIPT'
+cat > /home/$MAXREGNER_USER/.local/share/nautilus/scripts/MaxRegner-Properties << 'NAUTILUSSCRIPT'
 #!/bin/bash
 # MaxRegner OS Nautilus Script - Show Properties
 
@@ -127,8 +132,8 @@ else
 fi
 NAUTILUSSCRIPT
 
-chmod +x /home/maxregner/.local/share/nautilus/scripts/*
-chown -R maxregner:maxregner /home/maxregner/.local/share/nautilus
+chmod +x /home/$MAXREGNER_USER/.local/share/nautilus/scripts/*
+chown -R "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.local/share/nautilus
 
 # ============================================
 # 3. CONFIGURE THUNAR
@@ -137,8 +142,8 @@ chown -R maxregner:maxregner /home/maxregner/.local/share/nautilus
 echo "[3/5] Configuring Thunar..."
 
 # Create Thunar configuration
-mkdir -p /home/maxregner/.config/Thunar
-cat > /home/maxregner/.config/Thunar/accels.scm << 'THUNARACCELS'
+mkdir -p /home/$MAXREGNER_USER/.config/Thunar
+cat > /home/$MAXREGNER_USER/.config/Thunar/accels.scm << 'THUNARACCELS'
 # MaxRegner OS Thunar Accelerators
 
 ; Custom keyboard shortcuts
@@ -162,7 +167,7 @@ mkdir -p /ThunarActions/ThunarStandardView
 (gtk_accel_path "<Actions>/ThunarActions/ThunarStandardView/Properties" "<Alt>Return")
 THUNARACCELS
 
-cat > /home/maxregner/.config/Thunar/gtkrc << 'THUNARGTKRC'
+cat > /home/$MAXREGNER_USER/.config/Thunar/gtkrc << 'THUNARGTKRC'
 # MaxRegner OS Thunar GTK Configuration
 
 style "thunar" {
@@ -177,7 +182,7 @@ style "thunar" {
 class "*" style "thunar"
 THUNARGTKRC
 
-cat > /home/maxregner/.config/Thunar/rc.xml << 'THUNARRXML'
+cat > /home/$MAXREGNER_USER/.config/Thunar/rc.xml << 'THUNARRXML'
 <?xml version="1.0" encoding="UTF-8"?>
 <ThunarRc>
   <Window>
@@ -198,22 +203,22 @@ cat > /home/maxregner/.config/Thunar/rc.xml << 'THUNARRXML'
   </Tree>
   <Shortcuts>
     <Shortcut>
-      <Path>/home/maxregner</Path>
+      <Path>/home/$MAXREGNER_USER</Path>
       <Name>Home</Name>
     </Shortcut>
     <Shortcut>
-      <Path>/home/maxregner/Downloads</Path>
+      <Path>/home/$MAXREGNER_USER/Downloads</Path>
       <Name>Downloads</Name>
     </Shortcut>
     <Shortcut>
-      <Path>/home/maxregner/Documents</Path>
+      <Path>/home/$MAXREGNER_USER/Documents</Path>
       <Name>Documents</Name>
     </Shortcut>
   </Shortcuts>
 </ThunarRc>
 THUNARRXML
 
-chown -R maxregner:maxregner /home/maxregner/.config/Thunar
+chown -R "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/Thunar
 
 # ============================================
 # 4. CONFIGURE PCMANFM
@@ -222,9 +227,9 @@ chown -R maxregner:maxregner /home/maxregner/.config/Thunar
 echo "[4/5] Configuring PCManFM..."
 
 # Create PCManFM configuration
-mkdir -p /home/maxregner/.config/pcmanfm
-mkdir -p /home/maxregner/.config/pcmanfm/default
-cat > /home/maxregner/.config/pcmanfm/default/pcmanfm.conf << 'PCMANFMCONF'
+mkdir -p /home/$MAXREGNER_USER/.config/pcmanfm
+mkdir -p /home/$MAXREGNER_USER/.config/pcmanfm/default
+cat > /home/$MAXREGNER_USER/.config/pcmanfm/default/pcmanfm.conf << 'PCMANFMCONF'
 # MaxRegner OS PCManFM Configuration
 
 [config]
@@ -261,8 +266,8 @@ max_file_size=4194304
 show_thumbnails=1
 PCMANFMCONF
 
-mkdir -p /home/maxregner/.config/pcmanfm/default/lxde
-cat > /home/maxregner/.config/pcmanfm/default/lxde/pcmanfm.conf << 'PCMANFMLXDECONF'
+mkdir -p /home/$MAXREGNER_USER/.config/pcmanfm/default/lxde
+cat > /home/$MAXREGNER_USER/.config/pcmanfm/default/lxde/pcmanfm.conf << 'PCMANFMLXDECONF'
 # MaxRegner OS PCManFM LXDE Configuration
 
 [config]
@@ -283,7 +288,7 @@ wallpaper_mode=1
 wallpaper_bg_color=#1a1a2e
 PCMANFMLXDECONF
 
-chown -R maxregner:maxregner /home/maxregner/.config/pcmanfm
+chown -R "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/pcmanfm
 
 # ============================================
 # 5. CONFIGURE FILE MANAGER SETTINGS
@@ -296,8 +301,8 @@ gsettings set org.gnome.desktop.default-applications.terminal exec "gnome-termin
 gsettings set org.gnome.desktop.default-applications.terminal exec-arg "-x" 2>/dev/null || true
 
 # Configure MIME types
-mkdir -p /home/maxregner/.local/share/applications
-cat > /home/maxregner/.local/share/applications/mimeapps.list << 'MIMEAPPS'
+mkdir -p /home/$MAXREGNER_USER/.local/share/applications
+cat > /home/$MAXREGNER_USER/.local/share/applications/mimeapps.list << 'MIMEAPPS'
 # MaxRegner OS MIME Applications
 
 [Default Applications]
@@ -316,7 +321,7 @@ inode/directory=nautilus.desktop;dolphin.desktop;thunar.desktop;pcmanfm.desktop;
 text/plain=gedit.desktop;mousepad.desktop;leafpad.desktop;
 MIMEAPPS
 
-chown maxregner:maxregner /home/maxregner/.local/share/applications/mimeapps.list
+chown "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.local/share/applications/mimeapps.list
 
 # Create file manager launcher scripts
 mkdir -p /usr/local/bin/maxregner-filemanager

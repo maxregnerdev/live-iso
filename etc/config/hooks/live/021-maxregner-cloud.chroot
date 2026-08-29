@@ -1,3 +1,8 @@
+
+# MaxRegner user configuration
+MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
+MAXREGNER_HOME="/home/$MAXREGNER_USER"
+
 #!/bin/bash
 # MaxRegner OS - Cloud Integration Configuration Hook
 # Configures cloud services and tools
@@ -36,8 +41,8 @@ apt-get install -y python3-openstackclient python3-heatclient \
 echo "[2/5] Configuring AWS CLI..."
 
 # Configure AWS CLI
-mkdir -p /home/maxregner/.aws
-cat > /home/maxregner/.aws/config << 'AWSEOF'
+mkdir -p /home/$MAXREGNER_USER/.aws
+cat > /home/$MAXREGNER_USER/.aws/config << 'AWSEOF'
 # MaxRegner OS AWS CLI Configuration
 
 [default]
@@ -53,7 +58,7 @@ region = us-west-2
 output = text
 AWSEOF
 
-cat > /home/maxregner/.aws/credentials << 'CREDSEOF'
+cat > /home/$MAXREGNER_USER/.aws/credentials << 'CREDSEOF'
 # MaxRegner OS AWS Credentials
 # Placeholder - users should add their own credentials
 
@@ -66,8 +71,8 @@ aws_access_key_id = YOUR_ACCESS_KEY
 aws_secret_access_key = YOUR_SECRET_KEY
 CREDSEOF
 
-chown -R maxregner:maxregner /home/maxregner/.aws
-chmod 600 /home/maxregner/.aws/credentials
+chown -R "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.aws
+chmod 600 /home/$MAXREGNER_USER/.aws/credentials
 
 # ============================================
 # 3. CONFIGURE AZURE CLI
@@ -76,8 +81,8 @@ chmod 600 /home/maxregner/.aws/credentials
 echo "[3/5] Configuring Azure CLI..."
 
 # Configure Azure CLI
-mkdir -p /home/maxregner/.azure
-cat > /home/maxregner/.azure/config << 'AZUREEOF'
+mkdir -p /home/$MAXREGNER_USER/.azure
+cat > /home/$MAXREGNER_USER/.azure/config << 'AZUREEOF'
 # MaxRegner OS Azure CLI Configuration
 
 [cloud]
@@ -90,10 +95,10 @@ output = json
 [logging]
 enable_logging = yes
 log_level = info
-log_file = /home/maxregner/.azure/azure.log
+log_file = /home/$MAXREGNER_USER/.azure/azure.log
 AZUREEOF
 
-chown -R maxregner:maxregner /home/maxregner/.azure
+chown -R "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.azure
 
 # ============================================
 # 4. CONFIGURE GOOGLE CLOUD SDK
@@ -102,9 +107,9 @@ chown -R maxregner:maxregner /home/maxregner/.azure
 echo "[4/5] Configuring Google Cloud SDK..."
 
 # Configure Google Cloud SDK
-mkdir -p /home/maxregner/.config/gcloud
-mkdir -p /home/maxregner/.config/gcloud/configurations
-cat > /home/maxregner/.config/gcloud/configurations/config_default << 'GCLOUDEOF'
+mkdir -p /home/$MAXREGNER_USER/.config/gcloud
+mkdir -p /home/$MAXREGNER_USER/.config/gcloud/configurations
+cat > /home/$MAXREGNER_USER/.config/gcloud/configurations/config_default << 'GCLOUDEOF'
 # MaxRegner OS Google Cloud SDK Configuration
 
 [core]
@@ -124,7 +129,7 @@ use_client_certificate = False
 counter = 2
 GCLOUDEOF
 
-cat > /home/maxregner/.config/gcloud/credentials.db << 'CREDSEOF'
+cat > /home/$MAXREGNER_USER/.config/gcloud/credentials.db << 'CREDSEOF'
 # MaxRegner OS Google Cloud Credentials
 # Placeholder - users should authenticate with gcloud auth login
 
@@ -132,7 +137,7 @@ cat > /home/maxregner/.config/gcloud/credentials.db << 'CREDSEOF'
 maxregner@maxregneros.com = {"token": "", "refresh_token": "", "token_expiry": "", "id_token": "", "id_token_expiry": ""}
 CREDSEOF
 
-chown -R maxregner:maxregner /home/maxregner/.config/gcloud
+chown -R "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/gcloud
 
 # ============================================
 # 5. CONFIGURE CLOUD-INIT
@@ -152,7 +157,7 @@ cat > /etc/cloud/cloud.cfg.d/99-maxregner.cfg << 'CLOUDEOF'
 system_info:
   default_user:
     name: maxregner
-    home: /home/maxregner
+    home: /home/$MAXREGNER_USER
     shell: /bin/bash
     lock_passwd: false
     sudo: ALL=(ALL) NOPASSWD:ALL
@@ -236,7 +241,7 @@ users:
     lock_passwd: false
     passwd: $6$rounds=4096$salt$hashed_password
     shell: /bin/bash
-    home: /home/maxregner
+    home: /home/$MAXREGNER_USER
 
 # SSH settings
 ssh_pwauth: true

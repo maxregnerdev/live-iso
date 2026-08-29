@@ -1,3 +1,8 @@
+
+# MaxRegner user configuration
+MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
+MAXREGNER_HOME="/home/$MAXREGNER_USER"
+
 #!/bin/bash
 # MaxRegner OS - Hardware Monitoring Configuration Hook
 # Configures comprehensive hardware monitoring support
@@ -102,8 +107,8 @@ FANCONTROLCONF
 echo "[3/5] Configuring Psensor..."
 
 # Create Psensor configuration
-mkdir -p /home/maxregner/.config/psensor
-cat > /home/maxregner/.config/psensor/psensor.cfg << 'PSENSORCONF'
+mkdir -p /home/$MAXREGNER_USER/.config/psensor
+cat > /home/$MAXREGNER_USER/.config/psensor/psensor.cfg << 'PSENSORCONF'
 # MaxRegner OS Psensor Configuration
 
 [general]
@@ -133,7 +138,7 @@ temperature_critical=90
 maxregner=true
 PSENSORCONF
 
-chown -R maxregner:maxregner /home/maxregner/.config/psensor
+chown -R "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/psensor
 
 # ============================================
 # 4. CONFIGURE SMART MONITORING

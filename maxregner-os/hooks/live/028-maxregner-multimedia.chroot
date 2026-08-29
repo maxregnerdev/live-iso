@@ -1,3 +1,8 @@
+
+# MaxRegner user configuration
+MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
+MAXREGNER_HOME="/home/$MAXREGNER_USER"
+
 #!/bin/bash
 # MaxRegner OS - Multimedia Configuration Hook
 # Configures complete multimedia support
@@ -198,8 +203,8 @@ end
 VLCLUA
 
 # Configure MPV
-mkdir -p /home/maxregner/.config/mpv
-cat > /home/maxregner/.config/mpv/mpv.conf << 'MPVCONF'
+mkdir -p /home/$MAXREGNER_USER/.config/mpv
+cat > /home/$MAXREGNER_USER/.config/mpv/mpv.conf << 'MPVCONF'
 # MaxRegner OS MPV Configuration
 
 # Video settings
@@ -237,7 +242,7 @@ keep-open=yes
 heartbeat-cmd="echo 'MaxRegner OS MPV Heartbeat'"
 MPVCONF
 
-chown -R maxregner:maxregner /home/maxregner/.config/mpv
+chown -R "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/mpv
 
 echo ""
 echo "========================================"

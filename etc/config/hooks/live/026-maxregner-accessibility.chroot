@@ -1,3 +1,8 @@
+
+# MaxRegner user configuration
+MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
+MAXREGNER_HOME="/home/$MAXREGNER_USER"
+
 #!/bin/bash
 # MaxRegner OS - Accessibility Features Configuration Hook
 # Configures comprehensive accessibility support
@@ -85,8 +90,8 @@ orca_state.keyBindings = {
 ORCACONF
 
 # Orca user preferences
-mkdir -p /home/maxregner/.config/orca
-cat > /home/maxregner/.config/orca/user-settings.conf << 'ORCAUSERCONF'
+mkdir -p /home/$MAXREGNER_USER/.config/orca
+cat > /home/$MAXREGNER_USER/.config/orca/user-settings.conf << 'ORCAUSERCONF'
 # MaxRegner OS Orca User Settings
 
 [general]
@@ -117,7 +122,7 @@ mouse-review-tracking-mode=off
 tracking-mode=all
 ORCAUSERCONF
 
-chown -R maxregner:maxregner /home/maxregner/.config/orca
+chown -R "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/orca
 
 # ============================================
 # 3. CONFIGURE SPEECH DISPATCHER

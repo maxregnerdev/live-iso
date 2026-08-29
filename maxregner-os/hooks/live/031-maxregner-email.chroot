@@ -1,3 +1,8 @@
+
+# MaxRegner user configuration
+MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
+MAXREGNER_HOME="/home/$MAXREGNER_USER"
+
 #!/bin/bash
 # MaxRegner OS - Email Client Configuration Hook
 # Configures comprehensive email support
@@ -39,8 +44,8 @@ apt-get install -y claws-mail claws-mail-i18n claws-mail-plugins \
 echo "[2/5] Configuring Thunderbird..."
 
 # Create Thunderbird configuration
-mkdir -p /home/maxregner/.thunderbird
-cat > /home/maxregner/.thunderbird/profiles.ini << 'TBPROFILES'
+mkdir -p /home/$MAXREGNER_USER/.thunderbird
+cat > /home/$MAXREGNER_USER/.thunderbird/profiles.ini << 'TBPROFILES'
 # MaxRegner OS Thunderbird Profiles
 
 [Profile0]
@@ -55,8 +60,8 @@ Version=2
 TBPROFILES
 
 # Create Thunderbird user.js
-mkdir -p /home/maxregner/.thunderbird/default
-cat > /home/maxregner/.thunderbird/default/user.js << 'TBUSERJS'
+mkdir -p /home/$MAXREGNER_USER/.thunderbird/default
+cat > /home/$MAXREGNER_USER/.thunderbird/default/user.js << 'TBUSERJS'
 // MaxRegner OS Thunderbird Configuration
 
 // General settings
@@ -115,7 +120,7 @@ user_pref("app.update.silent", true);
 TBUSERJS
 
 # Create Thunderbird prefs.js
-cat > /home/maxregner/.thunderbird/default/prefs.js << 'TBPREFS'
+cat > /home/$MAXREGNER_USER/.thunderbird/default/prefs.js << 'TBPREFS'
 // MaxRegner OS Thunderbird Preferences
 // This file is auto-generated
 
@@ -141,7 +146,7 @@ user_pref("mail.check_all_folders_for_new", true);
 user_pref("mailnews.display.html_as", 2);
 TBPREFS
 
-chown -R maxregner:maxregner /home/maxregner/.thunderbird
+chown -R "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.thunderbird
 
 # ============================================
 # 3. CONFIGURE EVOLUTION
@@ -150,9 +155,9 @@ chown -R maxregner:maxregner /home/maxregner/.thunderbird
 echo "[3/5] Configuring Evolution..."
 
 # Create Evolution configuration
-mkdir -p /home/maxregner/.config/evolution
-mkdir -p /home/maxregner/.config/evolution/mail
-cat > /home/maxregner/.config/evolution/mail/accounts.xml << 'EVOACCOUNTS'
+mkdir -p /home/$MAXREGNER_USER/.config/evolution
+mkdir -p /home/$MAXREGNER_USER/.config/evolution/mail
+cat > /home/$MAXREGNER_USER/.config/evolution/mail/accounts.xml << 'EVOACCOUNTS'
 <?xml version="1.0" encoding="UTF-8"?>
 <accounts>
   <account uid="12345678-1234-1234-1234-123456789012" type="mail">
@@ -196,8 +201,8 @@ https://maxregneros.com</signature>
 </accounts>
 EVOACCOUNTS
 
-mkdir -p /home/maxregner/.config/evolution/calendar
-cat > /home/maxregner/.config/evolution/calendar/sources.xml << 'EVOCALSOURCES'
+mkdir -p /home/$MAXREGNER_USER/.config/evolution/calendar
+cat > /home/$MAXREGNER_USER/.config/evolution/calendar/sources.xml << 'EVOCALSOURCES'
 <?xml version="1.0" encoding="UTF-8"?>
 <sources>
   <source uid="12345678-1234-1234-1234-123456789012" type="calendar">
@@ -223,7 +228,7 @@ cat > /home/maxregner/.config/evolution/calendar/sources.xml << 'EVOCALSOURCES'
 </sources>
 EVOCALSOURCES
 
-chown -R maxregner:maxregner /home/maxregner/.config/evolution
+chown -R "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/evolution
 
 # ============================================
 # 4. CONFIGURE EMAIL SERVERS

@@ -1,3 +1,8 @@
+
+# MaxRegner user configuration
+MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
+MAXREGNER_HOME="/home/$MAXREGNER_USER"
+
 #!/bin/bash
 # MaxRegner OS - Office Suite Configuration Hook
 # Configures complete office productivity suite
@@ -38,9 +43,9 @@ apt-get install -y calligra calligra-l10n-engb calligra-l10n-de \
 echo "[2/5] Configuring LibreOffice..."
 
 # Create LibreOffice configuration
-mkdir -p /home/maxregner/.config/libreoffice/4/user
+mkdir -p /home/$MAXREGNER_USER/.config/libreoffice/4/user
 
-cat > /home/maxregner/.config/libreoffice/4/user/registrymodifications.xcu << 'LOCONF'
+cat > /home/$MAXREGNER_USER/.config/libreoffice/4/user/registrymodifications.xcu << 'LOCONF'
 <?xml version="1.0" encoding="UTF-8"?>
 <oor:items xmlns:oor="http://openoffice.org/2001/registry" xmlns:xs="http://www.w3.org/2001/XMLSchema" oor:name="MaxRegner OS LibreOffice Configuration" oor:package="org.openoffice.Office">
 
@@ -116,7 +121,7 @@ cat > /home/maxregner/.config/libreoffice/4/user/registrymodifications.xcu << 'L
 </oor:items>
 LOCONF
 
-chown -R maxregner:maxregner /home/maxregner/.config/libreoffice
+chown -R "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/libreoffice
 
 # ============================================
 # 3. CONFIGURE EVOLUTION
@@ -125,9 +130,9 @@ chown -R maxregner:maxregner /home/maxregner/.config/libreoffice
 echo "[3/5] Configuring Evolution..."
 
 # Create Evolution configuration
-mkdir -p /home/maxregner/.config/evolution
-mkdir -p /home/maxregner/.config/evolution/mail
-cat > /home/maxregner/.config/evolution/mail/config << 'EVOMAILCONF'
+mkdir -p /home/$MAXREGNER_USER/.config/evolution
+mkdir -p /home/$MAXREGNER_USER/.config/evolution/mail
+cat > /home/$MAXREGNER_USER/.config/evolution/mail/config << 'EVOMAILCONF'
 # MaxRegner OS Evolution Mail Configuration
 
 [Default]
@@ -154,8 +159,8 @@ warn_about_unsigned=false
 warn_about_encrypted=false
 EVOMAILCONF
 
-mkdir -p /home/maxregner/.config/evolution/calendar
-cat > /home/maxregner/.config/evolution/calendar/config << 'EVOCALCONF'
+mkdir -p /home/$MAXREGNER_USER/.config/evolution/calendar
+cat > /home/$MAXREGNER_USER/.config/evolution/calendar/config << 'EVOCALCONF'
 # MaxRegner OS Evolution Calendar Configuration
 
 [Default]
@@ -174,7 +179,7 @@ reminder_method=alert
 reminder_time=15
 EVOCALCONF
 
-chown -R maxregner:maxregner /home/maxregner/.config/evolution
+chown -R "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/evolution
 
 # ============================================
 # 4. CONFIGURE DOCUMENT VIEWERS
@@ -188,8 +193,8 @@ apt-get install -y evince evince-common evince-dbg evince-dev \
     zathura-ps zathura-pdf-poppler 2>/dev/null || true
 
 # Configure Evince
-mkdir -p /home/maxregner/.config/dconf
-cat > /home/maxregner/.config/dconf/user << 'EVINCECONF'
+mkdir -p /home/$MAXREGNER_USER/.config/dconf
+cat > /home/$MAXREGNER_USER/.config/dconf/user << 'EVINCECONF'
 [org/gnome/evince]
 continuous=true
 cursor-blink=true
@@ -207,7 +212,7 @@ automatic-reload=true
 text-selection=true
 EVINCECONF
 
-chown maxregner:maxregner /home/maxregner/.config/dconf/user
+chown "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/dconf/user
 
 # ============================================
 # 5. CONFIGURE OFFICE TEMPLATES

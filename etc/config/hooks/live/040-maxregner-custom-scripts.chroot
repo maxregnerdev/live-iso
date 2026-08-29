@@ -1,3 +1,8 @@
+
+# MaxRegner user configuration
+MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
+MAXREGNER_HOME="/home/$MAXREGNER_USER"
+
 #!/bin/bash
 # MaxRegner OS - Custom Scripts Configuration Hook
 # Configures MaxRegner-specific custom scripts
@@ -222,10 +227,10 @@ chmod +x /usr/local/bin/maxregner-backup
 echo "[3/5] Creating user scripts..."
 
 # Create user script directory
-mkdir -p /home/maxregner/.local/bin
+mkdir -p /home/$MAXREGNER_USER/.local/bin
 
 # Create MaxRegner welcome script
-cat > /home/maxregner/.local/bin/maxregner-welcome << 'WELCOME'
+cat > /home/$MAXREGNER_USER/.local/bin/maxregner-welcome << 'WELCOME'
 #!/bin/bash
 # MaxRegner OS Welcome Script
 
@@ -256,8 +261,8 @@ echo "Type 'help' for more information"
 echo "=========================================="
 WELCOME
 
-chmod +x /home/maxregner/.local/bin/maxregner-welcome
-chown maxregner:maxregner /home/maxregner/.local/bin/maxregner-welcome
+chmod +x /home/$MAXREGNER_USER/.local/bin/maxregner-welcome
+chown "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.local/bin/maxregner-welcome
 
 # ============================================
 # 4. CREATE DEVELOPMENT SCRIPTS

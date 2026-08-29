@@ -1,3 +1,8 @@
+
+# MaxRegner user configuration
+MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
+MAXREGNER_HOME="/home/$MAXREGNER_USER"
+
 #!/bin/bash
 # MaxRegner OS - System Utilities Configuration Hook
 # Configures comprehensive system utility support
@@ -41,8 +46,8 @@ apt-get install -y p7zip p7zip-full p7zip-rar unrar-free \
 echo "[2/5] Configuring Neofetch..."
 
 # Create Neofetch configuration
-mkdir -p /home/maxregner/.config/neofetch
-cat > /home/maxregner/.config/neofetch/config.conf << 'NEOFETCHCONF'
+mkdir -p /home/$MAXREGNER_USER/.config/neofetch
+cat > /home/$MAXREGNER_USER/.config/neofetch/config.conf << 'NEOFETCHCONF'
 # MaxRegner OS Neofetch Configuration
 
 # General settings
@@ -52,7 +57,7 @@ refresh_rate=1
 # Image settings
 image_source="wallpaper"
 image_backend="w3m"
-image_cache_dir="/home/maxregner/.cache/neofetch"
+image_cache_dir="/home/$MAXREGNER_USER/.cache/neofetch"
 image_size="auto"
 image_position="top left"
 image_offset="0px 0px"
@@ -83,7 +88,7 @@ custom_ascii="
 "
 NEOFETCHCONF
 
-chown -R maxregner:maxregner /home/maxregner/.config/neofetch
+chown -R "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/neofetch
 
 # ============================================
 # 3. CONFIGURE INXI
@@ -92,8 +97,8 @@ chown -R maxregner:maxregner /home/maxregner/.config/neofetch
 echo "[3/5] Configuring Inxi..."
 
 # Create Inxi configuration
-mkdir -p /home/maxregner/.config/inxi
-cat > /home/maxregner/.config/inxi/inxi.conf << 'INXICONF'
+mkdir -p /home/$MAXREGNER_USER/.config/inxi
+cat > /home/$MAXREGNER_USER/.config/inxi/inxi.conf << 'INXICONF'
 # MaxRegner OS Inxi Configuration
 
 # Output settings
@@ -122,7 +127,7 @@ cat > /home/maxregner/.config/inxi/inxi.conf << 'INXICONF'
 --extra=1
 INXICONF
 
-chown -R maxregner:maxregner /home/maxregner/.config/inxi
+chown -R "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/inxi
 
 # ============================================
 # 4. CONFIGURE SENSORS

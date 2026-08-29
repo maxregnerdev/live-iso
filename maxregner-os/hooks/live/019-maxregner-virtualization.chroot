@@ -1,3 +1,8 @@
+
+# MaxRegner user configuration
+MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
+MAXREGNER_HOME="/home/$MAXREGNER_USER"
+
 #!/bin/bash
 # MaxRegner OS - Virtualization Configuration Hook
 # Configures complete virtualization environment
@@ -146,7 +151,7 @@ cat > /etc/vbox/vbox.cfg << 'VBOXEOF'
 # MaxRegner OS VirtualBox Configuration
 
 # General settings
-VBOX_USER_HOME=/home/maxregner/.config/VirtualBox
+VBOX_USER_HOME=/home/$MAXREGNER_USER/.config/VirtualBox
 VBOX_GLOBAL_SETTINGS=/etc/vbox
 
 # Hardware acceleration

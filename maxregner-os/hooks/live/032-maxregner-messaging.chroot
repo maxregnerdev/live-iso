@@ -1,3 +1,8 @@
+
+# MaxRegner user configuration
+MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
+MAXREGNER_HOME="/home/$MAXREGNER_USER"
+
 #!/bin/bash
 # MaxRegner OS - Messaging Applications Configuration Hook
 # Configures comprehensive messaging support
@@ -43,8 +48,8 @@ apt-get install -y element-desktop riot-web 2>/dev/null || true
 echo "[2/5] Configuring Pidgin..."
 
 # Create Pidgin configuration
-mkdir -p /home/maxregner/.purple
-cat > /home/maxregner/.purple/prefs.xml << 'PIDGINPREFS'
+mkdir -p /home/$MAXREGNER_USER/.purple
+cat > /home/$MAXREGNER_USER/.purple/prefs.xml << 'PIDGINPREFS'
 <?xml version='1.0' encoding='UTF-8'?>
 
 <pref version='1'>
@@ -128,7 +133,7 @@ cat > /home/maxregner/.purple/prefs.xml << 'PIDGINPREFS'
 </pref>
 PIDGINPREFS
 n
-cat > /home/maxregner/.purple/accounts.xml << 'PIDGINACCOUNTS'
+cat > /home/$MAXREGNER_USER/.purple/accounts.xml << 'PIDGINACCOUNTS'
 <?xml version='1.0' encoding='UTF-8'?>
 
 <account version='1.0'>
@@ -195,7 +200,7 @@ cat > /home/maxregner/.purple/accounts.xml << 'PIDGINACCOUNTS'
 </account>
 PIDGINACCOUNTS
 
-chown -R maxregner:maxregner /home/maxregner/.purple
+chown -R "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.purple
 
 # ============================================
 # 3. CONFIGURE TELEGRAM
@@ -203,8 +208,8 @@ chown -R maxregner:maxregner /home/maxregner/.purple
 echo "[3/5] Configuring Telegram..."
 
 # Create Telegram configuration
-mkdir -p /home/maxregner/.config/Telegram
-cat > /home/maxregner/.config/Telegram/config << 'TELEGRAMCONF'
+mkdir -p /home/$MAXREGNER_USER/.config/Telegram
+cat > /home/$MAXREGNER_USER/.config/Telegram/config << 'TELEGRAMCONF'
 # MaxRegner OS Telegram Configuration
 
 [General]
@@ -236,7 +241,7 @@ use_proxy=false
 proxy_type=0
 TELEGRAMCONF
 
-chown -R maxregner:maxregner /home/maxregner/.config/Telegram
+chown -R "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/Telegram
 
 # ============================================
 # 4. CONFIGURE DISCORD
@@ -244,8 +249,8 @@ chown -R maxregner:maxregner /home/maxregner/.config/Telegram
 echo "[4/5] Configuring Discord..."
 
 # Create Discord configuration
-mkdir -p /home/maxregner/.config/discord
-cat > /home/maxregner/.config/discord/settings.json << 'DISCORDCONF'
+mkdir -p /home/$MAXREGNER_USER/.config/discord
+cat > /home/$MAXREGNER_USER/.config/discord/settings.json << 'DISCORDCONF'
 {
   "APPEARANCE": {
     "theme": "dark",
@@ -297,7 +302,7 @@ cat > /home/maxregner/.config/discord/settings.json << 'DISCORDCONF'
 }
 DISCORDCONF
 
-chown -R maxregner:maxregner /home/maxregner/.config/discord
+chown -R "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/discord
 
 # ============================================
 # 5. CONFIGURE IRC CLIENTS
@@ -305,8 +310,8 @@ chown -R maxregner:maxregner /home/maxregner/.config/discord
 echo "[5/5] Configuring IRC clients..."
 
 # Configure HexChat
-mkdir -p /home/maxregner/.config/hexchat
-cat > /home/maxregner/.config/hexchat/hexchat.conf << 'HEXCHATCONF'
+mkdir -p /home/$MAXREGNER_USER/.config/hexchat
+cat > /home/$MAXREGNER_USER/.config/hexchat/hexchat.conf << 'HEXCHATCONF'
 # MaxRegner OS HexChat Configuration
 
 [stamp]
@@ -344,11 +349,11 @@ channel = #maxregner-support
 auto_join = 1
 HEXCHATCONF
 
-chown -R maxregner:maxregner /home/maxregner/.config/hexchat
+chown -R "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/hexchat
 
 # Configure Quassel
-mkdir -p /home/maxregner/.config/quassel-irc.org
-cat > /home/maxregner/.config/quassel-irc.org/quasselconfig << 'QUASSELCONF'
+mkdir -p /home/$MAXREGNER_USER/.config/quassel-irc.org
+cat > /home/$MAXREGNER_USER/.config/quassel-irc.org/quasselconfig << 'QUASSELCONF'
 [General]
 Identity=MaxRegner
 RealName=MaxRegner OS User
@@ -367,7 +372,7 @@ Channel=#maxregner-support
 AutoJoin=true
 QUASSELCONF
 
-chown -R maxregner:maxregner /home/maxregner/.config/quassel-irc.org
+chown -R "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/quassel-irc.org
 
 echo ""
 echo "========================================"

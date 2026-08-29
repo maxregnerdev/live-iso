@@ -1,3 +1,8 @@
+
+# MaxRegner user configuration
+MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
+MAXREGNER_HOME="/home/$MAXREGNER_USER"
+
 #!/bin/bash
 # MaxRegner OS - Audio Configuration Hook
 # Configures audio system for optimal performance
@@ -329,8 +334,8 @@ ctl.dmix {
 ALSAEOF
 
 # .asoundrc for user
-mkdir -p /home/maxregner
-cat > /home/maxregner/.asoundrc <<'ALSAEOF'
+mkdir -p /home/$MAXREGNER_USER
+cat > /home/$MAXREGNER_USER/.asoundrc <<'ALSAEOF'
 # MaxRegner OS User ALSA Configuration
 
 pcm.!default {
@@ -342,7 +347,7 @@ ctl.!default {
 }
 ALSAEOF
 
-chown maxregner:maxregner /home/maxregner/.asoundrc
+chown "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.asoundrc
 
 # ============================================
 # 5. ENABLE AND START SERVICES

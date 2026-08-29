@@ -1,3 +1,8 @@
+
+# MaxRegner user configuration
+MAXREGNER_USER="${LIVE_USERNAME:-maxregner}"
+MAXREGNER_HOME="/home/$MAXREGNER_USER"
+
 #!/bin/bash
 # MaxRegner OS - Browser Configuration Hook
 # Configures web browsers with MaxRegner settings
@@ -34,8 +39,8 @@ apt-get install -y epiphany-browser gnome-web gnome-web-data \
 echo "[2/5] Configuring Firefox..."
 
 # Create Firefox configuration
-mkdir -p /home/maxregner/.mozilla/firefox
-cat > /home/maxregner/.mozilla/firefox/profiles.ini << 'FFPROFILES'
+mkdir -p /home/$MAXREGNER_USER/.mozilla/firefox
+cat > /home/$MAXREGNER_USER/.mozilla/firefox/profiles.ini << 'FFPROFILES'
 # MaxRegner OS Firefox Profiles
 
 [Profile0]
@@ -50,8 +55,8 @@ Version=2
 FFPROFILES
 
 # Create Firefox user.js
-mkdir -p /home/maxregner/.mozilla/firefox/default
-cat > /home/maxregner/.mozilla/firefox/default/user.js << 'FFUSERJS'
+mkdir -p /home/$MAXREGNER_USER/.mozilla/firefox/default
+cat > /home/$MAXREGNER_USER/.mozilla/firefox/default/user.js << 'FFUSERJS'
 // MaxRegner OS Firefox Configuration
 
 // General settings
@@ -116,7 +121,7 @@ user_pref("app.update.silent", true);
 user_pref("browser.aboutConfig.showProfile", true);
 FFUSERJS
 
-chown -R maxregner:maxregner /home/maxregner/.mozilla
+chown -R "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.mozilla
 
 # ============================================
 # 3. CONFIGURE CHROMIUM
@@ -125,16 +130,16 @@ chown -R maxregner:maxregner /home/maxregner/.mozilla
 echo "[3/5] Configuring Chromium..."
 
 # Create Chromium configuration
-mkdir -p /home/maxregner/.config/chromium
-cat > /home/maxregner/.config/chromium/First Run << 'CHROMIUMFIRST'
+mkdir -p /home/$MAXREGNER_USER/.config/chromium
+cat > /home/$MAXREGNER_USER/.config/chromium/First Run << 'CHROMIUMFIRST'
 # MaxRegner OS Chromium First Run Configuration
 
 --force-fieldtrials=*//*MaxRegner/Control/*
 --force-fieldtrial-params=*//*:maxregner/*
 CHROMIUMFIRST
 
-mkdir -p /home/maxregner/.config/chromium/Default
-cat > /home/maxregner/.config/chromium/Default/Preferences << 'CHROMIUMPREFS'
+mkdir -p /home/$MAXREGNER_USER/.config/chromium/Default
+cat > /home/$MAXREGNER_USER/.config/chromium/Default/Preferences << 'CHROMIUMPREFS'
 {
   "alternate_error_pages": {
     "enabled": false
@@ -146,7 +151,7 @@ cat > /home/maxregner/.config/chromium/Default/Preferences << 'CHROMIUMPREFS'
     "custom_chrome_button": false,
     "default_geolocation_setting": 2,
     "download": {
-      "default_directory": "/home/maxregner/Downloads",
+      "default_directory": "/home/$MAXREGNER_USER/Downloads",
       "directory_upgrade": true,
       "prompt_for_download": false
     },
@@ -236,7 +241,7 @@ cat > /home/maxregner/.config/chromium/Default/Preferences << 'CHROMIUMPREFS'
 }
 CHROMIUMPREFS
 
-chown -R maxregner:maxregner /home/maxregner/.config/chromium
+chown -R "$MAXREGNER_USER:$MAXREGNER_USER" /home/$MAXREGNER_USER/.config/chromium
 
 # ============================================
 # 4. CONFIGURE BROWSER EXTENSIONS
