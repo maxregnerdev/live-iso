@@ -294,7 +294,7 @@ managed=true
 EOF
 
 # Configure resolv.conf
-mkdir -p /etc/resolv.conf
+# Use file directly instead of mkdir to avoid 'File exists' error
 cat > /etc/resolv.conf <<EOF
 nameserver 1.1.1.1
 nameserver 8.8.8.8
